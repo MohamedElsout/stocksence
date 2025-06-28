@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="./vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StockSence - Complete Inventory Management System</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="نظام إدارة المخزون الاحترافي للشركات العصرية - Professional inventory management system for modern businesses" />
+    <meta name="theme-color" content="#3B82F6" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="StockSence" />
+    <meta name="msapplication-TileColor" content="#3B82F6" />
+    <meta name="msapplication-config" content="./browserconfig.xml" />
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="./manifest.json" />
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="./icons/icon-192x192.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="./icons/icon-192x192.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="./icons/icon-192x192.png" />
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="./sw.js" as="script" />
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="StockSence - نظام إدارة المخزون" />
+    <meta property="og:description" content="نظام إدارة المخزون الاحترافي للشركات العصرية" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="./icons/icon-512x512.png" />
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="StockSence - نظام إدارة المخزون" />
+    <meta name="twitter:description" content="نظام إدارة المخزون الاحترافي للشركات العصرية" />
+    <meta name="twitter:image" content="./icons/icon-512x512.png" />
+    
+    <!-- Inline critical CSS for faster loading -->
+    <style>
+      /* Loading spinner styles */
+      .loading-spinner {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 9999;
+      }
+      
+      .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f4f6;
+        border-top: 4px solid #3b82f6;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      /* Hide loading spinner when app loads */
+      body.loaded .loading-spinner {
+        display: none;
+      }
+      
+      /* Prevent flash of unstyled content */
+      #root {
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+      }
+      
+      body.loaded #root {
+        opacity: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Loading Spinner -->
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+    </div>
+    
+    <div id="root"></div>
+    <script type="module" src="./src/main.tsx"></script>
+    
+    <!-- PWA Install Script -->
+    <script>
+      // تحسين تجربة PWA
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('./sw.js')
+            .then(function(registration) {
+              console.log('✅ ServiceWorker registration successful');
+            }, function(err) {
+              console.log('❌ ServiceWorker registration failed: ', err);
+            });
+        });
+      }
+      
+      // إخفاء splash screen عند التحميل
+      window.addEventListener('load', function() {
+        document.body.classList.add('loaded');
+      });
+      
+      // Handle app loading
+      document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(() => {
+          document.body.classList.add('loaded');
+        }, 100);
+      });
+    </script>
+  </body>
+</html>

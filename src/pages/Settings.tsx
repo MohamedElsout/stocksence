@@ -48,14 +48,12 @@ const Settings: React.FC = () => {
     deletedSales,
     restoreSale,
     permanentlyDeleteSale,
-    emptyTrash,
     formatPrice
   } = useStore();
   
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
   const [isTrashModalOpen, setIsTrashModalOpen] = useState(false);
-  const [isEmptyTrashModalOpen, setIsEmptyTrashModalOpen] = useState(false);
   const [tempSettings, setTempSettings] = useState({
     theme,
     language,
@@ -137,11 +135,6 @@ const Settings: React.FC = () => {
     if (window.confirm(language === 'ar' ? 'هل أنت متأكد من الحذف النهائي؟' : 'Are you sure you want to permanently delete this sale?')) {
       permanentlyDeleteSale(saleId);
     }
-  };
-
-  const handleEmptyTrash = () => {
-    emptyTrash();
-    setIsEmptyTrashModalOpen(false);
   };
 
   // 🗓️ حساب عدد الأيام المتبقية قبل الحذف التلقائي
@@ -631,26 +624,6 @@ const Settings: React.FC = () => {
             </div>
           </div>
 
-          {/* Empty Trash Button */}
-          {deletedSales.length > 0 && (
-            <div className="flex justify-between items-center pb-4 border-b border-gray-200 dark:border-gray-700">
-              <p className={`text-sm ${
-                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-              }`}>
-                {deletedSales.length} {t('trashItems')}
-              </p>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setIsEmptyTrashModalOpen(true)}
-                className="flex items-center px-3 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-300 text-sm"
-              >
-                <Trash2 className="w-4 h-4 mr-2" />
-                {t('emptyTrash')}
-              </motion.button>
-            </div>
-          )}
-
           {/* Deleted Sales List */}
           <div className="max-h-96 overflow-y-auto space-y-3">
             {deletedSales.length === 0 ? (
@@ -749,57 +722,6 @@ const Settings: React.FC = () => {
                 );
               })
             )}
-          </div>
-        </div>
-      </Modal>
-
-      {/* Empty Trash Confirmation Modal */}
-      <Modal
-        isOpen={isEmptyTrashModalOpen}
-        onClose={() => setIsEmptyTrashModalOpen(false)}
-        title={t('emptyTrash')}
-      >
-        <div className="space-y-4">
-          <div className="flex items-center space-x-3 rtl:space-x-reverse">
-            <AlertTriangle className="w-8 h-8 text-red-500" />
-            <div>
-              <h3 className={`text-lg font-semibold ${
-                theme === 'dark' ? 'text-white' : 'text-gray-900'
-              }`}>
-                {t('confirmEmptyTrash')}
-              </h3>
-              <p className={`text-sm ${
-                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-              }`}>
-                {language === 'ar' 
-                  ? `سيتم حذف ${deletedSales.length} عنصر نهائياً. لا يمكن التراجع عن هذا الإجراء.`
-                  : `${deletedSales.length} items will be permanently deleted. This action cannot be undone.`
-                }
-              </p>
-            </div>
-          </div>
-          
-          <div className="flex justify-end space-x-3 rtl:space-x-reverse pt-4">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setIsEmptyTrashModalOpen(false)}
-              className={`px-4 py-2 border rounded-lg ${
-                theme === 'dark'
-                  ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
-                  : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-              } transition-colors`}
-            >
-              {language === 'ar' ? 'إلغاء' : 'Cancel'}
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={handleEmptyTrash}
-              className="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-300"
-            >
-              {t('emptyTrash')}
-            </motion.button>
           </div>
         </div>
       </Modal>

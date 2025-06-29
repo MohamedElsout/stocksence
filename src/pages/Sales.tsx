@@ -31,9 +31,20 @@ const Sales: React.FC = () => {
     productId: '',
     quantity: 1,
     barcodeScan: false,
+    serialSearch: '', // إضافة حقل البحث بالرقم التسلسلي
   });
 
   const isRTL = i18n.language === 'ar';
+
+  // البحث عن المنتج بالرقم التسلسلي
+  const findProductBySerial = (serialNumber: string) => {
+    return products.find(p => p.serialNumber === serialNumber && p.quantity > 0);
+  };
+
+  // التحقق من صحة الرقم التسلسلي المدخل
+  const isValidSerial = (serial: string) => {
+    return /^\d{6,16}$/.test(serial);
+  };
 
   const selectedProduct = products.find(p => p.id === saleForm.productId);
   const totalAmount = selectedProduct ? selectedProduct.price * saleForm.quantity : 0;
@@ -69,7 +80,7 @@ const Sales: React.FC = () => {
       barcodeScan: saleForm.barcodeScan,
     });
 
-    setSaleForm({ productId: '', quantity: 1, barcodeScan: false });
+    setSaleForm({ productId: '', quantity: 1, barcodeScan: false, serialSearch: '' });
     setIsSaleModalOpen(false);
   };
 
@@ -77,7 +88,7 @@ const Sales: React.FC = () => {
     try {
       if (window.confirm(t('confirmDeleteSale'))) {
         deleteSale(saleId);
-        console.log('Sale deleted successfully:', saleId); // للتأكد من التنفيذ
+        console.log('Sale deleted successfully:', saleId);
       }
     } catch (error) {
       console.error('Error deleting sale:', error);
@@ -85,6 +96,36 @@ const Sales: React.FC = () => {
         type: 'error',
         message: isRTL ? 'حدث خطأ أثناء حذف المبيعة' : 'Error occurred while deleting sale'
       });
+    }
+  };
+
+  // دالة البحث بالرقم التسلسلي
+  const handleSerialSearch = (serialNumber: string) => {
+    setSaleForm({ ...saleForm, serialSearch: serialNumber });
+    
+    if (serialNumber.length >= 6) {
+      const foundProduct = findProductBySerial(serialNumber);
+      if (foundProduct) {
+        setSaleForm({ 
+          ...saleForm, 
+          productId: foundProduct.id, 
+          serialSearch: serialNumber,
+          barcodeScan: true // تلقائياً يعتبر بحث بالباركود
+        });
+        addNotification({
+          type: 'success',
+          message: isRTL 
+            ? `تم العثور على المنتج: ${foundProduct.name}` 
+            : `Product found: ${foundProduct.name}`
+        });
+      } else if (isValidSerial(serialNumber)) {
+        addNotification({
+          type: 'warning',
+          message: isRTL 
+            ? 'لم يتم العثور على منتج بهذا الرقم التسلسلي أو المنتج غير متوفر' 
+            : 'No product found with this serial number or product out of stock'
+        });
+      }
     }
   };
 
@@ -406,96 +447,130 @@ const Sales: React.FC = () => {
         isOpen={isSaleModalOpen}
         onClose={() => {
           setIsSaleModalOpen(false);
-          setSaleForm({ productId: '', quantity: 1, barcodeScan: false });
+          setSaleForm({ productId: '', quantity: 1, barcodeScan: false, serialSearch: '' });
         }}
         title={t('sellProduct')}
       >
         <form onSubmit={handleSale} className="space-y-6">
-          {/* Barcode Scan Option - تحسين التصميم */}
+          {/* Serial Number Search - الميزة الجديدة */}
           <div className={`p-4 rounded-xl border-2 transition-all duration-300 ${
-            saleForm.barcodeScan
+            saleForm.serialSearch && isValidSerial(saleForm.serialSearch)
               ? theme === 'dark' 
-                ? 'bg-purple-900/20 border-purple-500/50' 
-                : 'bg-purple-50 border-purple-300'
+                ? 'bg-green-900/20 border-green-500/50' 
+                : 'bg-green-50 border-green-300'
               : theme === 'dark' 
               ? 'bg-gray-700/50 border-gray-600' 
               : 'bg-gray-50 border-gray-200'
           }`}>
-            <div className="flex items-center justify-between">
+            <div className="space-y-3">
               <div className="flex items-center space-x-3 rtl:space-x-reverse">
                 <motion.div
-                  animate={saleForm.barcodeScan ? { scale: [1, 1.1, 1] } : {}}
+                  animate={saleForm.serialSearch && isValidSerial(saleForm.serialSearch) ? { scale: [1, 1.1, 1] } : {}}
                   transition={{ duration: 0.3 }}
                   className={`p-2 rounded-lg ${
-                    saleForm.barcodeScan
-                      ? 'bg-purple-500 text-white'
+                    saleForm.serialSearch && isValidSerial(saleForm.serialSearch)
+                      ? 'bg-green-500 text-white'
                       : theme === 'dark' 
                       ? 'bg-gray-600 text-gray-300' 
                       : 'bg-gray-200 text-gray-600'
                   }`}
                 >
-                  <Scan className="w-5 h-5" />
+                  <Hash className="w-5 h-5" />
                 </motion.div>
-                <div>
-                  <p className={`font-semibold ${
-                    saleForm.barcodeScan
-                      ? theme === 'dark' ? 'text-purple-300' : 'text-purple-700'
+                <div className="flex-1">
+                  <label className={`block text-sm font-semibold mb-1 ${
+                    saleForm.serialSearch && isValidSerial(saleForm.serialSearch)
+                      ? theme === 'dark' ? 'text-green-300' : 'text-green-700'
                       : theme === 'dark' ? 'text-white' : 'text-gray-900'
                   }`}>
-                    {isRTL ? 'مسح الباركود' : 'Barcode Scan'}
-                  </p>
-                  <p className={`text-sm ${
-                    theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
-                  }`}>
-                    {isRTL ? 'تحديد هذا البيع كمسح باركود' : 'Mark this sale as barcode scan'}
-                  </p>
+                    {isRTL ? 'البحث بالرقم التسلسلي' : 'Search by Serial Number'}
+                  </label>
+                  <input
+                    type="text"
+                    value={saleForm.serialSearch}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, ''); // أرقام فقط
+                      handleSerialSearch(value);
+                    }}
+                    placeholder={isRTL ? 'أدخل الرقم التسلسلي للمنتج' : 'Enter product serial number'}
+                    className={`w-full px-3 py-2 border rounded-lg font-mono text-lg ${
+                      theme === 'dark'
+                        ? 'bg-gray-600 border-gray-500 text-white placeholder-gray-400'
+                        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                    } focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      saleForm.serialSearch && !isValidSerial(saleForm.serialSearch) && saleForm.serialSearch.length > 0
+                        ? 'border-yellow-500 focus:ring-yellow-500' 
+                        : saleForm.serialSearch && isValidSerial(saleForm.serialSearch) && selectedProduct
+                        ? 'border-green-500 focus:ring-green-500'
+                        : ''
+                    }`}
+                    maxLength={16}
+                  />
                 </div>
               </div>
               
-              {/* Toggle Switch محسّن */}
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                type="button"
-                onClick={() => setSaleForm({ ...saleForm, barcodeScan: !saleForm.barcodeScan })}
-                className={`relative inline-flex h-7 w-12 items-center rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 ${
-                  saleForm.barcodeScan 
-                    ? 'bg-purple-600 shadow-lg' 
-                    : theme === 'dark' ? 'bg-gray-600' : 'bg-gray-300'
-                }`}
-              >
-                <motion.span
-                  animate={{ 
-                    x: saleForm.barcodeScan ? (isRTL ? -20 : 20) : 0,
-                    scale: saleForm.barcodeScan ? 1.1 : 1
-                  }}
-                  transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                  className={`inline-block h-5 w-5 transform rounded-full transition-all duration-300 ${
-                    saleForm.barcodeScan ? 'bg-white shadow-lg' : 'bg-white'
-                  }`}
-                  style={{ 
-                    marginLeft: isRTL ? (saleForm.barcodeScan ? '4px' : '24px') : '4px',
-                    marginRight: isRTL ? '4px' : (saleForm.barcodeScan ? '4px' : '24px')
-                  }}
-                />
-              </motion.button>
+              {/* Status Messages */}
+              {saleForm.serialSearch && (
+                <div className="mt-2">
+                  {!isValidSerial(saleForm.serialSearch) && saleForm.serialSearch.length > 0 && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="text-yellow-600 dark:text-yellow-400 text-sm flex items-center space-x-1 rtl:space-x-reverse"
+                    >
+                      <Hash className="w-4 h-4" />
+                      <span>
+                        {isRTL ? 'الرقم التسلسلي يجب أن يكون من 6-16 رقم' : 'Serial number must be 6-16 digits'}
+                      </span>
+                    </motion.p>
+                  )}
+                  
+                  {isValidSerial(saleForm.serialSearch) && selectedProduct && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="text-green-600 dark:text-green-400 text-sm flex items-center space-x-1 rtl:space-x-reverse"
+                    >
+                      <CheckCircle className="w-4 h-4" />
+                      <span>
+                        {isRTL ? `تم العثور على: ${selectedProduct.name}` : `Found: ${selectedProduct.name}`}
+                      </span>
+                    </motion.p>
+                  )}
+                  
+                  {isValidSerial(saleForm.serialSearch) && !selectedProduct && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="text-red-600 dark:text-red-400 text-sm flex items-center space-x-1 rtl:space-x-reverse"
+                    >
+                      <XCircle className="w-4 h-4" />
+                      <span>
+                        {isRTL ? 'لم يتم العثور على منتج بهذا الرقم' : 'No product found with this serial'}
+                      </span>
+                    </motion.p>
+                  )}
+                </div>
+              )}
             </div>
-            
-            {/* Status Indicator */}
-            {saleForm.barcodeScan && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-3 flex items-center space-x-2 rtl:space-x-reverse"
-              >
-                <CheckCircle className="w-4 h-4 text-purple-500" />
-                <span className={`text-sm font-medium ${
-                  theme === 'dark' ? 'text-purple-300' : 'text-purple-700'
-                }`}>
-                  {isRTL ? 'سيتم تسجيل هذا البيع كمسح باركود' : 'This sale will be recorded as barcode scan'}
-                </span>
-              </motion.div>
-            )}
+          </div>
+
+          {/* OR Divider */}
+          <div className="relative">
+            <div className={`absolute inset-0 flex items-center ${
+              theme === 'dark' ? 'text-gray-600' : 'text-gray-400'
+            }`}>
+              <div className={`w-full border-t ${
+                theme === 'dark' ? 'border-gray-600' : 'border-gray-300'
+              }`} />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className={`px-2 ${
+                theme === 'dark' ? 'bg-gray-800 text-gray-400' : 'bg-white text-gray-500'
+              }`}>
+                {isRTL ? 'أو' : 'OR'}
+              </span>
+            </div>
           </div>
 
           {/* Product Selection */}
@@ -507,7 +582,7 @@ const Sales: React.FC = () => {
             </label>
             <select
               value={saleForm.productId}
-              onChange={(e) => setSaleForm({ ...saleForm, productId: e.target.value })}
+              onChange={(e) => setSaleForm({ ...saleForm, productId: e.target.value, serialSearch: '' })}
               className={`w-full px-3 py-2 border rounded-lg ${
                 theme === 'dark'
                   ? 'bg-gray-700 border-gray-600 text-white'
@@ -582,7 +657,7 @@ const Sales: React.FC = () => {
                 {saleForm.quantity} × {formatPrice(selectedProduct.price)}
               </div>
               <div className="flex items-center mt-2 space-x-2 rtl:space-x-reverse">
-                {saleForm.barcodeScan ? (
+                {saleForm.barcodeScan || saleForm.serialSearch ? (
                   <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400">
                     <Scan className="w-3 h-3 mr-1" />
                     {isRTL ? 'بيع بالباركود' : 'Barcode Sale'}
@@ -605,7 +680,7 @@ const Sales: React.FC = () => {
               type="button"
               onClick={() => {
                 setIsSaleModalOpen(false);
-                setSaleForm({ productId: '', quantity: 1, barcodeScan: false });
+                setSaleForm({ productId: '', quantity: 1, barcodeScan: false, serialSearch: '' });
               }}
               className={`px-4 py-2 border rounded-lg ${
                 theme === 'dark'

@@ -91,6 +91,7 @@ interface StoreState {
   restoreSale: (id: string) => void; // استعادة مبيعة من سلة القمامة
   permanentlyDeleteSale: (id: string) => void; // حذف نهائي من سلة القمامة
   emptyTrash: () => void; // إفراغ سلة القمامة نهائياً
+  cleanupOldDeletedSales: () => void; // 🗑️ تنظيف المبيعات القديمة (أكثر من 30 يوم)
   
   theme: 'light' | 'dark';
   language: 'en' | 'ar';
@@ -125,6 +126,13 @@ const generateProductSerial = () => {
 // دالة لإنشاء رقم تسلسلي بسيط من 6 أرقام للمستخدمين
 const generateSimpleSerial = () => {
   return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+// 🗓️ دالة للتحقق من عمر المبيعة المحذوفة (30 يوم)
+const isOlderThan30Days = (deletedAt: Date): boolean => {
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  return new Date(deletedAt) < thirtyDaysAgo;
 };
 
 const currencies: Currency[] = [
@@ -171,6 +179,9 @@ export const useStore = create<StoreState>()(
 
       login: async (username: string, password: string, companyId?: string) => {
         const state = get();
+        
+        // 🧹 تنظيف المبيعات القديمة عند تسجيل الدخول
+        get().cleanupOldDeletedSales();
         
         // Test account
         if (username === 'test' && password === 'test') {
@@ -443,6 +454,10 @@ export const useStore = create<StoreState>()(
       
       addSale: (saleData) => {
         const state = get();
+        
+        // 🧹 تنظيف المبيعات القديمة عند إضافة مبيعة جديدة
+        get().cleanupOldDeletedSales();
+        
         const newSale: Sale = {
           ...saleData,
           id: generateId(),
@@ -580,6 +595,30 @@ export const useStore = create<StoreState>()(
             ? `🗑️ تم إفراغ سلة القمامة! حُذف ${trashCount} عنصر نهائياً` 
             : `🗑️ Trash emptied! ${trashCount} items permanently deleted` 
         });
+      },
+
+      // 🧹 تنظيف المبيعات القديمة (أكثر من 30 يوم) تلقائياً
+      cleanupOldDeletedSales: () => {
+        const state = get();
+        const oldSales = state.deletedSales.filter(sale => isOlderThan30Days(sale.deletedAt));
+        
+        if (oldSales.length > 0) {
+          set(state => ({
+            deletedSales: state.deletedSales.filter(sale => !isOlderThan30Days(sale.deletedAt))
+          }));
+          
+          console.log(`🧹 Auto-cleanup: Removed ${oldSales.length} sales older than 30 days`);
+          
+          // إشعار للمستخدم (اختياري - يمكن إزالته إذا كان مزعجاً)
+          if (oldSales.length > 0) {
+            get().addNotification({ 
+              type: 'info', 
+              message: get().language === 'ar' 
+                ? `🧹 تم حذف ${oldSales.length} مبيعة قديمة تلقائياً (أكثر من 30 يوم)` 
+                : `🧹 Auto-deleted ${oldSales.length} old sales (older than 30 days)` 
+            });
+          }
+        }
       },
       
       theme: 'light',

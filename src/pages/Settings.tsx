@@ -24,7 +24,9 @@ import {
   RefreshCw,
   Eye,
   Calendar,
-  RotateCcw as RestoreIcon
+  RotateCcw as RestoreIcon,
+  Clock,
+  Info
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import Sidebar from '../components/Layout/Sidebar';
@@ -140,6 +142,14 @@ const Settings: React.FC = () => {
   const handleEmptyTrash = () => {
     emptyTrash();
     setIsEmptyTrashModalOpen(false);
+  };
+
+  // 🗓️ حساب عدد الأيام المتبقية قبل الحذف التلقائي
+  const getDaysUntilAutoDelete = (deletedAt: Date): number => {
+    const now = new Date();
+    const deletedDate = new Date(deletedAt);
+    const daysDiff = Math.floor((now.getTime() - deletedDate.getTime()) / (1000 * 60 * 60 * 24));
+    return Math.max(0, 30 - daysDiff);
   };
 
   const settingsSections = [
@@ -607,6 +617,20 @@ const Settings: React.FC = () => {
         title={`${t('salesTrash')} (${deletedSales.length})`}
       >
         <div className="space-y-4">
+          {/* Auto-cleanup Info */}
+          <div className={`p-3 rounded-lg ${
+            theme === 'dark' ? 'bg-blue-900/20' : 'bg-blue-50'
+          } border border-blue-500/30`}>
+            <div className="flex items-center space-x-2 rtl:space-x-reverse">
+              <Clock className="w-4 h-4 text-blue-500" />
+              <span className={`text-sm font-medium ${
+                theme === 'dark' ? 'text-blue-400' : 'text-blue-600'
+              }`}>
+                {t('autoCleanupInfo')}
+              </span>
+            </div>
+          </div>
+
           {/* Empty Trash Button */}
           {deletedSales.length > 0 && (
             <div className="flex justify-between items-center pb-4 border-b border-gray-200 dark:border-gray-700">
@@ -637,69 +661,93 @@ const Settings: React.FC = () => {
                 <p>{t('noItemsInTrash')}</p>
               </div>
             ) : (
-              deletedSales.map((sale) => (
-                <motion.div
-                  key={sale.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className={`p-4 rounded-lg border ${
-                    theme === 'dark' 
-                      ? 'border-gray-700 bg-gray-700/50' 
-                      : 'border-gray-200 bg-gray-50'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <h4 className={`font-medium ${
-                        theme === 'dark' ? 'text-white' : 'text-gray-900'
-                      }`}>
-                        {sale.productName}
-                      </h4>
-                      <div className="flex items-center space-x-4 rtl:space-x-reverse mt-1">
-                        <span className={`text-sm ${
-                          theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              deletedSales.map((sale) => {
+                const daysLeft = getDaysUntilAutoDelete(sale.deletedAt);
+                return (
+                  <motion.div
+                    key={sale.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className={`p-4 rounded-lg border ${
+                      theme === 'dark' 
+                        ? 'border-gray-700 bg-gray-700/50' 
+                        : 'border-gray-200 bg-gray-50'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <h4 className={`font-medium ${
+                          theme === 'dark' ? 'text-white' : 'text-gray-900'
                         }`}>
-                          {t('quantity')}: {sale.quantity}
-                        </span>
-                        <span className={`text-sm font-medium ${
-                          theme === 'dark' ? 'text-green-400' : 'text-green-600'
-                        }`}>
-                          {formatPrice(sale.totalAmount)}
-                        </span>
+                          {sale.productName}
+                        </h4>
+                        <div className="flex items-center space-x-4 rtl:space-x-reverse mt-1">
+                          <span className={`text-sm ${
+                            theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                          }`}>
+                            {t('quantity')}: {sale.quantity}
+                          </span>
+                          <span className={`text-sm font-medium ${
+                            theme === 'dark' ? 'text-green-400' : 'text-green-600'
+                          }`}>
+                            {formatPrice(sale.totalAmount)}
+                          </span>
+                        </div>
+                        <div className="flex items-center space-x-4 rtl:space-x-reverse mt-2">
+                          <div className="flex items-center space-x-1 rtl:space-x-reverse">
+                            <Calendar className="w-4 h-4 text-gray-400" />
+                            <span className={`text-xs ${
+                              theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                            }`}>
+                              {t('deletedOn')}: {new Date(sale.deletedAt).toLocaleDateString()}
+                            </span>
+                          </div>
+                          
+                          {/* 🗓️ عداد الأيام المتبقية */}
+                          <div className="flex items-center space-x-1 rtl:space-x-reverse">
+                            <Clock className="w-4 h-4 text-orange-500" />
+                            <span className={`text-xs font-medium ${
+                              daysLeft <= 7 
+                                ? 'text-red-500' 
+                                : daysLeft <= 15 
+                                ? 'text-orange-500' 
+                                : 'text-green-500'
+                            }`}>
+                              {daysLeft === 0 
+                                ? (isRTL ? 'سيُحذف اليوم' : 'Deletes today')
+                                : daysLeft === 1
+                                ? (isRTL ? 'يوم واحد متبقي' : '1 day left')
+                                : (isRTL ? `${daysLeft} أيام متبقية` : `${daysLeft} days left`)
+                              }
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex items-center space-x-2 rtl:space-x-reverse mt-2">
-                        <Calendar className="w-4 h-4 text-gray-400" />
-                        <span className={`text-xs ${
-                          theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
-                        }`}>
-                          {t('deletedOn')}: {new Date(sale.deletedAt).toLocaleDateString()}
-                        </span>
+                      
+                      <div className="flex items-center space-x-2 rtl:space-x-reverse ml-4">
+                        <motion.button
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          onClick={() => handleRestoreSale(sale.id)}
+                          className="p-2 text-green-500 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors"
+                          title={t('restoreSale')}
+                        >
+                          <RestoreIcon className="w-4 h-4" />
+                        </motion.button>
+                        <motion.button
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          onClick={() => handlePermanentlyDeleteSale(sale.id)}
+                          className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                          title={t('permanentlyDelete')}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </motion.button>
                       </div>
                     </div>
-                    
-                    <div className="flex items-center space-x-2 rtl:space-x-reverse ml-4">
-                      <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        onClick={() => handleRestoreSale(sale.id)}
-                        className="p-2 text-green-500 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors"
-                        title={t('restoreSale')}
-                      >
-                        <RestoreIcon className="w-4 h-4" />
-                      </motion.button>
-                      <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        onClick={() => handlePermanentlyDeleteSale(sale.id)}
-                        className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                        title={t('permanentlyDelete')}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </motion.button>
-                    </div>
-                  </div>
-                </motion.div>
-              ))
+                  </motion.div>
+                );
+              })
             )}
           </div>
         </div>

@@ -211,6 +211,7 @@ const resources = {
       trashEmptied: 'Trash has been emptied',
       noItemsInTrash: 'No items in trash',
       deletedOn: 'Deleted on',
+      autoCleanupInfo: 'Items older than 30 days are automatically deleted',
       
       // Download
       
@@ -438,6 +439,7 @@ const resources = {
       trashEmptied: 'تم إفراغ سلة القمامة',
       noItemsInTrash: 'لا توجد عناصر في سلة القمامة',
       deletedOn: 'حُذف في',
+      autoCleanupInfo: 'العناصر الأقدم من 30 يوماً يتم حذفها تلقائياً',
       
       // Download
       

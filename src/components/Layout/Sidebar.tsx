@@ -94,9 +94,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
         onClick={onToggle}
         className={`fixed top-20 ${isRTL ? 'right-4' : 'left-4'} z-50 p-3 rounded-lg shadow-lg ${
           theme === 'dark'
-            ? 'bg-gray-800/80 text-white border border-gray-700/50'
-            : 'bg-white/80 text-gray-900 border border-gray-200/50'
-        } hover:shadow-xl transition-all duration-300 backdrop-blur-sm`}
+            ? 'bg-gray-800/40 text-white border border-gray-700/30'
+            : 'bg-white/40 text-gray-900 border border-gray-200/30'
+        } hover:shadow-xl transition-all duration-300 backdrop-blur-md`}
       >
         <Menu className="w-5 h-5" />
       </motion.button>
@@ -109,7 +109,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
             animate="open"
             exit="closed"
             onClick={onToggle}
-            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40"
+            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
           />
         )}
       </AnimatePresence>
@@ -123,9 +123,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
             exit="closed"
             className={`fixed top-0 ${isRTL ? 'right-0' : 'left-0'} h-full w-72 z-50 ${
               theme === 'dark'
-                ? 'bg-gray-900/95 border-gray-700'
-                : 'bg-white/95 border-gray-200'
-            } border-${isRTL ? 'l' : 'r'} shadow-2xl flex flex-col backdrop-blur-md`}
+                ? 'bg-gray-900/90 border-gray-700'
+                : 'bg-white/90 border-gray-200'
+            } border-${isRTL ? 'l' : 'r'} shadow-2xl flex flex-col backdrop-blur-lg`}
             style={{
               paddingTop: '4rem'
             }}
@@ -136,15 +136,15 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
               onClick={onToggle}
               className={`absolute top-4 ${isRTL ? 'left-4' : 'right-4'} p-2 rounded-lg ${
                 theme === 'dark'
-                  ? 'text-gray-400 hover:text-white hover:bg-gray-800'
-                  : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
+                  ? 'text-gray-400 hover:text-white hover:bg-gray-800/50'
+                  : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100/50'
               } transition-all duration-200`}
             >
               <X className="w-5 h-5" />
             </motion.button>
 
             <div className={`px-6 py-4 border-b ${
-              theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+              theme === 'dark' ? 'border-gray-700/50' : 'border-gray-200/50'
             } flex-shrink-0`}>
               <div className="flex items-center space-x-3 rtl:space-x-reverse">
                 <motion.div
@@ -167,7 +167,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
             {/* User Info Section */}
             {isAuthenticated && currentUser && (
               <div className={`px-6 py-4 border-b ${
-                theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+                theme === 'dark' ? 'border-gray-700/50' : 'border-gray-200/50'
               } flex-shrink-0`}>
                 <Link to="/profile" onClick={onToggle}>
                   <motion.div
@@ -176,11 +176,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
                     className={`flex items-center space-x-3 rtl:space-x-reverse p-3 rounded-lg transition-all duration-300 ${
                       location.pathname === '/profile'
                         ? theme === 'dark'
-                          ? 'bg-purple-600 text-white'
-                          : 'bg-purple-500 text-white'
+                          ? 'bg-purple-600/80 text-white'
+                          : 'bg-purple-500/80 text-white'
                         : theme === 'dark'
-                        ? 'bg-gray-800 hover:bg-gray-700'
-                        : 'bg-gray-100 hover:bg-gray-200'
+                        ? 'bg-gray-800/50 hover:bg-gray-700/50'
+                        : 'bg-gray-100/50 hover:bg-gray-200/50'
                     }`}
                   >
                     <UserCircle className={`w-8 h-8 ${
@@ -235,11 +235,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
                         className={`flex items-center space-x-3 rtl:space-x-reverse px-4 py-3 rounded-xl transition-all duration-300 group ${
                           isActive
                             ? theme === 'dark'
-                              ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg'
-                              : 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg'
+                              ? 'bg-gradient-to-r from-blue-600/80 to-blue-700/80 text-white shadow-lg'
+                              : 'bg-gradient-to-r from-blue-500/80 to-blue-600/80 text-white shadow-lg'
                             : theme === 'dark'
-                            ? 'text-gray-300 hover:text-white hover:bg-gray-800/50'
-                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100/50'
+                            ? 'text-gray-300 hover:text-white hover:bg-gray-800/30'
+                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100/30'
                         }`}
                       >
                         <motion.div
@@ -252,8 +252,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
                             isActive 
                               ? 'bg-white/20' 
                               : theme === 'dark'
-                              ? 'group-hover:bg-gray-700'
-                              : 'group-hover:bg-gray-200'
+                              ? 'group-hover:bg-gray-700/50'
+                              : 'group-hover:bg-gray-200/50'
                           } transition-all duration-300`}
                         >
                           <Icon className="w-5 h-5" />
@@ -274,7 +274,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
 
                 {/* Auth Section */}
                 <div className={`pt-4 mt-4 border-t ${
-                  theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+                  theme === 'dark' ? 'border-gray-700/50' : 'border-gray-200/50'
                 }`}>
                   {isAuthenticated ? (
                     <motion.button
@@ -288,14 +288,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
                       className={`w-full flex items-center space-x-3 rtl:space-x-reverse px-4 py-3 rounded-xl transition-all duration-300 group ${
                         theme === 'dark'
                           ? 'text-red-400 hover:text-red-300 hover:bg-red-900/20'
-                          : 'text-red-600 hover:text-red-500 hover:bg-red-50'
+                          : 'text-red-600 hover:text-red-500 hover:bg-red-50/50'
                       }`}
                     >
                       <motion.div
                         className={`p-2 rounded-lg ${
                           theme === 'dark'
                             ? 'group-hover:bg-red-900/30'
-                            : 'group-hover:bg-red-100'
+                            : 'group-hover:bg-red-100/50'
                         } transition-all duration-300`}
                       >
                         <LogOut className="w-5 h-5" />
@@ -314,14 +314,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
                         className={`flex items-center space-x-3 rtl:space-x-reverse px-4 py-3 rounded-xl transition-all duration-300 group ${
                           theme === 'dark'
                             ? 'text-blue-400 hover:text-blue-300 hover:bg-blue-900/20'
-                            : 'text-blue-600 hover:text-blue-500 hover:bg-blue-50'
+                            : 'text-blue-600 hover:text-blue-500 hover:bg-blue-50/50'
                         }`}
                       >
                         <motion.div
                           className={`p-2 rounded-lg ${
                             theme === 'dark'
                               ? 'group-hover:bg-blue-900/30'
-                              : 'group-hover:bg-blue-100'
+                              : 'group-hover:bg-blue-100/50'
                           } transition-all duration-300`}
                         >
                           <LogIn className="w-5 h-5" />
@@ -335,7 +335,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
             </nav>
 
             <div className={`px-6 py-4 border-t ${
-              theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+              theme === 'dark' ? 'border-gray-700/50' : 'border-gray-200/50'
             } flex-shrink-0`}>
               <div className={`text-xs ${
                 theme === 'dark' ? 'text-gray-400' : 'text-gray-500'

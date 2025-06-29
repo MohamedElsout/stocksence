@@ -183,14 +183,14 @@ export const useStore = create<StoreState>()(
         // 🧹 تنظيف المبيعات القديمة عند تسجيل الدخول
         get().cleanupOldDeletedSales();
         
-        // Test account
+        // Test account - رقم الشركة 0000
         if (username === 'test' && password === 'test') {
           const testUser: User = {
             id: 'test-user',
             username: 'test',
             password: 'test',
             role: 'admin',
-            companyId: 'test-company',
+            companyId: '0000', // ✅ رقم الشركة 0000 للحساب التجريبي
             createdAt: new Date(),
             isActive: true,
             email: 'test@example.com'
@@ -199,12 +199,12 @@ export const useStore = create<StoreState>()(
           set({ 
             currentUser: testUser, 
             isAuthenticated: true,
-            currentCompanyId: 'test-company'
+            currentCompanyId: '0000' // ✅ تعيين رقم الشركة 0000
           });
           
           get().addNotification({ 
             type: 'success', 
-            message: state.language === 'ar' ? 'تم تسجيل الدخول بالحساب التجريبي!' : 'Logged in with test account!' 
+            message: state.language === 'ar' ? 'تم تسجيل الدخول بالحساب التجريبي! رقم الشركة: 0000' : 'Logged in with test account! Company ID: 0000' 
           });
           return true;
         }

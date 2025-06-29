@@ -30,7 +30,37 @@ export interface Currency {
   rate: number;
 }
 
+export interface User {
+  id: string;
+  username: string;
+  password: string;
+  role: 'admin' | 'employee';
+  serialNumber?: string;
+  createdAt: Date;
+  isActive: boolean;
+}
+
+export interface SerialNumber {
+  id: string;
+  serialNumber: string;
+  isUsed: boolean;
+  createdAt: Date;
+  usedBy?: string;
+  usedAt?: Date;
+}
+
 interface StoreState {
+  // Authentication
+  currentUser: User | null;
+  users: User[];
+  serialNumbers: SerialNumber[];
+  isAuthenticated: boolean;
+  login: (username: string, password: string, serialNumber?: string) => Promise<boolean>;
+  logout: () => void;
+  register: (username: string, password: string, serialNumber?: string) => Promise<boolean>;
+  addSerialNumber: (serialNumber: string) => void;
+  removeSerialNumber: (id: string) => void;
+  
   products: Product[];
   addProduct: (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => void;
   updateProduct: (id: string, product: Partial<Product>) => void;
@@ -95,6 +125,192 @@ const currencies: Currency[] = [
 export const useStore = create<StoreState>()(
   persist(
     (set, get) => ({
+      // Authentication state
+      currentUser: null,
+      users: [],
+      serialNumbers: [
+        {
+          id: '1',
+          serialNumber: 'ADMIN001',
+          isUsed: false,
+          createdAt: new Date(),
+        },
+        {
+          id: '2',
+          serialNumber: 'EMP001',
+          isUsed: false,
+          createdAt: new Date(),
+        },
+        {
+          id: '3',
+          serialNumber: 'EMP002',
+          isUsed: false,
+          createdAt: new Date(),
+        }
+      ],
+      isAuthenticated: false,
+
+      login: async (username: string, password: string, serialNumber?: string) => {
+        const state = get();
+        
+        // Check if this is the first user (admin)
+        if (state.users.length === 0) {
+          if (!serialNumber) {
+            get().addNotification({ type: 'error', message: 'Serial number is required for first admin registration' });
+            return false;
+          }
+          
+          const serial = state.serialNumbers.find(s => s.serialNumber === serialNumber && !s.isUsed);
+          if (!serial) {
+            get().addNotification({ type: 'error', message: 'Invalid or used serial number' });
+            return false;
+          }
+          
+          // Create first admin user
+          const adminUser: User = {
+            id: generateId(),
+            username,
+            password,
+            role: 'admin',
+            serialNumber,
+            createdAt: new Date(),
+            isActive: true
+          };
+          
+          // Mark serial as used
+          set(state => ({
+            users: [adminUser],
+            currentUser: adminUser,
+            isAuthenticated: true,
+            serialNumbers: state.serialNumbers.map(s => 
+              s.id === serial.id 
+                ? { ...s, isUsed: true, usedBy: adminUser.id, usedAt: new Date() }
+                : s
+            )
+          }));
+          
+          get().addNotification({ 
+            type: 'success', 
+            message: state.language === 'ar' ? 'تم إنشاء حساب الأدمن بنجاح!' : 'Admin account created successfully!' 
+          });
+          return true;
+        }
+        
+        // Regular login
+        const user = state.users.find(u => u.username === username && u.password === password && u.isActive);
+        if (user) {
+          set({ currentUser: user, isAuthenticated: true });
+          get().addNotification({ 
+            type: 'success', 
+            message: state.language === 'ar' ? 'تم تسجيل الدخول بنجاح!' : 'Login successful!' 
+          });
+          return true;
+        }
+        
+        get().addNotification({ 
+          type: 'error', 
+          message: state.language === 'ar' ? 'اسم المستخدم أو كلمة المرور غير صحيحة' : 'Invalid username or password' 
+        });
+        return false;
+      },
+
+      register: async (username: string, password: string, serialNumber?: string) => {
+        const state = get();
+        
+        // Check if username already exists
+        if (state.users.find(u => u.username === username)) {
+          get().addNotification({ 
+            type: 'error', 
+            message: state.language === 'ar' ? 'اسم المستخدم موجود بالفعل' : 'Username already exists' 
+          });
+          return false;
+        }
+        
+        if (!serialNumber) {
+          get().addNotification({ 
+            type: 'error', 
+            message: state.language === 'ar' ? 'الرقم التسلسلي مطلوب' : 'Serial number is required' 
+          });
+          return false;
+        }
+        
+        const serial = state.serialNumbers.find(s => s.serialNumber === serialNumber && !s.isUsed);
+        if (!serial) {
+          get().addNotification({ 
+            type: 'error', 
+            message: state.language === 'ar' ? 'الرقم التسلسلي غير صحيح أو مستخدم بالفعل' : 'Invalid or used serial number' 
+          });
+          return false;
+        }
+        
+        // Determine role based on serial number
+        const role: 'admin' | 'employee' = serialNumber.includes('ADMIN') ? 'admin' : 'employee';
+        
+        const newUser: User = {
+          id: generateId(),
+          username,
+          password,
+          role,
+          serialNumber,
+          createdAt: new Date(),
+          isActive: true
+        };
+        
+        set(state => ({
+          users: [...state.users, newUser],
+          currentUser: newUser,
+          isAuthenticated: true,
+          serialNumbers: state.serialNumbers.map(s => 
+            s.id === serial.id 
+              ? { ...s, isUsed: true, usedBy: newUser.id, usedAt: new Date() }
+              : s
+          )
+        }));
+        
+        get().addNotification({ 
+          type: 'success', 
+          message: state.language === 'ar' ? 'تم إنشاء الحساب بنجاح!' : 'Account created successfully!' 
+        });
+        return true;
+      },
+
+      logout: () => {
+        set({ currentUser: null, isAuthenticated: false });
+        get().addNotification({ 
+          type: 'success', 
+          message: get().language === 'ar' ? 'تم تسجيل الخروج بنجاح!' : 'Logged out successfully!' 
+        });
+      },
+
+      addSerialNumber: (serialNumber: string) => {
+        const newSerial: SerialNumber = {
+          id: generateId(),
+          serialNumber,
+          isUsed: false,
+          createdAt: new Date()
+        };
+        
+        set(state => ({
+          serialNumbers: [...state.serialNumbers, newSerial]
+        }));
+        
+        get().addNotification({ 
+          type: 'success', 
+          message: get().language === 'ar' ? 'تم إضافة الرقم التسلسلي بنجاح!' : 'Serial number added successfully!' 
+        });
+      },
+
+      removeSerialNumber: (id: string) => {
+        set(state => ({
+          serialNumbers: state.serialNumbers.filter(s => s.id !== id)
+        }));
+        
+        get().addNotification({ 
+          type: 'success', 
+          message: get().language === 'ar' ? 'تم حذف الرقم التسلسلي بنجاح!' : 'Serial number removed successfully!' 
+        });
+      },
+      
       products: [
         {
           id: '1',
@@ -361,6 +577,10 @@ export const useStore = create<StoreState>()(
         theme: state.theme,
         language: state.language,
         currentCurrency: state.currentCurrency,
+        users: state.users,
+        serialNumbers: state.serialNumbers,
+        currentUser: state.currentUser,
+        isAuthenticated: state.isAuthenticated,
       }),
     }
   )

@@ -1,5 +1,5 @@
 import React, { useEffect, Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useStore } from './store/useStore';
 import Header from './components/Layout/Header';
@@ -14,6 +14,7 @@ const Reports = React.lazy(() => import('./pages/Reports'));
 const About = React.lazy(() => import('./pages/About'));
 const Settings = React.lazy(() => import('./pages/Settings'));
 const Download = React.lazy(() => import('./pages/Download'));
+const Auth = React.lazy(() => import('./pages/Auth'));
 
 // Loading component
 const LoadingSpinner = () => (
@@ -22,8 +23,19 @@ const LoadingSpinner = () => (
   </div>
 );
 
+// Protected Route Component
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isAuthenticated } = useStore();
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/auth" replace />;
+  }
+  
+  return <>{children}</>;
+};
+
 function App() {
-  const { theme, language, currentCurrency, setCurrency, addNotification } = useStore();
+  const { theme, language, currentCurrency, setCurrency, addNotification, isAuthenticated } = useStore();
   const { i18n } = useTranslation();
 
   useEffect(() => {
@@ -124,12 +136,34 @@ function App() {
           <Suspense fallback={<LoadingSpinner />}>
             <Routes>
               <Route path="/" element={<Landing />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/sales" element={<Sales />} />
-              <Route path="/reports" element={<Reports />} />
+              <Route path="/auth" element={<Auth />} />
               <Route path="/about" element={<About />} />
               <Route path="/download" element={<Download />} />
-              <Route path="/settings" element={<Settings />} />
+              
+              {/* Protected Routes */}
+              <Route path="/dashboard" element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/sales" element={
+                <ProtectedRoute>
+                  <Sales />
+                </ProtectedRoute>
+              } />
+              <Route path="/reports" element={
+                <ProtectedRoute>
+                  <Reports />
+                </ProtectedRoute>
+              } />
+              <Route path="/settings" element={
+                <ProtectedRoute>
+                  <Settings />
+                </ProtectedRoute>
+              } />
+              
+              {/* Redirect unknown routes to home */}
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Suspense>
         </main>

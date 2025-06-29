@@ -27,7 +27,7 @@ const Logo: React.FC<LogoProps> = ({
   
   return (
     <div className={`flex items-center space-x-2 rtl:space-x-reverse ${className}`}>
-      {/* Logo Image - Using the provided image */}
+      {/* Logo Image - Using the new logo.png */}
       <motion.div
         whileHover={{ 
           scale: 1.05,
@@ -42,15 +42,25 @@ const Logo: React.FC<LogoProps> = ({
           filter: 'drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15))'
         }}
       >
-        {/* Main Logo Image */}
-        <motion.img 
-          src="/download copy.png" 
-          alt="StockSence Logo" 
-          className="w-full h-full object-cover rounded-full"
+        {/* Main Logo Image - Circular with perfect fit */}
+        <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-        />
+          className="w-full h-full rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-purple-600 p-0.5"
+        >
+          <div className="w-full h-full rounded-full overflow-hidden bg-white dark:bg-gray-800 p-1">
+            <img 
+              src="/logo.png" 
+              alt="StockSence Logo" 
+              className="w-full h-full object-contain rounded-full"
+              style={{
+                imageRendering: 'crisp-edges',
+                WebkitImageRendering: 'crisp-edges'
+              }}
+            />
+          </div>
+        </motion.div>
         
         {/* Rotating Border Effect */}
         <motion.div
@@ -69,8 +79,8 @@ const Logo: React.FC<LogoProps> = ({
             } 90deg, transparent 180deg, ${
               theme === 'dark' ? 'rgba(139, 92, 246, 0.3)' : 'rgba(139, 92, 246, 0.2)'
             } 270deg, transparent 360deg)`,
-            mask: 'radial-gradient(circle, transparent 70%, black 72%)',
-            WebkitMask: 'radial-gradient(circle, transparent 70%, black 72%)'
+            mask: 'radial-gradient(circle, transparent 85%, black 87%)',
+            WebkitMask: 'radial-gradient(circle, transparent 85%, black 87%)'
           }}
         />
         
@@ -103,7 +113,7 @@ const Logo: React.FC<LogoProps> = ({
             ease: "easeInOut",
             repeatDelay: 2
           }}
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12"
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 rounded-full"
           style={{ 
             width: '50%',
             height: '100%'

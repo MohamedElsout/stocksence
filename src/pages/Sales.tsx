@@ -29,7 +29,7 @@ const Sales: React.FC = () => {
   const [saleForm, setSaleForm] = useState({
     productId: '',
     quantity: 1,
-    barcodeScan: false, // إضافة خيار مسح الباركود
+    barcodeScan: false,
   });
 
   const isRTL = i18n.language === 'ar';
@@ -198,7 +198,7 @@ const Sales: React.FC = () => {
                 <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
                   {/* Search */}
                   <div className="relative">
-                    <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
+                    <Search className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 w-4 h-4 ${
                       theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
                     }`} />
                     <input
@@ -206,7 +206,7 @@ const Sales: React.FC = () => {
                       placeholder={t('searchSales')}
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className={`pl-10 pr-4 py-2 border rounded-lg w-full sm:w-64 ${
+                      className={`${isRTL ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-2 border rounded-lg w-full sm:w-64 ${
                         theme === 'dark'
                           ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                           : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
@@ -250,32 +250,32 @@ const Sales: React.FC = () => {
                     theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'
                   }`}>
                     <tr>
-                      <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                      <th className={`px-6 py-3 text-${isRTL ? 'right' : 'left'} text-xs font-medium uppercase tracking-wider ${
                         theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
                       }`}>
                         {t('productName')}
                       </th>
-                      <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                      <th className={`px-6 py-3 text-${isRTL ? 'right' : 'left'} text-xs font-medium uppercase tracking-wider ${
                         theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
                       }`}>
                         {t('quantity')}
                       </th>
-                      <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                      <th className={`px-6 py-3 text-${isRTL ? 'right' : 'left'} text-xs font-medium uppercase tracking-wider ${
                         theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
                       }`}>
                         {t('unitPrice')}
                       </th>
-                      <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                      <th className={`px-6 py-3 text-${isRTL ? 'right' : 'left'} text-xs font-medium uppercase tracking-wider ${
                         theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
                       }`}>
                         {t('totalAmount')}
                       </th>
-                      <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                      <th className={`px-6 py-3 text-${isRTL ? 'right' : 'left'} text-xs font-medium uppercase tracking-wider ${
                         theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
                       }`}>
                         {isRTL ? 'طريقة البيع' : 'Sale Method'}
                       </th>
-                      <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                      <th className={`px-6 py-3 text-${isRTL ? 'right' : 'left'} text-xs font-medium uppercase tracking-wider ${
                         theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
                       }`}>
                         {t('saleDate')}
@@ -367,46 +367,91 @@ const Sales: React.FC = () => {
         title={t('sellProduct')}
       >
         <form onSubmit={handleSale} className="space-y-6">
-          {/* Barcode Scan Option */}
-          <div className={`p-4 rounded-lg ${
-            theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'
-          } border ${theme === 'dark' ? 'border-gray-600' : 'border-gray-200'}`}>
+          {/* Barcode Scan Option - تحسين التصميم */}
+          <div className={`p-4 rounded-xl border-2 transition-all duration-300 ${
+            saleForm.barcodeScan
+              ? theme === 'dark' 
+                ? 'bg-purple-900/20 border-purple-500/50' 
+                : 'bg-purple-50 border-purple-300'
+              : theme === 'dark' 
+              ? 'bg-gray-700/50 border-gray-600' 
+              : 'bg-gray-50 border-gray-200'
+          }`}>
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3 rtl:space-x-reverse">
-                <Scan className={`w-5 h-5 ${
-                  theme === 'dark' ? 'text-purple-400' : 'text-purple-600'
-                }`} />
+                <motion.div
+                  animate={saleForm.barcodeScan ? { scale: [1, 1.1, 1] } : {}}
+                  transition={{ duration: 0.3 }}
+                  className={`p-2 rounded-lg ${
+                    saleForm.barcodeScan
+                      ? 'bg-purple-500 text-white'
+                      : theme === 'dark' 
+                      ? 'bg-gray-600 text-gray-300' 
+                      : 'bg-gray-200 text-gray-600'
+                  }`}
+                >
+                  <Scan className="w-5 h-5" />
+                </motion.div>
                 <div>
-                  <p className={`font-medium ${
-                    theme === 'dark' ? 'text-white' : 'text-gray-900'
+                  <p className={`font-semibold ${
+                    saleForm.barcodeScan
+                      ? theme === 'dark' ? 'text-purple-300' : 'text-purple-700'
+                      : theme === 'dark' ? 'text-white' : 'text-gray-900'
                   }`}>
                     {isRTL ? 'مسح الباركود' : 'Barcode Scan'}
                   </p>
-                  <p className={`text-xs ${
-                    theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                  <p className={`text-sm ${
+                    theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
                   }`}>
-                    {isRTL ? 'تحديد هذا البيع كمسح باركود' : 'Mark this sale as scanned via barcode'}
+                    {isRTL ? 'تحديد هذا البيع كمسح باركود' : 'Mark this sale as barcode scan'}
                   </p>
                 </div>
               </div>
+              
+              {/* Toggle Switch محسّن */}
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 type="button"
                 onClick={() => setSaleForm({ ...saleForm, barcodeScan: !saleForm.barcodeScan })}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                className={`relative inline-flex h-7 w-12 items-center rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 ${
                   saleForm.barcodeScan 
-                    ? 'bg-purple-600' 
+                    ? 'bg-purple-600 shadow-lg' 
                     : theme === 'dark' ? 'bg-gray-600' : 'bg-gray-300'
                 }`}
               >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    saleForm.barcodeScan ? 'translate-x-6' : 'translate-x-1'
+                <motion.span
+                  animate={{ 
+                    x: saleForm.barcodeScan ? (isRTL ? -20 : 20) : 0,
+                    scale: saleForm.barcodeScan ? 1.1 : 1
+                  }}
+                  transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                  className={`inline-block h-5 w-5 transform rounded-full transition-all duration-300 ${
+                    saleForm.barcodeScan ? 'bg-white shadow-lg' : 'bg-white'
                   }`}
+                  style={{ 
+                    marginLeft: isRTL ? (saleForm.barcodeScan ? '4px' : '24px') : '4px',
+                    marginRight: isRTL ? '4px' : (saleForm.barcodeScan ? '4px' : '24px')
+                  }}
                 />
               </motion.button>
             </div>
+            
+            {/* Status Indicator */}
+            {saleForm.barcodeScan && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-3 flex items-center space-x-2 rtl:space-x-reverse"
+              >
+                <CheckCircle className="w-4 h-4 text-purple-500" />
+                <span className={`text-sm font-medium ${
+                  theme === 'dark' ? 'text-purple-300' : 'text-purple-700'
+                }`}>
+                  {isRTL ? 'سيتم تسجيل هذا البيع كمسح باركود' : 'This sale will be recorded as barcode scan'}
+                </span>
+              </motion.div>
+            )}
           </div>
 
           {/* Product Selection */}

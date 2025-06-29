@@ -6,7 +6,6 @@ import {
   ArrowRight, 
   TrendingUp, 
   Users, 
-  Package,
   ChevronLeft,
   ChevronRight,
   Star,
@@ -15,6 +14,7 @@ import {
 import { useStore } from '../store/useStore';
 import Sidebar from '../components/Layout/Sidebar';
 import AnimatedCounter from '../components/UI/AnimatedCounter';
+import Logo from '../components/UI/Logo';
 
 const Landing: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -47,13 +47,13 @@ const Landing: React.FC = () => {
       color: 'text-blue-500'
     },
     { 
-      icon: Package, 
+      icon: TrendingUp, 
       count: 50000, 
       label: t('totalProducts'),
       color: 'text-green-500'
     },
     { 
-      icon: TrendingUp, 
+      icon: Zap, 
       count: 8, 
       label: t('yearsExperience'),
       color: 'text-purple-500'
@@ -86,7 +86,7 @@ const Landing: React.FC = () => {
 
   const features = [
     {
-      icon: Package,
+      icon: TrendingUp,
       title: t('smartInventory'),
       description: t('smartInventoryDesc'),
       color: 'text-blue-500',
@@ -238,15 +238,7 @@ const Landing: React.FC = () => {
                 transition={{ delay: 0.2, duration: 0.6 }}
                 className="mb-8"
               >
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                  className={`inline-flex p-6 rounded-full mb-6 ${
-                    theme === 'dark' ? 'bg-blue-600' : 'bg-blue-500'
-                  } shadow-2xl`}
-                >
-                  <Package className="w-16 h-16 text-white" />
-                </motion.div>
+                <Logo size="xl" />
               </motion.div>
 
               <h1 className={`text-4xl md:text-6xl lg:text-7xl font-bold mb-6 ${
@@ -316,7 +308,7 @@ const Landing: React.FC = () => {
               transition={{ duration: 6, repeat: Infinity }}
               className="absolute top-20 left-10 opacity-20"
             >
-              <Package className="w-16 h-16 text-blue-500" />
+              <Logo size="lg" showText={false} />
             </motion.div>
             <motion.div
               animate={{ y: [0, 20, 0], rotate: [0, -5, 5, 0] }}
@@ -532,9 +524,9 @@ const Landing: React.FC = () => {
                 <motion.div
                   animate={{ scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] }}
                   transition={{ duration: 4, repeat: Infinity }}
-                  className="absolute -top-4 -right-4 w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg"
+                  className="absolute -top-4 -right-4 w-24 h-24 rounded-full flex items-center justify-center shadow-lg"
                 >
-                  <Package className="w-12 h-12 text-white" />
+                  <Logo size="lg" showText={false} />
                 </motion.div>
               </motion.div>
             </div>

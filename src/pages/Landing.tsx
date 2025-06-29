@@ -91,11 +91,108 @@ const Landing: React.FC = () => {
   ];
 
   return (
-    <div className={`min-h-screen ${
+    <div className={`min-h-screen relative ${
       theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'
     }`}>
       {/* Sidebar */}
       <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
+      
+      {/* Bolt Logo - Fixed in bottom right */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.5, rotate: -180 }}
+        animate={{ opacity: 1, scale: 1, rotate: 0 }}
+        transition={{ 
+          duration: 1.5, 
+          delay: 2,
+          type: "spring",
+          stiffness: 100,
+          damping: 10
+        }}
+        className={`fixed bottom-6 ${isRTL ? 'left-6' : 'right-6'} z-40`}
+      >
+        <motion.div
+          animate={{ 
+            rotate: 360,
+            scale: [1, 1.1, 1]
+          }}
+          transition={{ 
+            rotate: {
+              duration: 8, 
+              repeat: Infinity, 
+              ease: "linear"
+            },
+            scale: {
+              duration: 2,
+              repeat: Infinity,
+              repeatType: "reverse"
+            }
+          }}
+          whileHover={{ 
+            scale: 1.2,
+            rotate: 720,
+            transition: { duration: 0.6 }
+          }}
+          className={`w-16 h-16 rounded-full shadow-2xl cursor-pointer ${
+            theme === 'dark' 
+              ? 'bg-gradient-to-br from-blue-500 via-purple-600 to-pink-500' 
+              : 'bg-gradient-to-br from-blue-400 via-purple-500 to-pink-400'
+          } p-2 hover:shadow-3xl transition-all duration-300`}
+          title="Powered by Bolt"
+        >
+          <motion.img
+            src="/src/assets/bolt.svg"
+            alt="Bolt Logo"
+            className="w-full h-full object-contain filter brightness-0 invert"
+            whileHover={{ 
+              filter: "brightness(0) invert(0)",
+              transition: { duration: 0.3 }
+            }}
+          />
+        </motion.div>
+        
+        {/* Floating particles around the logo */}
+        {[...Array(6)].map((_, i) => (
+          <motion.div
+            key={i}
+            className={`absolute w-2 h-2 rounded-full ${
+              theme === 'dark' ? 'bg-blue-400' : 'bg-blue-500'
+            }`}
+            animate={{
+              x: [0, Math.cos(i * 60 * Math.PI / 180) * 30],
+              y: [0, Math.sin(i * 60 * Math.PI / 180) * 30],
+              opacity: [0, 1, 0],
+              scale: [0, 1, 0]
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              delay: i * 0.5,
+              ease: "easeInOut"
+            }}
+            style={{
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)'
+            }}
+          />
+        ))}
+        
+        {/* Pulsing ring effect */}
+        <motion.div
+          className={`absolute inset-0 rounded-full border-2 ${
+            theme === 'dark' ? 'border-blue-400' : 'border-blue-500'
+          }`}
+          animate={{
+            scale: [1, 1.5, 1],
+            opacity: [0.8, 0, 0.8]
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+      </motion.div>
       
       {/* Main Content - No margin adjustments */}
       <div className="w-full" style={{ paddingTop: '4rem' }}>

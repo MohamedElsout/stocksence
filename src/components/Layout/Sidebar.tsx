@@ -19,41 +19,140 @@ import {
 } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 
-// Custom Chart Icon Component
-const ChartIcon: React.FC<{ className?: string }> = ({ className = "w-5 h-5" }) => (
-  <svg 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    xmlns="http://www.w3.org/2000/svg"
-    className={className}
-  >
-    {/* Chart Bars */}
-    <rect x="3" y="16" width="2" height="5" fill="currentColor" rx="0.5" />
-    <rect x="7" y="12" width="2" height="9" fill="currentColor" rx="0.5" />
-    <rect x="11" y="8" width="2" height="13" fill="currentColor" rx="0.5" />
-    <rect x="15" y="14" width="2" height="7" fill="currentColor" rx="0.5" />
-    
-    {/* Trend Line */}
-    <path 
-      d="M3 17 L8 13 L12 9 L16 15 L21 6" 
-      stroke="currentColor" 
-      strokeWidth="2" 
-      strokeLinecap="round" 
-      strokeLinejoin="round"
-      fill="none"
-    />
-    
-    {/* Trend Arrow */}
-    <path 
-      d="M18 6 L21 6 L21 9" 
-      stroke="currentColor" 
-      strokeWidth="2" 
-      strokeLinecap="round" 
-      strokeLinejoin="round"
-      fill="none"
-    />
-  </svg>
-);
+// Professional Chart Icon Component - نفس الرمز المستخدم في الهيدر
+const ProfessionalChartIcon: React.FC<{ className?: string }> = ({ className = "w-5 h-5" }) => {
+  const { theme } = useStore();
+  
+  return (
+    <svg 
+      viewBox="0 0 32 32" 
+      fill="none" 
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+    >
+      {/* الأعمدة الأربعة بارتفاعات متدرجة */}
+      <motion.rect 
+        x="4" 
+        y="22" 
+        width="4" 
+        height="6" 
+        rx="1"
+        fill="white"
+        initial={{ height: 0, y: 28 }}
+        animate={{ height: 6, y: 22 }}
+        transition={{ duration: 0.8, delay: 0.1 }}
+      />
+      
+      <motion.rect 
+        x="10" 
+        y="18" 
+        width="4" 
+        height="10" 
+        rx="1"
+        fill="white"
+        initial={{ height: 0, y: 28 }}
+        animate={{ height: 10, y: 18 }}
+        transition={{ duration: 0.8, delay: 0.2 }}
+      />
+      
+      <motion.rect 
+        x="16" 
+        y="12" 
+        width="4" 
+        height="16" 
+        rx="1"
+        fill="white"
+        initial={{ height: 0, y: 28 }}
+        animate={{ height: 16, y: 12 }}
+        transition={{ duration: 0.8, delay: 0.3 }}
+      />
+      
+      <motion.rect 
+        x="22" 
+        y="8" 
+        width="4" 
+        height="20" 
+        rx="1"
+        fill="white"
+        initial={{ height: 0, y: 28 }}
+        animate={{ height: 20, y: 8 }}
+        transition={{ duration: 0.8, delay: 0.4 }}
+      />
+      
+      {/* الخط التصاعدي المنحني */}
+      <motion.path 
+        d="M6 23 Q12 19 18 13 Q21 10 24 9" 
+        stroke="white" 
+        strokeWidth="2.5" 
+        strokeLinecap="round" 
+        strokeLinejoin="round"
+        fill="none"
+        initial={{ pathLength: 0 }}
+        animate={{ pathLength: 1 }}
+        transition={{ duration: 1.2, delay: 0.6, ease: "easeInOut" }}
+      />
+      
+      {/* السهم في نهاية الخط */}
+      <motion.path 
+        d="M22 9 L24 9 L24 11" 
+        stroke="white" 
+        strokeWidth="2.5" 
+        strokeLinecap="round" 
+        strokeLinejoin="round"
+        fill="none"
+        initial={{ opacity: 0, scale: 0 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5, delay: 1.8 }}
+      />
+      
+      {/* نقاط متلألئة على الخط */}
+      <motion.circle 
+        cx="6" 
+        cy="23" 
+        r="1.5" 
+        fill="white"
+        animate={{
+          scale: [1, 1.3, 1],
+          opacity: [0.7, 1, 0.7]
+        }}
+        transition={{ duration: 2, repeat: Infinity, delay: 0 }}
+      />
+      <motion.circle 
+        cx="12" 
+        cy="19" 
+        r="1.5" 
+        fill="white"
+        animate={{
+          scale: [1, 1.3, 1],
+          opacity: [0.7, 1, 0.7]
+        }}
+        transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+      />
+      <motion.circle 
+        cx="18" 
+        cy="13" 
+        r="1.5" 
+        fill="white"
+        animate={{
+          scale: [1, 1.3, 1],
+          opacity: [0.7, 1, 0.7]
+        }}
+        transition={{ duration: 2, repeat: Infinity, delay: 1 }}
+      />
+      <motion.circle 
+        cx="24" 
+        cy="9" 
+        r="1.5" 
+        fill="white"
+        animate={{
+          scale: [1, 1.3, 1],
+          opacity: [0.7, 1, 0.7]
+        }}
+        transition={{ duration: 2, repeat: Infinity, delay: 1.5 }}
+      />
+    </svg>
+  );
+};
 
 interface SidebarProps {
   isOpen: boolean;
@@ -192,24 +291,32 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
                     scale: { duration: 0.2 },
                     rotate: { duration: 0.6, repeat: Infinity }
                   }}
-                  className={`relative p-2 rounded-lg ${
-                    theme === 'dark' ? 'bg-blue-600' : 'bg-blue-500'
-                  } overflow-hidden`}
+                  className={`relative p-2 rounded-lg shadow-lg overflow-hidden ${
+                    theme === 'dark' 
+                      ? 'bg-gradient-to-br from-blue-600 via-blue-700 to-purple-700' 
+                      : 'bg-gradient-to-br from-blue-500 via-blue-600 to-purple-600'
+                  }`}
                 >
                   {/* Background Gradient Animation */}
                   <motion.div
                     animate={{
-                      background: [
-                        'linear-gradient(45deg, #3B82F6, #1D4ED8)',
-                        'linear-gradient(45deg, #1D4ED8, #3B82F6)',
-                        'linear-gradient(45deg, #3B82F6, #1D4ED8)'
-                      ]
+                      background: theme === 'dark' 
+                        ? [
+                            'linear-gradient(45deg, #1E40AF, #7C3AED, #1E40AF)',
+                            'linear-gradient(45deg, #7C3AED, #1E40AF, #7C3AED)',
+                            'linear-gradient(45deg, #1E40AF, #7C3AED, #1E40AF)'
+                          ]
+                        : [
+                            'linear-gradient(45deg, #3B82F6, #8B5CF6, #3B82F6)',
+                            'linear-gradient(45deg, #8B5CF6, #3B82F6, #8B5CF6)',
+                            'linear-gradient(45deg, #3B82F6, #8B5CF6, #3B82F6)'
+                          ]
                     }}
                     transition={{ duration: 3, repeat: Infinity }}
                     className="absolute inset-0 rounded-lg"
                   />
                   
-                  {/* Chart Icon */}
+                  {/* Professional Chart Icon */}
                   <motion.div
                     animate={{
                       y: [0, -1, 0],
@@ -222,12 +329,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
                     }}
                     className="relative z-10"
                   >
-                    <ChartIcon className="w-5 h-5 text-white" />
+                    <ProfessionalChartIcon className="w-5 h-5" />
                   </motion.div>
                 </motion.div>
-                <h2 className={`text-lg font-semibold ${
-                  theme === 'dark' ? 'text-white' : 'text-gray-900'
-                }`}>
+                <h2 className={`text-lg font-semibold bg-gradient-to-r ${
+                  theme === 'dark' 
+                    ? 'from-blue-400 to-purple-400' 
+                    : 'from-blue-600 to-purple-600'
+                } bg-clip-text text-transparent`}>
                   {t('stockSence')}
                 </h2>
               </div>

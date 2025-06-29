@@ -11,41 +11,144 @@ import {
 } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 
-// Custom Chart Icon Component
-const ChartIcon: React.FC<{ className?: string }> = ({ className = "w-6 h-6" }) => (
-  <svg 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    xmlns="http://www.w3.org/2000/svg"
-    className={className}
-  >
-    {/* Chart Bars */}
-    <rect x="3" y="16" width="2" height="5" fill="currentColor" rx="0.5" />
-    <rect x="7" y="12" width="2" height="9" fill="currentColor" rx="0.5" />
-    <rect x="11" y="8" width="2" height="13" fill="currentColor" rx="0.5" />
-    <rect x="15" y="14" width="2" height="7" fill="currentColor" rx="0.5" />
-    
-    {/* Trend Line */}
-    <path 
-      d="M3 17 L8 13 L12 9 L16 15 L21 6" 
-      stroke="currentColor" 
-      strokeWidth="2" 
-      strokeLinecap="round" 
-      strokeLinejoin="round"
-      fill="none"
-    />
-    
-    {/* Trend Arrow */}
-    <path 
-      d="M18 6 L21 6 L21 9" 
-      stroke="currentColor" 
-      strokeWidth="2" 
-      strokeLinecap="round" 
-      strokeLinejoin="round"
-      fill="none"
-    />
-  </svg>
-);
+// Professional Chart Icon Component - رسم بياني احترافي
+const ProfessionalChartIcon: React.FC<{ className?: string }> = ({ className = "w-6 h-6" }) => {
+  const { theme } = useStore();
+  
+  return (
+    <svg 
+      viewBox="0 0 32 32" 
+      fill="none" 
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+    >
+      {/* الأعمدة الأربعة بارتفاعات متدرجة */}
+      {/* العمود الأول - قصير */}
+      <motion.rect 
+        x="4" 
+        y="22" 
+        width="4" 
+        height="6" 
+        rx="1"
+        fill="white"
+        initial={{ height: 0, y: 28 }}
+        animate={{ height: 6, y: 22 }}
+        transition={{ duration: 0.8, delay: 0.1 }}
+      />
+      
+      {/* العمود الثاني - متوسط */}
+      <motion.rect 
+        x="10" 
+        y="18" 
+        width="4" 
+        height="10" 
+        rx="1"
+        fill="white"
+        initial={{ height: 0, y: 28 }}
+        animate={{ height: 10, y: 18 }}
+        transition={{ duration: 0.8, delay: 0.2 }}
+      />
+      
+      {/* العمود الثالث - طويل */}
+      <motion.rect 
+        x="16" 
+        y="12" 
+        width="4" 
+        height="16" 
+        rx="1"
+        fill="white"
+        initial={{ height: 0, y: 28 }}
+        animate={{ height: 16, y: 12 }}
+        transition={{ duration: 0.8, delay: 0.3 }}
+      />
+      
+      {/* العمود الرابع - الأطول */}
+      <motion.rect 
+        x="22" 
+        y="8" 
+        width="4" 
+        height="20" 
+        rx="1"
+        fill="white"
+        initial={{ height: 0, y: 28 }}
+        animate={{ height: 20, y: 8 }}
+        transition={{ duration: 0.8, delay: 0.4 }}
+      />
+      
+      {/* الخط التصاعدي المنحني */}
+      <motion.path 
+        d="M6 23 Q12 19 18 13 Q21 10 24 9" 
+        stroke="white" 
+        strokeWidth="2.5" 
+        strokeLinecap="round" 
+        strokeLinejoin="round"
+        fill="none"
+        initial={{ pathLength: 0 }}
+        animate={{ pathLength: 1 }}
+        transition={{ duration: 1.2, delay: 0.6, ease: "easeInOut" }}
+      />
+      
+      {/* السهم في نهاية الخط */}
+      <motion.path 
+        d="M22 9 L24 9 L24 11" 
+        stroke="white" 
+        strokeWidth="2.5" 
+        strokeLinecap="round" 
+        strokeLinejoin="round"
+        fill="none"
+        initial={{ opacity: 0, scale: 0 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5, delay: 1.8 }}
+      />
+      
+      {/* نقاط متلألئة على الخط */}
+      <motion.circle 
+        cx="6" 
+        cy="23" 
+        r="1.5" 
+        fill="white"
+        animate={{
+          scale: [1, 1.3, 1],
+          opacity: [0.7, 1, 0.7]
+        }}
+        transition={{ duration: 2, repeat: Infinity, delay: 0 }}
+      />
+      <motion.circle 
+        cx="12" 
+        cy="19" 
+        r="1.5" 
+        fill="white"
+        animate={{
+          scale: [1, 1.3, 1],
+          opacity: [0.7, 1, 0.7]
+        }}
+        transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+      />
+      <motion.circle 
+        cx="18" 
+        cy="13" 
+        r="1.5" 
+        fill="white"
+        animate={{
+          scale: [1, 1.3, 1],
+          opacity: [0.7, 1, 0.7]
+        }}
+        transition={{ duration: 2, repeat: Infinity, delay: 1 }}
+      />
+      <motion.circle 
+        cx="24" 
+        cy="9" 
+        r="1.5" 
+        fill="white"
+        animate={{
+          scale: [1, 1.3, 1],
+          opacity: [0.7, 1, 0.7]
+        }}
+        transition={{ duration: 2, repeat: Infinity, delay: 1.5 }}
+      />
+    </svg>
+  );
+};
 
 const Header: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -84,37 +187,45 @@ const Header: React.FC = () => {
                   scale: { duration: 0.2 },
                   rotate: { duration: 0.6, repeat: Infinity }
                 }}
-                className={`relative p-2 rounded-full ${
-                  theme === 'dark' ? 'bg-blue-600' : 'bg-blue-500'
-                } shadow-lg overflow-hidden group`}
+                className={`relative p-3 rounded-full shadow-2xl overflow-hidden group ${
+                  theme === 'dark' 
+                    ? 'bg-gradient-to-br from-blue-600 via-blue-700 to-purple-700' 
+                    : 'bg-gradient-to-br from-blue-500 via-blue-600 to-purple-600'
+                }`}
               >
                 {/* Background Gradient Animation */}
                 <motion.div
                   animate={{
-                    background: [
-                      'linear-gradient(45deg, #3B82F6, #1D4ED8)',
-                      'linear-gradient(45deg, #1D4ED8, #3B82F6)',
-                      'linear-gradient(45deg, #3B82F6, #1D4ED8)'
-                    ]
+                    background: theme === 'dark' 
+                      ? [
+                          'linear-gradient(45deg, #1E40AF, #7C3AED, #1E40AF)',
+                          'linear-gradient(45deg, #7C3AED, #1E40AF, #7C3AED)',
+                          'linear-gradient(45deg, #1E40AF, #7C3AED, #1E40AF)'
+                        ]
+                      : [
+                          'linear-gradient(45deg, #3B82F6, #8B5CF6, #3B82F6)',
+                          'linear-gradient(45deg, #8B5CF6, #3B82F6, #8B5CF6)',
+                          'linear-gradient(45deg, #3B82F6, #8B5CF6, #3B82F6)'
+                        ]
                   }}
-                  transition={{ duration: 3, repeat: Infinity }}
+                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                   className="absolute inset-0 rounded-full"
                 />
                 
-                {/* Chart Icon */}
+                {/* Professional Chart Icon */}
                 <motion.div
                   animate={{
-                    y: [0, -1, 0],
+                    y: [0, -2, 0],
                     scale: [1, 1.05, 1]
                   }}
                   transition={{ 
-                    duration: 2, 
+                    duration: 3, 
                     repeat: Infinity,
                     ease: "easeInOut"
                   }}
                   className="relative z-10"
                 >
-                  <ChartIcon className="w-6 h-6 text-white" />
+                  <ProfessionalChartIcon className="w-7 h-7" />
                 </motion.div>
 
                 {/* Sparkle Effects */}
@@ -125,11 +236,11 @@ const Header: React.FC = () => {
                     rotate: [0, 180, 360]
                   }}
                   transition={{ 
-                    duration: 2, 
+                    duration: 3, 
                     repeat: Infinity,
                     delay: 0
                   }}
-                  className="absolute top-1 right-1 w-1 h-1 bg-white rounded-full"
+                  className="absolute top-1 right-1 w-1.5 h-1.5 bg-white rounded-full"
                 />
                 <motion.div
                   animate={{
@@ -138,31 +249,65 @@ const Header: React.FC = () => {
                     rotate: [0, -180, -360]
                   }}
                   transition={{ 
-                    duration: 2, 
+                    duration: 3, 
                     repeat: Infinity,
-                    delay: 1
+                    delay: 1.5
                   }}
-                  className="absolute bottom-1 left-1 w-0.5 h-0.5 bg-white rounded-full"
+                  className="absolute bottom-1 left-1 w-1 h-1 bg-white rounded-full"
+                />
+                <motion.div
+                  animate={{
+                    scale: [0, 1, 0],
+                    opacity: [0, 1, 0]
+                  }}
+                  transition={{ 
+                    duration: 3, 
+                    repeat: Infinity,
+                    delay: 3
+                  }}
+                  className="absolute top-2 left-2 w-0.5 h-0.5 bg-white rounded-full"
                 />
 
                 {/* Pulse Ring */}
                 <motion.div
                   animate={{
-                    scale: [1, 1.5, 1],
-                    opacity: [0.5, 0, 0.5]
+                    scale: [1, 1.4, 1],
+                    opacity: [0.3, 0, 0.3]
                   }}
                   transition={{ 
-                    duration: 2, 
+                    duration: 2.5, 
                     repeat: Infinity,
                     ease: "easeInOut"
                   }}
-                  className="absolute inset-0 rounded-full border-2 border-white"
+                  className={`absolute inset-0 rounded-full border-2 ${
+                    theme === 'dark' ? 'border-blue-400' : 'border-blue-300'
+                  }`}
+                />
+
+                {/* Outer Glow */}
+                <motion.div
+                  animate={{
+                    scale: [1, 1.2, 1],
+                    opacity: [0, 0.2, 0]
+                  }}
+                  transition={{ 
+                    duration: 3, 
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                  className={`absolute inset-0 rounded-full ${
+                    theme === 'dark' 
+                      ? 'bg-blue-400 shadow-blue-400/50' 
+                      : 'bg-blue-500 shadow-blue-500/50'
+                  } shadow-2xl`}
                 />
               </motion.div>
               
-              <h1 className={`text-xl font-bold ${
-                theme === 'dark' ? 'text-white' : 'text-gray-900'
-              }`}>
+              <h1 className={`text-xl font-bold bg-gradient-to-r ${
+                theme === 'dark' 
+                  ? 'from-blue-400 to-purple-400' 
+                  : 'from-blue-600 to-purple-600'
+              } bg-clip-text text-transparent`}>
                 {t('stockSence')}
               </h1>
             </motion.div>

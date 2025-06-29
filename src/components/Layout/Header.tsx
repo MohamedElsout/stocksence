@@ -6,14 +6,16 @@ import {
   Package, 
   LogIn,
   LogOut,
-  UserCircle
+  UserCircle,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 
 const Header: React.FC = () => {
   const { t } = useTranslation();
   const location = useLocation();
-  const { theme, currentUser, isAuthenticated, logout } = useStore();
+  const { theme, currentUser, isAuthenticated, logout, toggleTheme } = useStore();
 
   const handleLogout = () => {
     logout();
@@ -53,6 +55,51 @@ const Header: React.FC = () => {
               </h1>
             </motion.div>
           </Link>
+
+          {/* Center Section - Theme Toggle */}
+          <div className="flex items-center">
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={toggleTheme}
+              className={`relative p-3 rounded-full transition-all duration-300 ${
+                theme === 'dark'
+                  ? 'bg-gray-800 text-yellow-400 hover:bg-gray-700 shadow-lg'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 shadow-md'
+              }`}
+              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            >
+              <motion.div
+                initial={false}
+                animate={{ 
+                  rotate: theme === 'dark' ? 0 : 180,
+                  scale: theme === 'dark' ? 1 : 0.8
+                }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+              >
+                {theme === 'dark' ? (
+                  <Sun className="w-5 h-5" />
+                ) : (
+                  <Moon className="w-5 h-5" />
+                )}
+              </motion.div>
+              
+              {/* Glow effect for dark mode */}
+              {theme === 'dark' && (
+                <motion.div
+                  animate={{ 
+                    boxShadow: [
+                      '0 0 0 0 rgba(251, 191, 36, 0.4)',
+                      '0 0 0 8px rgba(251, 191, 36, 0)',
+                      '0 0 0 0 rgba(251, 191, 36, 0.4)'
+                    ]
+                  }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                  className="absolute inset-0 rounded-full"
+                />
+              )}
+            </motion.button>
+          </div>
 
           {/* Auth Section */}
           <div className="flex items-center space-x-4 rtl:space-x-reverse">

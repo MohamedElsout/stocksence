@@ -15,7 +15,6 @@ import {
   Users,
   Plus,
   Trash2,
-  Calendar,
   CheckCircle,
   XCircle
 } from 'lucide-react';
@@ -59,9 +58,15 @@ const Auth: React.FC = () => {
       let success = false;
       
       if (isLogin) {
-        success = await login(formData.username, formData.password, formData.serialNumber);
+        success = await login(formData.username, formData.password);
       } else {
-        success = await register(formData.username, formData.password, formData.serialNumber);
+        // For first user (admin), no serial number required
+        if (isFirstUser) {
+          success = await register(formData.username, formData.password);
+        } else {
+          // For subsequent users, serial number is required
+          success = await register(formData.username, formData.password, formData.serialNumber);
+        }
       }
 
       if (success) {
@@ -138,15 +143,15 @@ const Auth: React.FC = () => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 className={`mt-4 p-3 rounded-lg ${
-                  theme === 'dark' ? 'bg-blue-900/20' : 'bg-blue-50'
-                } border border-blue-500/30`}
+                  theme === 'dark' ? 'bg-green-900/20' : 'bg-green-50'
+                } border border-green-500/30`}
               >
                 <div className="flex items-center justify-center space-x-2 rtl:space-x-reverse">
-                  <Shield className="w-5 h-5 text-blue-500" />
+                  <Shield className="w-5 h-5 text-green-500" />
                   <span className={`text-sm font-medium ${
-                    theme === 'dark' ? 'text-blue-400' : 'text-blue-600'
+                    theme === 'dark' ? 'text-green-400' : 'text-green-600'
                   }`}>
-                    {isRTL ? 'إنشاء حساب الأدمن الأول' : 'Creating First Admin Account'}
+                    {isRTL ? 'إنشاء حساب الأدمن الأول - بدون رقم تسلسلي' : 'Creating First Admin Account - No Serial Required'}
                   </span>
                 </div>
               </motion.div>
@@ -218,8 +223,8 @@ const Auth: React.FC = () => {
               </div>
             </div>
 
-            {/* Serial Number */}
-            {(!isLogin || isFirstUser) && (
+            {/* Serial Number - Only for non-first users in register mode */}
+            {!isLogin && !isFirstUser && (
               <div>
                 <label className={`block text-sm font-medium mb-2 ${
                   theme === 'dark' ? 'text-gray-300' : 'text-gray-700'

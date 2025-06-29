@@ -55,7 +55,7 @@ interface StoreState {
   users: User[];
   serialNumbers: SerialNumber[];
   isAuthenticated: boolean;
-  login: (username: string, password: string, serialNumber?: string) => Promise<boolean>;
+  login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
   register: (username: string, password: string, serialNumber?: string) => Promise<boolean>;
   addSerialNumber: (serialNumber: string) => void;
@@ -150,53 +150,10 @@ export const useStore = create<StoreState>()(
       ],
       isAuthenticated: false,
 
-      login: async (username: string, password: string, serialNumber?: string) => {
+      login: async (username: string, password: string) => {
         const state = get();
         
-        // Check if this is the first user (admin)
-        if (state.users.length === 0) {
-          if (!serialNumber) {
-            get().addNotification({ type: 'error', message: 'Serial number is required for first admin registration' });
-            return false;
-          }
-          
-          const serial = state.serialNumbers.find(s => s.serialNumber === serialNumber && !s.isUsed);
-          if (!serial) {
-            get().addNotification({ type: 'error', message: 'Invalid or used serial number' });
-            return false;
-          }
-          
-          // Create first admin user
-          const adminUser: User = {
-            id: generateId(),
-            username,
-            password,
-            role: 'admin',
-            serialNumber,
-            createdAt: new Date(),
-            isActive: true
-          };
-          
-          // Mark serial as used
-          set(state => ({
-            users: [adminUser],
-            currentUser: adminUser,
-            isAuthenticated: true,
-            serialNumbers: state.serialNumbers.map(s => 
-              s.id === serial.id 
-                ? { ...s, isUsed: true, usedBy: adminUser.id, usedAt: new Date() }
-                : s
-            )
-          }));
-          
-          get().addNotification({ 
-            type: 'success', 
-            message: state.language === 'ar' ? 'تم إنشاء حساب الأدمن بنجاح!' : 'Admin account created successfully!' 
-          });
-          return true;
-        }
-        
-        // Regular login
+        // Regular login - find user by username and password
         const user = state.users.find(u => u.username === username && u.password === password && u.isActive);
         if (user) {
           set({ currentUser: user, isAuthenticated: true });
@@ -226,6 +183,31 @@ export const useStore = create<StoreState>()(
           return false;
         }
         
+        // Check if this is the first user (admin) - no serial number required
+        if (state.users.length === 0) {
+          const adminUser: User = {
+            id: generateId(),
+            username,
+            password,
+            role: 'admin',
+            createdAt: new Date(),
+            isActive: true
+          };
+          
+          set(state => ({
+            users: [adminUser],
+            currentUser: adminUser,
+            isAuthenticated: true
+          }));
+          
+          get().addNotification({ 
+            type: 'success', 
+            message: state.language === 'ar' ? 'تم إنشاء حساب الأدمن بنجاح!' : 'Admin account created successfully!' 
+          });
+          return true;
+        }
+        
+        // For subsequent users, serial number is required
         if (!serialNumber) {
           get().addNotification({ 
             type: 'error', 

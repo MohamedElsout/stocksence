@@ -104,6 +104,7 @@ const Landing: React.FC = () => {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 1, delay: 0.5 }}
         className={`fixed bottom-6 ${isRTL ? 'left-6' : 'right-6'} z-40`}
+        style={{ borderRadius: '50%', overflow: 'hidden', width: '80px', height: '80px' }}
       >
         <motion.div
           animate={{ rotate: 360 }}
@@ -113,12 +114,13 @@ const Landing: React.FC = () => {
             ease: "linear"
           }}
           whileHover={{ scale: 1.1 }}
-          className="w-20 h-20"
+          style={{ width: '100%', height: '100%', borderRadius: '50%' }}
         >
           <img 
             src="/download copy.png" 
             alt="Powered by Bolt" 
-            className="w-full h-full"
+            className="w-full h-full rounded-full"
+            style={{ objectFit: 'cover' }}
           />
         </motion.div>
       </motion.div>

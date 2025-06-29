@@ -61,10 +61,11 @@ interface StoreState {
   autoLoginWithGoogle: boolean;
   login: (username: string, password: string, serialNumber?: string) => Promise<boolean>;
   logout: () => void;
-  register: (username: string, password: string, serialNumber?: string) => Promise<boolean>;
+  register: (username: string, password: string, email?: string) => Promise<boolean>;
   addSerialNumber: (serialNumber: string) => void;
   removeSerialNumber: (id: string) => void;
   setAutoLoginWithGoogle: (enabled: boolean) => void;
+  clearAllData: () => void;
   
   products: Product[];
   addProduct: (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt' | 'serialNumber'>) => void;
@@ -135,6 +136,7 @@ const getGoogleEmail = async (): Promise<string | null> => {
     if ('google' in window && (window as any).google?.accounts) {
       return new Promise((resolve) => {
         (window as any).google.accounts.id.initialize({
+          client_id: 'YOUR_GOOGLE_CLIENT_ID', // يجب إضافة Client ID الحقيقي
           callback: (response: any) => {
             const payload = JSON.parse(atob(response.credential.split('.')[1]));
             resolve(payload.email);
@@ -172,29 +174,10 @@ const getGoogleEmail = async (): Promise<string | null> => {
 export const useStore = create<StoreState>()(
   persist(
     (set, get) => ({
-      // Authentication state
+      // Authentication state - مسح البيانات
       currentUser: null,
       users: [],
-      serialNumbers: [
-        {
-          id: '1',
-          serialNumber: 'ADMIN001',
-          isUsed: false,
-          createdAt: new Date(),
-        },
-        {
-          id: '2',
-          serialNumber: 'EMP001',
-          isUsed: false,
-          createdAt: new Date(),
-        },
-        {
-          id: '3',
-          serialNumber: 'EMP002',
-          isUsed: false,
-          createdAt: new Date(),
-        }
-      ],
+      serialNumbers: [],
       isAuthenticated: false,
       autoLoginWithGoogle: false,
 
@@ -243,7 +226,7 @@ export const useStore = create<StoreState>()(
         return true;
       },
 
-      register: async (username: string, password: string, serialNumber?: string) => {
+      register: async (username: string, password: string, email?: string) => {
         const state = get();
         
         // Check if username already exists
@@ -255,13 +238,13 @@ export const useStore = create<StoreState>()(
           return false;
         }
         
-        let userEmail: string | undefined;
+        let userEmail: string | undefined = email;
         
         // محاولة الحصول على الإيميل من Google إذا كان التسجيل التلقائي مفعل
-        if (state.autoLoginWithGoogle) {
-          const email = await getGoogleEmail();
-          if (email) {
-            userEmail = email;
+        if (state.autoLoginWithGoogle && !userEmail) {
+          const googleEmail = await getGoogleEmail();
+          if (googleEmail) {
+            userEmail = googleEmail;
           }
         }
         
@@ -373,150 +356,24 @@ export const useStore = create<StoreState>()(
       setAutoLoginWithGoogle: (enabled: boolean) => {
         set({ autoLoginWithGoogle: enabled });
       },
+
+      clearAllData: () => {
+        set({
+          currentUser: null,
+          users: [],
+          serialNumbers: [],
+          isAuthenticated: false,
+          products: [],
+          sales: []
+        });
+        
+        get().addNotification({ 
+          type: 'success', 
+          message: get().language === 'ar' ? 'تم مسح جميع البيانات بنجاح!' : 'All data cleared successfully!' 
+        });
+      },
       
-      products: [
-        {
-          id: '1',
-          name: 'MacBook Pro 16"',
-          description: 'Apple MacBook Pro with M2 Max chip, 32GB RAM, 1TB SSD',
-          quantity: 15,
-          price: 78000,
-          category: 'Electronics',
-          serialNumber: generateProductSerial(),
-          createdAt: new Date('2024-01-15'),
-          updatedAt: new Date('2024-01-15'),
-        },
-        {
-          id: '2',
-          name: 'Herman Miller Aeron Chair',
-          description: 'Ergonomic office chair with lumbar support',
-          quantity: 8,
-          price: 43500,
-          category: 'Furniture',
-          serialNumber: generateProductSerial(),
-          createdAt: new Date('2024-01-10'),
-          updatedAt: new Date('2024-01-10'),
-        },
-        {
-          id: '3',
-          name: 'iPhone 15 Pro Max',
-          description: 'Latest iPhone with titanium design, 256GB storage',
-          quantity: 25,
-          price: 37500,
-          category: 'Electronics',
-          serialNumber: generateProductSerial(),
-          createdAt: new Date('2024-01-20'),
-          updatedAt: new Date('2024-01-20'),
-        },
-        {
-          id: '4',
-          name: 'Logitech MX Master 3S',
-          description: 'Wireless mouse with precision tracking',
-          quantity: 4,
-          price: 3120,
-          category: 'Electronics',
-          serialNumber: generateProductSerial(),
-          createdAt: new Date('2024-01-12'),
-          updatedAt: new Date('2024-01-12'),
-        },
-        {
-          id: '5',
-          name: 'Standing Desk',
-          description: 'Height adjustable electric standing desk',
-          quantity: 12,
-          price: 18750,
-          category: 'Furniture',
-          serialNumber: generateProductSerial(),
-          createdAt: new Date('2024-01-18'),
-          updatedAt: new Date('2024-01-18'),
-        },
-        {
-          id: '6',
-          name: 'Dell UltraSharp 4K Monitor',
-          description: '27-inch 4K USB-C monitor with color accuracy',
-          quantity: 18,
-          price: 20300,
-          category: 'Electronics',
-          serialNumber: generateProductSerial(),
-          createdAt: new Date('2024-01-22'),
-          updatedAt: new Date('2024-01-22'),
-        },
-        {
-          id: '7',
-          name: 'Mechanical Keyboard',
-          description: 'RGB backlit mechanical keyboard with blue switches',
-          quantity: 2,
-          price: 4680,
-          category: 'Electronics',
-          serialNumber: generateProductSerial(),
-          createdAt: new Date('2024-01-14'),
-          updatedAt: new Date('2024-01-14'),
-        },
-        {
-          id: '8',
-          name: 'Office Bookshelf',
-          description: '5-tier wooden bookshelf for office organization',
-          quantity: 6,
-          price: 9375,
-          category: 'Furniture',
-          serialNumber: generateProductSerial(),
-          createdAt: new Date('2024-01-16'),
-          updatedAt: new Date('2024-01-16'),
-        }
-      ],
-      
-      sales: [
-        {
-          id: 's1',
-          productId: '1',
-          productName: 'MacBook Pro 16"',
-          quantity: 2,
-          price: 78000,
-          totalAmount: 156000,
-          saleDate: new Date('2024-01-25'),
-          barcodeScan: false,
-        },
-        {
-          id: 's2',
-          productId: '3',
-          productName: 'iPhone 15 Pro Max',
-          quantity: 5,
-          price: 37500,
-          totalAmount: 187500,
-          saleDate: new Date('2024-01-24'),
-          barcodeScan: true,
-        },
-        {
-          id: 's3',
-          productId: '6',
-          productName: 'Dell UltraSharp 4K Monitor',
-          quantity: 3,
-          price: 20300,
-          totalAmount: 60900,
-          saleDate: new Date('2024-01-23'),
-          barcodeScan: false,
-        },
-        {
-          id: 's4',
-          productId: '2',
-          productName: 'Herman Miller Aeron Chair',
-          quantity: 1,
-          price: 43500,
-          totalAmount: 43500,
-          saleDate: new Date('2024-01-22'),
-          barcodeScan: true,
-        },
-        {
-          id: 's5',
-          productId: '5',
-          productName: 'Standing Desk',
-          quantity: 2,
-          price: 18750,
-          totalAmount: 37500,
-          saleDate: new Date('2024-01-21'),
-          barcodeScan: false,
-        }
-      ],
+      products: [],
       
       addProduct: (productData) => {
         const newProduct: Product = {
@@ -554,6 +411,8 @@ export const useStore = create<StoreState>()(
         }));
         get().addNotification({ type: 'success', message: 'Product deleted successfully!' });
       },
+      
+      sales: [],
       
       addSale: (saleData) => {
         const newSale: Sale = {

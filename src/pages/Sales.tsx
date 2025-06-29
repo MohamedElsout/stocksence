@@ -9,7 +9,11 @@ import {
   DollarSign,
   Package,
   TrendingUp,
-  Receipt
+  Receipt,
+  Scan,
+  Hash,
+  CheckCircle,
+  XCircle
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import Sidebar from '../components/Layout/Sidebar';
@@ -25,6 +29,7 @@ const Sales: React.FC = () => {
   const [saleForm, setSaleForm] = useState({
     productId: '',
     quantity: 1,
+    barcodeScan: false, // إضافة خيار مسح الباركود
   });
 
   const selectedProduct = products.find(p => p.id === saleForm.productId);
@@ -42,6 +47,8 @@ const Sales: React.FC = () => {
     return saleDate.toDateString() === today.toDateString();
   });
 
+  const barcodeSales = sales.filter(sale => sale.barcodeScan).length;
+
   const handleSale = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedProduct) return;
@@ -56,9 +63,10 @@ const Sales: React.FC = () => {
       quantity: saleForm.quantity,
       price: selectedProduct.price,
       totalAmount: totalAmount,
+      barcodeScan: saleForm.barcodeScan,
     });
 
-    setSaleForm({ productId: '', quantity: 1 });
+    setSaleForm({ productId: '', quantity: 1, barcodeScan: false });
     setIsSaleModalOpen(false);
   };
 
@@ -84,6 +92,13 @@ const Sales: React.FC = () => {
       value: todaySales.length,
       color: 'text-purple-500',
       bgColor: 'bg-purple-50 dark:bg-purple-900/20'
+    },
+    {
+      icon: Scan,
+      label: 'Barcode Sales',
+      value: barcodeSales,
+      color: 'text-orange-500',
+      bgColor: 'bg-orange-50 dark:bg-orange-900/20'
     }
   ];
 
@@ -115,7 +130,7 @@ const Sales: React.FC = () => {
           </motion.div>
 
           {/* Stats Cards */}
-          <div className="grid md:grid-cols-3 gap-6 mb-8">
+          <div className="grid md:grid-cols-4 gap-6 mb-8">
             {stats.map((stat, index) => {
               const Icon = stat.icon;
               return (
@@ -256,6 +271,11 @@ const Sales: React.FC = () => {
                       <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                         theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
                       }`}>
+                        Sale Method
+                      </th>
+                      <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                        theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                      }`}>
                         {t('saleDate')}
                       </th>
                     </tr>
@@ -299,6 +319,27 @@ const Sales: React.FC = () => {
                         }`}>
                           {formatPrice(sale.totalAmount)}
                         </td>
+                        <td className={`px-6 py-4 whitespace-nowrap ${
+                          theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                        }`}>
+                          <span className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${
+                            sale.barcodeScan
+                              ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400'
+                              : 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
+                          }`}>
+                            {sale.barcodeScan ? (
+                              <>
+                                <Scan className="w-3 h-3 mr-1" />
+                                Barcode
+                              </>
+                            ) : (
+                              <>
+                                <Hash className="w-3 h-3 mr-1" />
+                                Manual
+                              </>
+                            )}
+                          </span>
+                        </td>
                         <td className={`px-6 py-4 whitespace-nowrap text-sm ${
                           theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
                         }`}>
@@ -319,11 +360,53 @@ const Sales: React.FC = () => {
         isOpen={isSaleModalOpen}
         onClose={() => {
           setIsSaleModalOpen(false);
-          setSaleForm({ productId: '', quantity: 1 });
+          setSaleForm({ productId: '', quantity: 1, barcodeScan: false });
         }}
         title={t('sellProduct')}
       >
         <form onSubmit={handleSale} className="space-y-6">
+          {/* Barcode Scan Option */}
+          <div className={`p-4 rounded-lg ${
+            theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'
+          } border ${theme === 'dark' ? 'border-gray-600' : 'border-gray-200'}`}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <Scan className={`w-5 h-5 ${
+                  theme === 'dark' ? 'text-purple-400' : 'text-purple-600'
+                }`} />
+                <div>
+                  <p className={`font-medium ${
+                    theme === 'dark' ? 'text-white' : 'text-gray-900'
+                  }`}>
+                    Barcode Scan
+                  </p>
+                  <p className={`text-xs ${
+                    theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                  }`}>
+                    Mark this sale as scanned via barcode
+                  </p>
+                </div>
+              </div>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                type="button"
+                onClick={() => setSaleForm({ ...saleForm, barcodeScan: !saleForm.barcodeScan })}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                  saleForm.barcodeScan 
+                    ? 'bg-purple-600' 
+                    : theme === 'dark' ? 'bg-gray-600' : 'bg-gray-300'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    saleForm.barcodeScan ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </motion.button>
+            </div>
+          </div>
+
           {/* Product Selection */}
           <div>
             <label className={`block text-sm font-medium mb-2 ${
@@ -346,7 +429,7 @@ const Sales: React.FC = () => {
                 .filter(product => product.quantity > 0)
                 .map(product => (
                   <option key={product.id} value={product.id}>
-                    {product.name} ({t('stock')}: {product.quantity})
+                    {product.name} ({t('stock')}: {product.quantity}) - {product.serialNumber}
                   </option>
                 ))}
             </select>
@@ -376,7 +459,7 @@ const Sales: React.FC = () => {
               <p className={`text-xs mt-1 ${
                 theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
               }`}>
-                {t('availableStock')}: {selectedProduct.quantity}
+                {t('availableStock')}: {selectedProduct.quantity} | Serial: {selectedProduct.serialNumber}
               </p>
             )}
           </div>
@@ -407,6 +490,19 @@ const Sales: React.FC = () => {
               }`}>
                 {saleForm.quantity} × {formatPrice(selectedProduct.price)}
               </div>
+              <div className="flex items-center mt-2 space-x-2">
+                {saleForm.barcodeScan ? (
+                  <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400">
+                    <Scan className="w-3 h-3 mr-1" />
+                    Barcode Sale
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400">
+                    <Hash className="w-3 h-3 mr-1" />
+                    Manual Sale
+                  </span>
+                )}
+              </div>
             </motion.div>
           )}
 
@@ -418,7 +514,7 @@ const Sales: React.FC = () => {
               type="button"
               onClick={() => {
                 setIsSaleModalOpen(false);
-                setSaleForm({ productId: '', quantity: 1 });
+                setSaleForm({ productId: '', quantity: 1, barcodeScan: false });
               }}
               className={`px-4 py-2 border rounded-lg ${
                 theme === 'dark'

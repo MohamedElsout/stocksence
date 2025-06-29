@@ -94,9 +94,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
         onClick={onToggle}
         className={`fixed top-20 ${isRTL ? 'right-4' : 'left-4'} z-50 p-3 rounded-lg shadow-lg ${
           theme === 'dark'
-            ? 'bg-gray-800/40 text-white border border-gray-700/30'
-            : 'bg-white/40 text-gray-900 border border-gray-200/30'
+            ? 'bg-gray-800/20 text-white border border-gray-700/20'
+            : 'bg-white/20 text-gray-900 border border-gray-200/20'
         } hover:shadow-xl transition-all duration-300 backdrop-blur-md`}
+        style={{ opacity: 0.7 }}
       >
         <Menu className="w-5 h-5" />
       </motion.button>

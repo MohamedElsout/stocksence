@@ -17,7 +17,9 @@ import {
   Trash2,
   CheckCircle,
   XCircle,
-  Info
+  Info,
+  Mail,
+  Globe
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 
@@ -33,7 +35,9 @@ const Auth: React.FC = () => {
     addSerialNumber, 
     removeSerialNumber,
     currentUser,
-    isAuthenticated 
+    isAuthenticated,
+    autoLoginWithGoogle,
+    setAutoLoginWithGoogle
   } = useStore();
   
   const [isLogin, setIsLogin] = useState(true);
@@ -165,12 +169,62 @@ const Auth: React.FC = () => {
                   <span className={`text-sm font-medium ${
                     theme === 'dark' ? 'text-green-400' : 'text-green-600'
                   }`}>
-                    {isRTL ? 'فقط اسم المستخدم وكلمة المرور مطلوبان' : 'Only username and password required'}
+                    {users.length === 0 
+                      ? (isRTL ? 'أول مستخدم سيكون أدمن تلقائياً' : 'First user will be admin automatically')
+                      : (isRTL ? 'المستخدمون الجدد سيكونون موظفين' : 'New users will be employees')
+                    }
                   </span>
                 </div>
               </motion.div>
             )}
           </div>
+
+          {/* Google Auto-Login Option */}
+          {!isLogin && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={`p-4 rounded-lg ${
+                theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'
+              } border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3 rtl:space-x-reverse">
+                  <Globe className={`w-5 h-5 ${
+                    theme === 'dark' ? 'text-blue-400' : 'text-blue-600'
+                  }`} />
+                  <div>
+                    <p className={`font-medium ${
+                      theme === 'dark' ? 'text-white' : 'text-gray-900'
+                    }`}>
+                      {isRTL ? 'تسجيل دخول تلقائي بـ Google' : 'Auto-login with Google'}
+                    </p>
+                    <p className={`text-xs ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                    }`}>
+                      {isRTL ? 'سيتم حفظ إيميل Google للتسجيل السريع' : 'Google email will be saved for quick login'}
+                    </p>
+                  </div>
+                </div>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setAutoLoginWithGoogle(!autoLoginWithGoogle)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    autoLoginWithGoogle 
+                      ? 'bg-blue-600' 
+                      : theme === 'dark' ? 'bg-gray-600' : 'bg-gray-300'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      autoLoginWithGoogle ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </motion.button>
+              </div>
+            </motion.div>
+          )}
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -415,6 +469,9 @@ const Auth: React.FC = () => {
               </p>
               <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                 {isRTL ? '• الرقم التسلسلي يُعطى تلقائياً عند التسجيل' : '• Serial number is auto-generated on registration'}
+              </p>
+              <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                {isRTL ? '• أول مستخدم يصبح أدمن تلقائياً' : '• First user becomes admin automatically'}
               </p>
             </div>
           </div>

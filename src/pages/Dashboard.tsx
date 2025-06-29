@@ -12,7 +12,10 @@ import {
   DollarSign,
   Eye,
   Filter,
-  Download
+  Download,
+  Hash,
+  Copy,
+  CheckCircle
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import Sidebar from '../components/Layout/Sidebar';
@@ -39,6 +42,7 @@ const Dashboard: React.FC = () => {
   const [viewingProduct, setViewingProduct] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
+  const [copiedSerial, setCopiedSerial] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -50,7 +54,8 @@ const Dashboard: React.FC = () => {
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          product.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.description.toLowerCase().includes(searchTerm.toLowerCase());
+                         product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         product.serialNumber.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = categoryFilter === '' || product.category === categoryFilter;
     return matchesSearch && matchesCategory;
   });
@@ -95,10 +100,20 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const copySerialNumber = async (serialNumber: string) => {
+    try {
+      await navigator.clipboard.writeText(serialNumber);
+      setCopiedSerial(serialNumber);
+      setTimeout(() => setCopiedSerial(null), 2000);
+    } catch (err) {
+      console.error('Failed to copy serial number:', err);
+    }
+  };
+
   const exportData = () => {
     const csvContent = "data:text/csv;charset=utf-8," 
-      + "Name,Description,Quantity,Price,Category,Created At\n"
-      + products.map(p => `"${p.name}","${p.description}",${p.quantity},${p.price},"${p.category}","${p.createdAt}"`).join("\n");
+      + "Name,Description,Quantity,Price,Category,Serial Number,Created At\n"
+      + products.map(p => `"${p.name}","${p.description}",${p.quantity},${p.price},"${p.category}","${p.serialNumber}","${p.createdAt}"`).join("\n");
     
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
@@ -343,6 +358,11 @@ const Dashboard: React.FC = () => {
                       <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                         theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
                       }`}>
+                        {t('serialNumber')}
+                      </th>
+                      <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                        theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                      }`}>
                         {t('category')}
                       </th>
                       <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
@@ -392,6 +412,36 @@ const Dashboard: React.FC = () => {
                                 ? `${product.description.substring(0, 50)}...` 
                                 : product.description}
                             </div>
+                          </div>
+                        </td>
+                        <td className={`px-6 py-4 whitespace-nowrap ${
+                          theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                        }`}>
+                          <div className="flex items-center space-x-2">
+                            <span className={`font-mono text-sm px-2 py-1 rounded ${
+                              theme === 'dark' ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-800'
+                            }`}>
+                              {product.serialNumber}
+                            </span>
+                            <motion.button
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
+                              onClick={() => copySerialNumber(product.serialNumber)}
+                              className={`p-1 rounded transition-colors ${
+                                copiedSerial === product.serialNumber
+                                  ? 'text-green-500'
+                                  : theme === 'dark' 
+                                  ? 'text-gray-400 hover:text-white' 
+                                  : 'text-gray-500 hover:text-gray-700'
+                              }`}
+                              title="Copy Serial Number"
+                            >
+                              {copiedSerial === product.serialNumber ? (
+                                <CheckCircle className="w-4 h-4" />
+                              ) : (
+                                <Copy className="w-4 h-4" />
+                              )}
+                            </motion.button>
                           </div>
                         </td>
                         <td className={`px-6 py-4 whitespace-nowrap ${
@@ -575,6 +625,21 @@ const Dashboard: React.FC = () => {
               required
             />
           </div>
+
+          {!editingProduct && (
+            <div className={`p-3 rounded-lg ${
+              theme === 'dark' ? 'bg-blue-900/20' : 'bg-blue-50'
+            } border border-blue-500/30`}>
+              <div className="flex items-center space-x-2">
+                <Hash className="w-5 h-5 text-blue-500" />
+                <span className={`text-sm font-medium ${
+                  theme === 'dark' ? 'text-blue-400' : 'text-blue-600'
+                }`}>
+                  سيتم إنشاء رقم تسلسلي تلقائياً للمنتج
+                </span>
+              </div>
+            </div>
+          )}
           
           <div className="flex justify-end space-x-3 pt-4">
             <motion.button
@@ -643,6 +708,40 @@ const Dashboard: React.FC = () => {
                 }`}>
                   {viewingProduct.category}
                 </span>
+              </div>
+            </div>
+
+            <div>
+              <label className={`block text-sm font-medium mb-1 ${
+                theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+              }`}>
+                {t('serialNumber')}
+              </label>
+              <div className="flex items-center space-x-2">
+                <span className={`font-mono text-lg px-3 py-2 rounded-lg ${
+                  theme === 'dark' ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-800'
+                }`}>
+                  {viewingProduct.serialNumber}
+                </span>
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => copySerialNumber(viewingProduct.serialNumber)}
+                  className={`p-2 rounded-lg transition-colors ${
+                    copiedSerial === viewingProduct.serialNumber
+                      ? 'text-green-500 bg-green-50 dark:bg-green-900/20'
+                      : theme === 'dark' 
+                      ? 'text-gray-400 hover:text-white hover:bg-gray-700' 
+                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                  }`}
+                  title="Copy Serial Number"
+                >
+                  {copiedSerial === viewingProduct.serialNumber ? (
+                    <CheckCircle className="w-5 h-5" />
+                  ) : (
+                    <Copy className="w-5 h-5" />
+                  )}
+                </motion.button>
               </div>
             </div>
             

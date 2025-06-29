@@ -8,6 +8,7 @@ export interface Product {
   quantity: number;
   price: number;
   category: string;
+  serialNumber: string; // إضافة رقم تسلسلي للمنتج
   createdAt: Date;
   updatedAt: Date;
 }
@@ -20,6 +21,7 @@ export interface Sale {
   price: number;
   totalAmount: number;
   saleDate: Date;
+  barcodeScan?: boolean; // إضافة خيار مسح الباركود
 }
 
 export interface Currency {
@@ -38,6 +40,7 @@ export interface User {
   serialNumber?: string;
   createdAt: Date;
   isActive: boolean;
+  email?: string; // إضافة الإيميل للتسجيل التلقائي
 }
 
 export interface SerialNumber {
@@ -55,14 +58,16 @@ interface StoreState {
   users: User[];
   serialNumbers: SerialNumber[];
   isAuthenticated: boolean;
+  autoLoginWithGoogle: boolean;
   login: (username: string, password: string, serialNumber?: string) => Promise<boolean>;
   logout: () => void;
   register: (username: string, password: string, serialNumber?: string) => Promise<boolean>;
   addSerialNumber: (serialNumber: string) => void;
   removeSerialNumber: (id: string) => void;
+  setAutoLoginWithGoogle: (enabled: boolean) => void;
   
   products: Product[];
-  addProduct: (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  addProduct: (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt' | 'serialNumber'>) => void;
   updateProduct: (id: string, product: Partial<Product>) => void;
   deleteProduct: (id: string) => void;
   
@@ -90,6 +95,7 @@ interface StoreState {
 }
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
+const generateProductSerial = () => `PRD${Date.now()}${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
 
 const currencies: Currency[] = [
   {
@@ -122,6 +128,47 @@ const currencies: Currency[] = [
   }
 ];
 
+// دالة للحصول على الإيميل من Google
+const getGoogleEmail = async (): Promise<string | null> => {
+  try {
+    // محاولة الحصول على الإيميل من Google Account API
+    if ('google' in window && (window as any).google?.accounts) {
+      return new Promise((resolve) => {
+        (window as any).google.accounts.id.initialize({
+          callback: (response: any) => {
+            const payload = JSON.parse(atob(response.credential.split('.')[1]));
+            resolve(payload.email);
+          }
+        });
+        (window as any).google.accounts.id.prompt();
+      });
+    }
+    
+    // بديل: محاولة الحصول على الإيميل من localStorage أو sessionStorage
+    const savedEmail = localStorage.getItem('userEmail') || sessionStorage.getItem('userEmail');
+    if (savedEmail) return savedEmail;
+    
+    // بديل آخر: استخدام navigator.credentials إذا كان متاحاً
+    if ('credentials' in navigator && navigator.credentials) {
+      const credential = await navigator.credentials.get({
+        password: true,
+        federated: {
+          providers: ['https://accounts.google.com']
+        }
+      } as any);
+      
+      if (credential && 'id' in credential) {
+        return credential.id;
+      }
+    }
+    
+    return null;
+  } catch (error) {
+    console.log('Could not get Google email:', error);
+    return null;
+  }
+};
+
 export const useStore = create<StoreState>()(
   persist(
     (set, get) => ({
@@ -149,6 +196,7 @@ export const useStore = create<StoreState>()(
         }
       ],
       isAuthenticated: false,
+      autoLoginWithGoogle: false,
 
       login: async (username: string, password: string, serialNumber?: string) => {
         const state = get();
@@ -182,6 +230,12 @@ export const useStore = create<StoreState>()(
         }
         
         set({ currentUser: user, isAuthenticated: true });
+        
+        // إذا كان التسجيل التلقائي مفعل، احفظ الإيميل
+        if (state.autoLoginWithGoogle && user.email) {
+          localStorage.setItem('userEmail', user.email);
+        }
+        
         get().addNotification({ 
           type: 'success', 
           message: state.language === 'ar' ? 'تم تسجيل الدخول بنجاح!' : 'Login successful!' 
@@ -201,6 +255,16 @@ export const useStore = create<StoreState>()(
           return false;
         }
         
+        let userEmail: string | undefined;
+        
+        // محاولة الحصول على الإيميل من Google إذا كان التسجيل التلقائي مفعل
+        if (state.autoLoginWithGoogle) {
+          const email = await getGoogleEmail();
+          if (email) {
+            userEmail = email;
+          }
+        }
+        
         // Check if this is the first user (admin) - no serial number required
         if (state.users.length === 0) {
           // إنشاء أول مستخدم (أدمن) - بدون رقم تسلسلي
@@ -210,7 +274,8 @@ export const useStore = create<StoreState>()(
             password,
             role: 'admin',
             createdAt: new Date(),
-            isActive: true
+            isActive: true,
+            email: userEmail
           };
           
           set(state => ({
@@ -226,18 +291,18 @@ export const useStore = create<StoreState>()(
           return true;
         }
         
-        // للمستخدمين الجدد (ليس الأدمن الأول) - إنشاء حساب بدون رقم تسلسلي
-        // سيتم ربط رقم تسلسلي تلقائياً
+        // للمستخدمين الجدد (ليس الأدمن الأول) - إنشاء حساب موظف
         const autoSerialNumber = `USER${Date.now()}`;
         
         const newUser: User = {
           id: generateId(),
           username,
           password,
-          role: 'employee',
+          role: 'employee', // المستخدمون الجدد يكونون موظفين
           serialNumber: autoSerialNumber,
           createdAt: new Date(),
-          isActive: true
+          isActive: true,
+          email: userEmail
         };
         
         // إضافة الرقم التسلسلي التلقائي للقائمة
@@ -268,6 +333,8 @@ export const useStore = create<StoreState>()(
 
       logout: () => {
         set({ currentUser: null, isAuthenticated: false });
+        localStorage.removeItem('userEmail');
+        sessionStorage.removeItem('userEmail');
         get().addNotification({ 
           type: 'success', 
           message: get().language === 'ar' ? 'تم تسجيل الخروج بنجاح!' : 'Logged out successfully!' 
@@ -302,6 +369,10 @@ export const useStore = create<StoreState>()(
           message: get().language === 'ar' ? 'تم حذف الرقم التسلسلي بنجاح!' : 'Serial number removed successfully!' 
         });
       },
+
+      setAutoLoginWithGoogle: (enabled: boolean) => {
+        set({ autoLoginWithGoogle: enabled });
+      },
       
       products: [
         {
@@ -311,6 +382,7 @@ export const useStore = create<StoreState>()(
           quantity: 15,
           price: 78000,
           category: 'Electronics',
+          serialNumber: generateProductSerial(),
           createdAt: new Date('2024-01-15'),
           updatedAt: new Date('2024-01-15'),
         },
@@ -321,6 +393,7 @@ export const useStore = create<StoreState>()(
           quantity: 8,
           price: 43500,
           category: 'Furniture',
+          serialNumber: generateProductSerial(),
           createdAt: new Date('2024-01-10'),
           updatedAt: new Date('2024-01-10'),
         },
@@ -331,6 +404,7 @@ export const useStore = create<StoreState>()(
           quantity: 25,
           price: 37500,
           category: 'Electronics',
+          serialNumber: generateProductSerial(),
           createdAt: new Date('2024-01-20'),
           updatedAt: new Date('2024-01-20'),
         },
@@ -341,6 +415,7 @@ export const useStore = create<StoreState>()(
           quantity: 4,
           price: 3120,
           category: 'Electronics',
+          serialNumber: generateProductSerial(),
           createdAt: new Date('2024-01-12'),
           updatedAt: new Date('2024-01-12'),
         },
@@ -351,6 +426,7 @@ export const useStore = create<StoreState>()(
           quantity: 12,
           price: 18750,
           category: 'Furniture',
+          serialNumber: generateProductSerial(),
           createdAt: new Date('2024-01-18'),
           updatedAt: new Date('2024-01-18'),
         },
@@ -361,6 +437,7 @@ export const useStore = create<StoreState>()(
           quantity: 18,
           price: 20300,
           category: 'Electronics',
+          serialNumber: generateProductSerial(),
           createdAt: new Date('2024-01-22'),
           updatedAt: new Date('2024-01-22'),
         },
@@ -371,6 +448,7 @@ export const useStore = create<StoreState>()(
           quantity: 2,
           price: 4680,
           category: 'Electronics',
+          serialNumber: generateProductSerial(),
           createdAt: new Date('2024-01-14'),
           updatedAt: new Date('2024-01-14'),
         },
@@ -381,6 +459,7 @@ export const useStore = create<StoreState>()(
           quantity: 6,
           price: 9375,
           category: 'Furniture',
+          serialNumber: generateProductSerial(),
           createdAt: new Date('2024-01-16'),
           updatedAt: new Date('2024-01-16'),
         }
@@ -395,6 +474,7 @@ export const useStore = create<StoreState>()(
           price: 78000,
           totalAmount: 156000,
           saleDate: new Date('2024-01-25'),
+          barcodeScan: false,
         },
         {
           id: 's2',
@@ -404,6 +484,7 @@ export const useStore = create<StoreState>()(
           price: 37500,
           totalAmount: 187500,
           saleDate: new Date('2024-01-24'),
+          barcodeScan: true,
         },
         {
           id: 's3',
@@ -413,6 +494,7 @@ export const useStore = create<StoreState>()(
           price: 20300,
           totalAmount: 60900,
           saleDate: new Date('2024-01-23'),
+          barcodeScan: false,
         },
         {
           id: 's4',
@@ -422,6 +504,7 @@ export const useStore = create<StoreState>()(
           price: 43500,
           totalAmount: 43500,
           saleDate: new Date('2024-01-22'),
+          barcodeScan: true,
         },
         {
           id: 's5',
@@ -431,6 +514,7 @@ export const useStore = create<StoreState>()(
           price: 18750,
           totalAmount: 37500,
           saleDate: new Date('2024-01-21'),
+          barcodeScan: false,
         }
       ],
       
@@ -438,13 +522,19 @@ export const useStore = create<StoreState>()(
         const newProduct: Product = {
           ...productData,
           id: generateId(),
+          serialNumber: generateProductSerial(), // إضافة رقم تسلسلي تلقائي
           createdAt: new Date(),
           updatedAt: new Date(),
         };
         set((state) => ({
           products: [...state.products, newProduct],
         }));
-        get().addNotification({ type: 'success', message: 'Product added successfully!' });
+        get().addNotification({ 
+          type: 'success', 
+          message: get().language === 'ar' 
+            ? `تم إضافة المنتج بنجاح! الرقم التسلسلي: ${newProduct.serialNumber}` 
+            : `Product added successfully! Serial: ${newProduct.serialNumber}` 
+        });
       },
       
       updateProduct: (id, productData) => {
@@ -482,16 +572,30 @@ export const useStore = create<StoreState>()(
             sales: [...state.sales, newSale],
           }));
           
-          get().addNotification({ type: 'success', message: 'Sale completed successfully!' });
+          const saleMethod = saleData.barcodeScan ? 
+            (get().language === 'ar' ? 'بمسح الباركود' : 'via barcode scan') : 
+            (get().language === 'ar' ? 'يدوياً' : 'manually');
+          
+          get().addNotification({ 
+            type: 'success', 
+            message: get().language === 'ar' 
+              ? `تم إتمام البيع بنجاح ${saleMethod}!` 
+              : `Sale completed successfully ${saleMethod}!` 
+          });
           
           if (product.quantity - saleData.quantity < 5) {
             get().addNotification({ 
               type: 'warning', 
-              message: `Low stock warning: ${product.name} has ${product.quantity - saleData.quantity} items left!` 
+              message: get().language === 'ar'
+                ? `تحذير مخزون منخفض: ${product.name} متبقي ${product.quantity - saleData.quantity} قطعة!`
+                : `Low stock warning: ${product.name} has ${product.quantity - saleData.quantity} items left!` 
             });
           }
         } else {
-          get().addNotification({ type: 'error', message: 'Insufficient stock available!' });
+          get().addNotification({ 
+            type: 'error', 
+            message: get().language === 'ar' ? 'المخزون غير كافي!' : 'Insufficient stock available!' 
+          });
         }
       },
       
@@ -573,6 +677,7 @@ export const useStore = create<StoreState>()(
         serialNumbers: state.serialNumbers,
         currentUser: state.currentUser,
         isAuthenticated: state.isAuthenticated,
+        autoLoginWithGoogle: state.autoLoginWithGoogle,
       }),
     }
   )

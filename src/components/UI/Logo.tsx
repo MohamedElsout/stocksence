@@ -27,7 +27,7 @@ const Logo: React.FC<LogoProps> = ({
   
   return (
     <div className={`flex items-center space-x-2 rtl:space-x-reverse ${className}`}>
-      {/* Logo Image - Using the new logo.png */}
+      {/* Logo Image - بدون حواف بيضاء */}
       <motion.div
         whileHover={{ 
           scale: 1.05,
@@ -42,24 +42,36 @@ const Logo: React.FC<LogoProps> = ({
           filter: 'drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15))'
         }}
       >
-        {/* Main Logo Image - Circular with perfect fit */}
+        {/* Main Logo Image - مباشرة بدون خلفية بيضاء */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="w-full h-full rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-purple-600 p-0.5"
+          className="w-full h-full rounded-full overflow-hidden relative"
         >
-          <div className="w-full h-full rounded-full overflow-hidden bg-white dark:bg-gray-800 p-1">
-            <img 
-              src="/logo.png" 
-              alt="StockSence Logo" 
-              className="w-full h-full object-contain rounded-full"
-              style={{
-                imageRendering: 'crisp-edges',
-                WebkitImageRendering: 'crisp-edges'
-              }}
-            />
-          </div>
+          {/* الصورة مباشرة بدون حاوي أبيض */}
+          <img 
+            src="/logo.png" 
+            alt="StockSence Logo" 
+            className="w-full h-full object-cover rounded-full"
+            style={{
+              imageRendering: 'crisp-edges',
+              WebkitImageRendering: 'crisp-edges',
+              // قص الحواف البيضاء باستخدام CSS
+              transform: 'scale(1.1)', // تكبير الصورة قليلاً لقص الحواف
+              filter: 'contrast(1.1) saturate(1.1)' // تحسين الألوان
+            }}
+          />
+          
+          {/* طبقة تدرج لوني لإخفاء أي حواف متبقية */}
+          <div 
+            className="absolute inset-0 rounded-full"
+            style={{
+              background: `radial-gradient(circle at center, transparent 85%, ${
+                theme === 'dark' ? '#1F2937' : '#F9FAFB'
+              } 95%)`
+            }}
+          />
         </motion.div>
         
         {/* Rotating Border Effect */}
@@ -79,8 +91,8 @@ const Logo: React.FC<LogoProps> = ({
             } 90deg, transparent 180deg, ${
               theme === 'dark' ? 'rgba(139, 92, 246, 0.3)' : 'rgba(139, 92, 246, 0.2)'
             } 270deg, transparent 360deg)`,
-            mask: 'radial-gradient(circle, transparent 85%, black 87%)',
-            WebkitMask: 'radial-gradient(circle, transparent 85%, black 87%)'
+            mask: 'radial-gradient(circle, transparent 88%, black 90%)',
+            WebkitMask: 'radial-gradient(circle, transparent 88%, black 90%)'
           }}
         />
         

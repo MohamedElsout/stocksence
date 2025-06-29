@@ -10,6 +10,9 @@
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
+  /* قص الحواف البيضاء */
+  transform: scale(1.15);
+  filter: contrast(1.1) saturate(1.1);
 }
 
 /* Pulse animation for the logo */
@@ -27,4 +30,47 @@
 
 .pulse-animation {
   animation: pulse 2s infinite;
+}
+
+/* تحسين عرض اللوجو بدون حواف بيضاء */
+.logo-no-white-edges {
+  position: relative;
+  overflow: hidden;
+  border-radius: 50%;
+}
+
+.logo-no-white-edges img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  transform: scale(1.1); /* تكبير قليل لقص الحواف */
+  filter: contrast(1.05) saturate(1.05);
+}
+
+.logo-no-white-edges::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at center, transparent 85%, rgba(255, 255, 255, 0.1) 95%);
+  pointer-events: none;
+}
+
+/* تحسين الشعار العائم */
+.floating-logo {
+  position: relative;
+  border-radius: 50%;
+  overflow: hidden;
+  background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+  padding: 2px;
+}
+
+.floating-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  transform: scale(1.05);
+  filter: contrast(1.1) saturate(1.1) brightness(1.05);
 }

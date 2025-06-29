@@ -115,7 +115,7 @@ const Landing: React.FC = () => {
       {/* Sidebar */}
       <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
       
-      {/* Floating Logo - يظهر فقط عند النزول للأسفل */}
+      {/* Floating Logo - يظهر فقط عند النزول للأسفل - بدون حواف بيضاء */}
       <motion.div
         initial={{ opacity: 0, scale: 0.5, y: 100 }}
         animate={{ 
@@ -144,12 +144,12 @@ const Landing: React.FC = () => {
           whileTap={{ scale: 0.95 }}
           className="relative cursor-pointer"
         >
-          {/* Main Logo */}
-          <div className="w-20 h-20 rounded-full overflow-hidden shadow-2xl">
+          {/* Main Logo - بدون حواف بيضاء */}
+          <div className="floating-logo w-20 h-20 shadow-2xl">
             <img 
-              src="/download copy.png" 
+              src="/logo.png" 
               alt="StockSence Logo" 
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover rounded-full"
             />
           </div>
           

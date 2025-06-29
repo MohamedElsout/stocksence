@@ -37,7 +37,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
     { path: '/sales', label: t('sales'), icon: ShoppingCart, requireAuth: true },
     { path: '/reports', label: t('reports'), icon: BarChart3, requireAuth: true },
     { path: '/about', label: t('aboutUs'), icon: Info },
-    { path: '/download', label: t('downloadSystem'), icon: Download },
+    { path: '/download', label: t('downloadSystem'), icon: Download, requireAuth: true }, // ✅ تتطلب تسجيل دخول
     { path: '/settings', label: t('settings'), icon: Settings, requireAuth: true },
   ];
 

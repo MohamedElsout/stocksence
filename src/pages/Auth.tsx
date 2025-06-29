@@ -54,7 +54,8 @@ const GoogleSignIn: React.FC<{ onSuccess: (email: string) => void; onError: () =
     script.onload = () => {
       if (window.google) {
         window.google.accounts.id.initialize({
-          client_id: '1234567890-abcdefghijklmnopqrstuvwxyz.apps.googleusercontent.com', // Example client ID
+          // 🔥 هنا تضع Google Client ID الحقيقي بعد الرفع
+          client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID || 'YOUR_GOOGLE_CLIENT_ID_HERE',
           callback: (response: any) => {
             try {
               const payload = JSON.parse(atob(response.credential.split('.')[1]));

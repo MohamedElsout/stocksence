@@ -163,16 +163,22 @@ export const useStore = create<StoreState>()(
           return false;
         }
 
-        // Check serial number if provided
-        if (serialNumber) {
-          // Verify that the serial number matches the user's serial number
-          if (user.serialNumber !== serialNumber) {
-            get().addNotification({ 
-              type: 'error', 
-              message: state.language === 'ar' ? 'الرقم التسلسلي غير صحيح' : 'Invalid serial number' 
-            });
-            return false;
-          }
+        // Check serial number - مطلوب دائماً في تسجيل الدخول
+        if (!serialNumber) {
+          get().addNotification({ 
+            type: 'error', 
+            message: state.language === 'ar' ? 'الرقم التسلسلي مطلوب' : 'Serial number is required' 
+          });
+          return false;
+        }
+
+        // Verify that the serial number matches the user's serial number
+        if (user.serialNumber !== serialNumber) {
+          get().addNotification({ 
+            type: 'error', 
+            message: state.language === 'ar' ? 'الرقم التسلسلي غير صحيح' : 'Invalid serial number' 
+          });
+          return false;
         }
         
         set({ currentUser: user, isAuthenticated: true });

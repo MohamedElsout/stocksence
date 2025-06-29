@@ -68,16 +68,16 @@ const CircularChartIcon: React.FC<{ className?: string }> = ({ className = "w-6 
           transition={{ duration: 0.6, delay: 0.2 }}
         />
         
-        {/* العمود الثالث - طويل */}
+        {/* العمود الثالث - أقصر من الرابع */}
         <motion.rect 
           x="11" 
-          y="12" 
+          y="13" 
           width="2.5" 
-          height="9" 
+          height="8" 
           rx="0.5"
           fill="white"
           initial={{ height: 0, y: 21 }}
-          animate={{ height: 9, y: 12 }}
+          animate={{ height: 8, y: 13 }}
           transition={{ duration: 0.6, delay: 0.3 }}
         />
         
@@ -94,9 +94,9 @@ const CircularChartIcon: React.FC<{ className?: string }> = ({ className = "w-6 
           transition={{ duration: 0.6, delay: 0.4 }}
         />
         
-        {/* الخط التصاعدي المنحني */}
+        {/* الخط التصاعدي المنحني - تم تعديله ليكون أكثر انحناءً */}
         <motion.path 
-          d="M4 19 Q8 16 12 13 Q14 11 16 10" 
+          d="M4 18 L8 15 L12 12 L16 8" 
           stroke="white" 
           strokeWidth="1.5" 
           strokeLinecap="round" 
@@ -107,9 +107,9 @@ const CircularChartIcon: React.FC<{ className?: string }> = ({ className = "w-6 
           transition={{ duration: 1, delay: 0.5, ease: "easeInOut" }}
         />
         
-        {/* السهم في نهاية الخط */}
+        {/* السهم في نهاية الخط - تم تعديله ليكون أكثر وضوحاً */}
         <motion.path 
-          d="M14.5 10 L16 10 L16 11.5" 
+          d="M14 8 L16 8 L16 10" 
           stroke="white" 
           strokeWidth="1.5" 
           strokeLinecap="round" 
@@ -118,52 +118,6 @@ const CircularChartIcon: React.FC<{ className?: string }> = ({ className = "w-6 
           initial={{ opacity: 0, scale: 0 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.4, delay: 1.5 }}
-        />
-        
-        {/* نقاط متلألئة على الخط */}
-        <motion.circle 
-          cx="4" 
-          cy="19" 
-          r="0.8" 
-          fill="white"
-          animate={{
-            scale: [1, 1.3, 1],
-            opacity: [0.7, 1, 0.7]
-          }}
-          transition={{ duration: 2, repeat: Infinity, delay: 0 }}
-        />
-        <motion.circle 
-          cx="8" 
-          cy="16" 
-          r="0.8" 
-          fill="white"
-          animate={{
-            scale: [1, 1.3, 1],
-            opacity: [0.7, 1, 0.7]
-          }}
-          transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
-        />
-        <motion.circle 
-          cx="12" 
-          cy="13" 
-          r="0.8" 
-          fill="white"
-          animate={{
-            scale: [1, 1.3, 1],
-            opacity: [0.7, 1, 0.7]
-          }}
-          transition={{ duration: 2, repeat: Infinity, delay: 1 }}
-        />
-        <motion.circle 
-          cx="16" 
-          cy="10" 
-          r="0.8" 
-          fill="white"
-          animate={{
-            scale: [1, 1.3, 1],
-            opacity: [0.7, 1, 0.7]
-          }}
-          transition={{ duration: 2, repeat: Infinity, delay: 1.5 }}
         />
       </svg>
       
@@ -223,7 +177,7 @@ const Header: React.FC = () => {
                   scale: { duration: 0.2 },
                   rotate: { duration: 0.6, repeat: Infinity }
                 }}
-                className={`relative p-3 rounded-full shadow-2xl overflow-hidden group ${
+                className={`relative p-2 rounded-full shadow-2xl overflow-hidden group ${
                   theme === 'dark' 
                     ? 'bg-gradient-to-br from-blue-600 via-blue-700 to-purple-700' 
                     : 'bg-gradient-to-br from-blue-500 via-blue-600 to-purple-600'
@@ -251,17 +205,17 @@ const Header: React.FC = () => {
                 {/* Circular Chart Icon */}
                 <motion.div
                   animate={{
-                    y: [0, -2, 0],
+                    y: [0, -1, 0],
                     scale: [1, 1.05, 1]
                   }}
                   transition={{ 
-                    duration: 3, 
+                    duration: 2, 
                     repeat: Infinity,
                     ease: "easeInOut"
                   }}
                   className="relative z-10"
                 >
-                  <CircularChartIcon className="w-7 h-7" />
+                  <CircularChartIcon className="w-6 h-6" />
                 </motion.div>
 
                 {/* Sparkle Effects */}

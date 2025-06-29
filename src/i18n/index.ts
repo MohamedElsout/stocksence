@@ -17,6 +17,8 @@ const resources = {
       logout: 'Logout',
       register: 'Register',
       profile: 'Profile',
+      lightMode: 'Light Mode',
+      darkMode: 'Dark Mode',
       
       // Authentication
       username: 'Username',
@@ -169,6 +171,7 @@ const resources = {
       allProductsWellStocked: 'All products are well stocked!',
       products: 'Products',
       units: 'Units',
+      value: 'Value',
       
       // About
       ourMission: 'Our Mission',
@@ -245,6 +248,8 @@ const resources = {
       logout: 'تسجيل الخروج',
       register: 'إنشاء حساب',
       profile: 'الملف الشخصي',
+      lightMode: 'الوضع الفاتح',
+      darkMode: 'الوضع المظلم',
       
       // Authentication
       username: 'اسم المستخدم',
@@ -397,6 +402,7 @@ const resources = {
       allProductsWellStocked: 'جميع المنتجات متوفرة بكمية جيدة!',
       products: 'منتجات',
       units: 'وحدات',
+      value: 'القيمة',
       
       // About
       ourMission: 'مهمتنا',

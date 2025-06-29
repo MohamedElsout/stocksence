@@ -8,14 +8,16 @@ import {
   LogOut,
   UserCircle,
   Sun,
-  Moon
+  Moon,
+  Palette
 } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 
 const Header: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const location = useLocation();
   const { theme, currentUser, isAuthenticated, logout, toggleTheme } = useStore();
+  const isRTL = i18n.language === 'ar';
 
   const handleLogout = () => {
     logout();
@@ -27,8 +29,8 @@ const Header: React.FC = () => {
       animate={{ y: 0 }}
       className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-md border-b transition-all duration-300 ${
         theme === 'dark'
-          ? 'bg-gray-900/70 border-gray-700'
-          : 'bg-white/70 border-gray-200'
+          ? 'bg-gray-900/80 border-gray-700'
+          : 'bg-white/80 border-gray-200'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -44,7 +46,7 @@ const Header: React.FC = () => {
                 transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
                 className={`p-2 rounded-lg ${
                   theme === 'dark' ? 'bg-blue-600' : 'bg-blue-500'
-                }`}
+                } shadow-lg`}
               >
                 <Package className="w-6 h-6 text-white" />
               </motion.div>
@@ -56,49 +58,147 @@ const Header: React.FC = () => {
             </motion.div>
           </Link>
 
-          {/* Center Section - Theme Toggle */}
+          {/* Center Section - Enhanced Theme Toggle */}
           <div className="flex items-center">
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={toggleTheme}
-              className={`relative p-3 rounded-full transition-all duration-300 ${
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              className={`relative p-1 rounded-2xl transition-all duration-500 ${
                 theme === 'dark'
-                  ? 'bg-gray-800 text-yellow-400 hover:bg-gray-700 shadow-lg'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 shadow-md'
+                  ? 'bg-gradient-to-r from-gray-800 to-gray-700 shadow-xl border border-gray-600'
+                  : 'bg-gradient-to-r from-gray-100 to-gray-50 shadow-lg border border-gray-200'
               }`}
-              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
             >
+              {/* Background Slider */}
               <motion.div
-                initial={false}
-                animate={{ 
-                  rotate: theme === 'dark' ? 0 : 180,
-                  scale: theme === 'dark' ? 1 : 0.8
+                animate={{
+                  x: theme === 'dark' ? (isRTL ? 0 : 44) : (isRTL ? 44 : 0),
                 }}
-                transition={{ duration: 0.3, ease: "easeInOut" }}
+                transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                className={`absolute top-1 w-10 h-10 rounded-xl ${
+                  theme === 'dark'
+                    ? 'bg-gradient-to-br from-yellow-400 to-orange-500 shadow-lg'
+                    : 'bg-gradient-to-br from-blue-500 to-purple-600 shadow-lg'
+                }`}
+                style={{
+                  left: isRTL ? 'auto' : '4px',
+                  right: isRTL ? '4px' : 'auto'
+                }}
+              />
+
+              {/* Theme Buttons Container */}
+              <div className="relative flex items-center">
+                {/* Light Mode Button */}
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => theme === 'dark' && toggleTheme()}
+                  className={`relative z-10 p-2.5 rounded-xl transition-all duration-300 ${
+                    theme === 'light'
+                      ? 'text-white'
+                      : 'text-gray-400 hover:text-gray-600'
+                  }`}
+                  title={t('lightMode') || 'Light Mode'}
+                >
+                  <motion.div
+                    animate={{ 
+                      rotate: theme === 'light' ? [0, 180, 360] : 0,
+                      scale: theme === 'light' ? [1, 1.2, 1] : 1
+                    }}
+                    transition={{ duration: 0.6 }}
+                  >
+                    <Sun className="w-5 h-5" />
+                  </motion.div>
+                  
+                  {/* Light rays effect */}
+                  {theme === 'light' && (
+                    <motion.div
+                      animate={{
+                        scale: [1, 1.5, 1],
+                        opacity: [0.5, 0, 0.5]
+                      }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                      className="absolute inset-0 rounded-xl border-2 border-yellow-300"
+                    />
+                  )}
+                </motion.button>
+
+                {/* Dark Mode Button */}
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => theme === 'light' && toggleTheme()}
+                  className={`relative z-10 p-2.5 rounded-xl transition-all duration-300 ${
+                    theme === 'dark'
+                      ? 'text-white'
+                      : 'text-gray-400 hover:text-gray-600'
+                  }`}
+                  title={t('darkMode') || 'Dark Mode'}
+                >
+                  <motion.div
+                    animate={{ 
+                      rotate: theme === 'dark' ? [0, -15, 15, 0] : 0,
+                      scale: theme === 'dark' ? [1, 1.1, 1] : 1
+                    }}
+                    transition={{ duration: 0.8 }}
+                  >
+                    <Moon className="w-5 h-5" />
+                  </motion.div>
+                  
+                  {/* Stars effect for dark mode */}
+                  {theme === 'dark' && (
+                    <>
+                      <motion.div
+                        animate={{
+                          scale: [0, 1, 0],
+                          opacity: [0, 1, 0]
+                        }}
+                        transition={{ 
+                          duration: 2, 
+                          repeat: Infinity,
+                          delay: 0
+                        }}
+                        className="absolute -top-1 -right-1 w-1 h-1 bg-yellow-300 rounded-full"
+                      />
+                      <motion.div
+                        animate={{
+                          scale: [0, 1, 0],
+                          opacity: [0, 1, 0]
+                        }}
+                        transition={{ 
+                          duration: 2, 
+                          repeat: Infinity,
+                          delay: 0.5
+                        }}
+                        className="absolute -bottom-1 -left-1 w-1 h-1 bg-blue-300 rounded-full"
+                      />
+                      <motion.div
+                        animate={{
+                          scale: [0, 1, 0],
+                          opacity: [0, 1, 0]
+                        }}
+                        transition={{ 
+                          duration: 2, 
+                          repeat: Infinity,
+                          delay: 1
+                        }}
+                        className="absolute top-0 left-0 w-0.5 h-0.5 bg-purple-300 rounded-full"
+                      />
+                    </>
+                  )}
+                </motion.button>
+              </div>
+
+              {/* Theme indicator text */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-xs font-medium whitespace-nowrap ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                }`}
               >
-                {theme === 'dark' ? (
-                  <Sun className="w-5 h-5" />
-                ) : (
-                  <Moon className="w-5 h-5" />
-                )}
+                {theme === 'dark' ? (isRTL ? 'مظلم' : 'Dark') : (isRTL ? 'فاتح' : 'Light')}
               </motion.div>
-              
-              {/* Glow effect for dark mode */}
-              {theme === 'dark' && (
-                <motion.div
-                  animate={{ 
-                    boxShadow: [
-                      '0 0 0 0 rgba(251, 191, 36, 0.4)',
-                      '0 0 0 8px rgba(251, 191, 36, 0)',
-                      '0 0 0 0 rgba(251, 191, 36, 0.4)'
-                    ]
-                  }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                  className="absolute inset-0 rounded-full"
-                />
-              )}
-            </motion.button>
+            </motion.div>
           </div>
 
           {/* Auth Section */}

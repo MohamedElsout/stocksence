@@ -72,6 +72,7 @@ interface StoreState {
   removeSerialNumber: (id: string) => void;
   setAutoLoginWithGoogle: (enabled: boolean) => void;
   clearAllData: () => void;
+  clearSalesHistory: () => void; // إضافة دالة مسح المبيعات
   
   products: Product[];
   addProduct: (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt' | 'serialNumber' | 'createdBy' | 'companyId'>) => void;
@@ -364,6 +365,21 @@ export const useStore = create<StoreState>()(
           message: get().language === 'ar' ? 'تم مسح جميع البيانات بنجاح!' : 'All data cleared successfully!' 
         });
       },
+
+      // 🔥 دالة جديدة لمسح هيستوري المبيعات فقط
+      clearSalesHistory: () => {
+        const state = get();
+        
+        // مسح المبيعات للشركة الحالية فقط
+        set(state => ({
+          sales: state.sales.filter(sale => sale.companyId !== state.currentCompanyId)
+        }));
+        
+        get().addNotification({ 
+          type: 'success', 
+          message: state.language === 'ar' ? '🗑️ تم مسح هيستوري المبيعات بنجاح!' : '🗑️ Sales history cleared successfully!' 
+        });
+      },
       
       products: [],
       
@@ -415,7 +431,7 @@ export const useStore = create<StoreState>()(
         });
       },
       
-      sales: [],
+      sales: [], // 🔥 تم مسح جميع المبيعات
       
       addSale: (saleData) => {
         const state = get();
@@ -534,7 +550,7 @@ export const useStore = create<StoreState>()(
       name: 'stocksence-store',
       partialize: (state) => ({
         products: state.products,
-        sales: state.sales,
+        sales: [], // 🔥 مسح المبيعات من التخزين المحلي
         theme: state.theme,
         language: state.language,
         currentCurrency: state.currentCurrency,

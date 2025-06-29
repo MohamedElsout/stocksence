@@ -72,7 +72,7 @@ interface StoreState {
   removeSerialNumber: (id: string) => void;
   setAutoLoginWithGoogle: (enabled: boolean) => void;
   clearAllData: () => void;
-  clearSalesHistory: () => void; // إضافة دالة مسح المبيعات
+  clearSalesHistory: () => void;
   
   products: Product[];
   addProduct: (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt' | 'serialNumber' | 'createdBy' | 'companyId'>) => void;
@@ -249,7 +249,7 @@ export const useStore = create<StoreState>()(
           id: generateId(),
           username,
           password,
-          role: 'admin', // 🔥 تم التعديل: كل مستخدم جديد يصبح أدمن
+          role: 'admin',
           companyId,
           createdAt: new Date(),
           isActive: true,
@@ -366,18 +366,14 @@ export const useStore = create<StoreState>()(
         });
       },
 
-      // 🔥 دالة جديدة لمسح هيستوري المبيعات فقط
+      // 🔥 دالة مسح هيستوري المبيعات نهائياً
       clearSalesHistory: () => {
-        const state = get();
-        
-        // مسح المبيعات للشركة الحالية فقط
-        set(state => ({
-          sales: state.sales.filter(sale => sale.companyId !== state.currentCompanyId)
-        }));
+        // مسح جميع المبيعات نهائياً
+        set({ sales: [] });
         
         get().addNotification({ 
           type: 'success', 
-          message: state.language === 'ar' ? '🗑️ تم مسح هيستوري المبيعات بنجاح!' : '🗑️ Sales history cleared successfully!' 
+          message: get().language === 'ar' ? '🗑️ تم مسح هيستوري المبيعات نهائياً!' : '🗑️ Sales history permanently cleared!' 
         });
       },
       
@@ -431,7 +427,7 @@ export const useStore = create<StoreState>()(
         });
       },
       
-      sales: [], // 🔥 تم مسح جميع المبيعات
+      sales: [], // 🔥 مسح نهائي لجميع المبيعات
       
       addSale: (saleData) => {
         const state = get();
@@ -550,7 +546,7 @@ export const useStore = create<StoreState>()(
       name: 'stocksence-store',
       partialize: (state) => ({
         products: state.products,
-        sales: [], // 🔥 مسح المبيعات من التخزين المحلي
+        sales: [], // 🔥 عدم حفظ المبيعات في التخزين المحلي
         theme: state.theme,
         language: state.language,
         currentCurrency: state.currentCurrency,

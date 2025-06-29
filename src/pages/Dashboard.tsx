@@ -47,7 +47,7 @@ const Dashboard: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    quantity: 0,
+    quantity: '',
     price: 0,
     category: ''
   });
@@ -70,13 +70,21 @@ const Dashboard: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const quantity = parseInt(formData.quantity) || 0;
+    
     if (editingProduct) {
-      updateProduct(editingProduct.id, formData);
+      updateProduct(editingProduct.id, {
+        ...formData,
+        quantity
+      });
       setEditingProduct(null);
     } else {
-      addProduct(formData);
+      addProduct({
+        ...formData,
+        quantity
+      });
     }
-    setFormData({ name: '', description: '', quantity: 0, price: 0, category: '' });
+    setFormData({ name: '', description: '', quantity: '', price: 0, category: '' });
     setIsAddModalOpen(false);
   };
 
@@ -85,7 +93,7 @@ const Dashboard: React.FC = () => {
     setFormData({
       name: product.name,
       description: product.description,
-      quantity: product.quantity,
+      quantity: product.quantity.toString(),
       price: product.price,
       category: product.category
     });
@@ -524,7 +532,7 @@ const Dashboard: React.FC = () => {
         onClose={() => {
           setIsAddModalOpen(false);
           setEditingProduct(null);
-          setFormData({ name: '', description: '', quantity: 0, price: 0, category: '' });
+          setFormData({ name: '', description: '', quantity: '', price: 0, category: '' });
         }}
         title={editingProduct ? t('editProduct') : t('addProduct')}
       >
@@ -576,13 +584,14 @@ const Dashboard: React.FC = () => {
               <input
                 type="number"
                 value={formData.quantity}
-                onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) || 0 })}
+                onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
                 className={`w-full px-3 py-2 border rounded-lg ${
                   theme === 'dark'
                     ? 'bg-gray-700 border-gray-600 text-white'
                     : 'bg-white border-gray-300 text-gray-900'
                 } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
                 min="0"
+                placeholder="0"
                 required
               />
             </div>
@@ -651,7 +660,7 @@ const Dashboard: React.FC = () => {
               onClick={() => {
                 setIsAddModalOpen(false);
                 setEditingProduct(null);
-                setFormData({ name: '', description: '', quantity: 0, price: 0, category: '' });
+                setFormData({ name: '', description: '', quantity: '', price: 0, category: '' });
               }}
               className={`px-4 py-2 border rounded-lg ${
                 theme === 'dark'

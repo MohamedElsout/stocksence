@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, 
-  Package, 
   ShoppingCart, 
   BarChart3, 
   Settings,
@@ -19,6 +18,42 @@ import {
   UserCircle
 } from 'lucide-react';
 import { useStore } from '../../store/useStore';
+
+// Custom Chart Icon Component
+const ChartIcon: React.FC<{ className?: string }> = ({ className = "w-5 h-5" }) => (
+  <svg 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+  >
+    {/* Chart Bars */}
+    <rect x="3" y="16" width="2" height="5" fill="currentColor" rx="0.5" />
+    <rect x="7" y="12" width="2" height="9" fill="currentColor" rx="0.5" />
+    <rect x="11" y="8" width="2" height="13" fill="currentColor" rx="0.5" />
+    <rect x="15" y="14" width="2" height="7" fill="currentColor" rx="0.5" />
+    
+    {/* Trend Line */}
+    <path 
+      d="M3 17 L8 13 L12 9 L16 15 L21 6" 
+      stroke="currentColor" 
+      strokeWidth="2" 
+      strokeLinecap="round" 
+      strokeLinejoin="round"
+      fill="none"
+    />
+    
+    {/* Trend Arrow */}
+    <path 
+      d="M18 6 L21 6 L21 9" 
+      stroke="currentColor" 
+      strokeWidth="2" 
+      strokeLinecap="round" 
+      strokeLinejoin="round"
+      fill="none"
+    />
+  </svg>
+);
 
 interface SidebarProps {
   isOpen: boolean;
@@ -37,7 +72,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
     { path: '/sales', label: t('sales'), icon: ShoppingCart, requireAuth: true },
     { path: '/reports', label: t('reports'), icon: BarChart3, requireAuth: true },
     { path: '/about', label: t('aboutUs'), icon: Info },
-    { path: '/download', label: t('downloadSystem'), icon: Download, requireAuth: true }, // ✅ تتطلب تسجيل دخول
+    { path: '/download', label: t('downloadSystem'), icon: Download, requireAuth: true },
     { path: '/settings', label: t('settings'), icon: Settings, requireAuth: true },
   ];
 
@@ -149,13 +184,46 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
             } flex-shrink-0`}>
               <div className="flex items-center space-x-3 rtl:space-x-reverse">
                 <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                  className={`p-2 rounded-lg ${
+                  whileHover={{ 
+                    scale: 1.1,
+                    rotate: [0, 5, -5, 0]
+                  }}
+                  transition={{ 
+                    scale: { duration: 0.2 },
+                    rotate: { duration: 0.6, repeat: Infinity }
+                  }}
+                  className={`relative p-2 rounded-lg ${
                     theme === 'dark' ? 'bg-blue-600' : 'bg-blue-500'
-                  }`}
+                  } overflow-hidden`}
                 >
-                  <Package className="w-5 h-5 text-white" />
+                  {/* Background Gradient Animation */}
+                  <motion.div
+                    animate={{
+                      background: [
+                        'linear-gradient(45deg, #3B82F6, #1D4ED8)',
+                        'linear-gradient(45deg, #1D4ED8, #3B82F6)',
+                        'linear-gradient(45deg, #3B82F6, #1D4ED8)'
+                      ]
+                    }}
+                    transition={{ duration: 3, repeat: Infinity }}
+                    className="absolute inset-0 rounded-lg"
+                  />
+                  
+                  {/* Chart Icon */}
+                  <motion.div
+                    animate={{
+                      y: [0, -1, 0],
+                      scale: [1, 1.05, 1]
+                    }}
+                    transition={{ 
+                      duration: 2, 
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                    className="relative z-10"
+                  >
+                    <ChartIcon className="w-5 h-5 text-white" />
+                  </motion.div>
                 </motion.div>
                 <h2 className={`text-lg font-semibold ${
                   theme === 'dark' ? 'text-white' : 'text-gray-900'

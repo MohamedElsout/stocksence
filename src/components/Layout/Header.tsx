@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
 import { 
-  Package, 
   LogIn,
   LogOut,
   UserCircle,
@@ -11,6 +10,42 @@ import {
   Moon
 } from 'lucide-react';
 import { useStore } from '../../store/useStore';
+
+// Custom Chart Icon Component
+const ChartIcon: React.FC<{ className?: string }> = ({ className = "w-6 h-6" }) => (
+  <svg 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+  >
+    {/* Chart Bars */}
+    <rect x="3" y="16" width="2" height="5" fill="currentColor" rx="0.5" />
+    <rect x="7" y="12" width="2" height="9" fill="currentColor" rx="0.5" />
+    <rect x="11" y="8" width="2" height="13" fill="currentColor" rx="0.5" />
+    <rect x="15" y="14" width="2" height="7" fill="currentColor" rx="0.5" />
+    
+    {/* Trend Line */}
+    <path 
+      d="M3 17 L8 13 L12 9 L16 15 L21 6" 
+      stroke="currentColor" 
+      strokeWidth="2" 
+      strokeLinecap="round" 
+      strokeLinejoin="round"
+      fill="none"
+    />
+    
+    {/* Trend Arrow */}
+    <path 
+      d="M18 6 L21 6 L21 9" 
+      stroke="currentColor" 
+      strokeWidth="2" 
+      strokeLinecap="round" 
+      strokeLinejoin="round"
+      fill="none"
+    />
+  </svg>
+);
 
 const Header: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -41,14 +76,90 @@ const Header: React.FC = () => {
               className="flex items-center space-x-2 rtl:space-x-reverse cursor-pointer"
             >
               <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                className={`p-2 rounded-lg ${
+                whileHover={{ 
+                  scale: 1.1,
+                  rotate: [0, 5, -5, 0]
+                }}
+                transition={{ 
+                  scale: { duration: 0.2 },
+                  rotate: { duration: 0.6, repeat: Infinity }
+                }}
+                className={`relative p-2 rounded-full ${
                   theme === 'dark' ? 'bg-blue-600' : 'bg-blue-500'
-                } shadow-lg`}
+                } shadow-lg overflow-hidden group`}
               >
-                <Package className="w-6 h-6 text-white" />
+                {/* Background Gradient Animation */}
+                <motion.div
+                  animate={{
+                    background: [
+                      'linear-gradient(45deg, #3B82F6, #1D4ED8)',
+                      'linear-gradient(45deg, #1D4ED8, #3B82F6)',
+                      'linear-gradient(45deg, #3B82F6, #1D4ED8)'
+                    ]
+                  }}
+                  transition={{ duration: 3, repeat: Infinity }}
+                  className="absolute inset-0 rounded-full"
+                />
+                
+                {/* Chart Icon */}
+                <motion.div
+                  animate={{
+                    y: [0, -1, 0],
+                    scale: [1, 1.05, 1]
+                  }}
+                  transition={{ 
+                    duration: 2, 
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                  className="relative z-10"
+                >
+                  <ChartIcon className="w-6 h-6 text-white" />
+                </motion.div>
+
+                {/* Sparkle Effects */}
+                <motion.div
+                  animate={{
+                    scale: [0, 1, 0],
+                    opacity: [0, 1, 0],
+                    rotate: [0, 180, 360]
+                  }}
+                  transition={{ 
+                    duration: 2, 
+                    repeat: Infinity,
+                    delay: 0
+                  }}
+                  className="absolute top-1 right-1 w-1 h-1 bg-white rounded-full"
+                />
+                <motion.div
+                  animate={{
+                    scale: [0, 1, 0],
+                    opacity: [0, 1, 0],
+                    rotate: [0, -180, -360]
+                  }}
+                  transition={{ 
+                    duration: 2, 
+                    repeat: Infinity,
+                    delay: 1
+                  }}
+                  className="absolute bottom-1 left-1 w-0.5 h-0.5 bg-white rounded-full"
+                />
+
+                {/* Pulse Ring */}
+                <motion.div
+                  animate={{
+                    scale: [1, 1.5, 1],
+                    opacity: [0.5, 0, 0.5]
+                  }}
+                  transition={{ 
+                    duration: 2, 
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                  className="absolute inset-0 rounded-full border-2 border-white"
+                />
               </motion.div>
+              
               <h1 className={`text-xl font-bold ${
                 theme === 'dark' ? 'text-white' : 'text-gray-900'
               }`}>

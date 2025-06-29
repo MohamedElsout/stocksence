@@ -1,8 +1,9 @@
-/* Custom styles for circular logo */
+/* Custom styles for circular logo - إزالة الحواف البيضاء نهائياً */
 .circular-logo {
   border-radius: 50%;
   overflow: hidden;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  background: transparent;
 }
 
 .circular-logo img {
@@ -10,9 +11,12 @@
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
-  /* قص الحواف البيضاء */
-  transform: scale(1.15);
-  filter: contrast(1.1) saturate(1.1);
+  /* قص الحواف البيضاء بشكل أقوى */
+  transform: scale(1.3);
+  filter: contrast(1.3) saturate(1.3) brightness(1.1);
+  /* قص دائري للتخلص من الحواف البيضاء */
+  clip-path: circle(40% at center);
+  background: transparent;
 }
 
 /* Pulse animation for the logo */
@@ -32,11 +36,12 @@
   animation: pulse 2s infinite;
 }
 
-/* تحسين عرض اللوجو بدون حواف بيضاء */
+/* تحسين عرض اللوجو بدون حواف بيضاء - نسخة محسنة */
 .logo-no-white-edges {
   position: relative;
   overflow: hidden;
   border-radius: 50%;
+  background: transparent;
 }
 
 .logo-no-white-edges img {
@@ -44,8 +49,21 @@
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
-  transform: scale(1.1); /* تكبير قليل لقص الحواف */
-  filter: contrast(1.05) saturate(1.05);
+  /* تكبير أكبر لقص الحواف البيضاء تماماً */
+  transform: scale(1.4);
+  filter: contrast(1.3) saturate(1.3) brightness(1.1);
+  /* قص دائري دقيق */
+  clip-path: circle(38% at center);
+  background: transparent;
+}
+
+.logo-no-white-edges::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: transparent;
+  z-index: 1;
 }
 
 .logo-no-white-edges::after {
@@ -53,17 +71,18 @@
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: radial-gradient(circle at center, transparent 85%, rgba(255, 255, 255, 0.1) 95%);
+  background: radial-gradient(circle at center, transparent 75%, rgba(0, 0, 0, 0.1) 100%);
   pointer-events: none;
+  z-index: 2;
 }
 
-/* تحسين الشعار العائم */
+/* تحسين الشعار العائم - بدون حواف بيضاء */
 .floating-logo {
   position: relative;
   border-radius: 50%;
   overflow: hidden;
   background: linear-gradient(135deg, #3B82F6, #8B5CF6);
-  padding: 2px;
+  padding: 1px;
 }
 
 .floating-logo img {
@@ -71,6 +90,48 @@
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
-  transform: scale(1.05);
-  filter: contrast(1.1) saturate(1.1) brightness(1.05);
+  /* قص الحواف البيضاء في الشعار العائم */
+  transform: scale(1.35);
+  filter: contrast(1.25) saturate(1.25) brightness(1.1);
+  clip-path: circle(39% at center);
+  background: transparent;
+}
+
+/* إضافة تأثير خاص للشعار العائم */
+.floating-logo::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, #3B82F6, #8B5CF6, #EC4899, #3B82F6);
+  z-index: -1;
+  animation: rotate 3s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* تحسين عام للصور الدائرية */
+.circular-image-no-white {
+  border-radius: 50%;
+  overflow: hidden;
+  position: relative;
+  background: transparent;
+}
+
+.circular-image-no-white img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  transform: scale(1.3);
+  filter: contrast(1.2) saturate(1.2);
+  clip-path: circle(40% at center);
+  background: transparent;
 }

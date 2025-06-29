@@ -27,7 +27,7 @@ const Logo: React.FC<LogoProps> = ({
   
   return (
     <div className={`flex items-center space-x-2 rtl:space-x-reverse ${className}`}>
-      {/* Logo Image - بدون حواف بيضاء */}
+      {/* Logo Image - بدون حواف بيضاء نهائياً */}
       <motion.div
         whileHover={{ 
           scale: 1.05,
@@ -42,14 +42,18 @@ const Logo: React.FC<LogoProps> = ({
           filter: 'drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15))'
         }}
       >
-        {/* Main Logo Image - مباشرة بدون خلفية بيضاء */}
+        {/* Main Logo Image - قص الحواف البيضاء تماماً */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="w-full h-full rounded-full overflow-hidden relative"
+          style={{
+            // إخفاء الحواف البيضاء بشكل كامل
+            background: 'transparent'
+          }}
         >
-          {/* الصورة مباشرة بدون حاوي أبيض */}
+          {/* الصورة مع قص الحواف البيضاء */}
           <img 
             src="/logo.png" 
             alt="StockSence Logo" 
@@ -57,19 +61,24 @@ const Logo: React.FC<LogoProps> = ({
             style={{
               imageRendering: 'crisp-edges',
               WebkitImageRendering: 'crisp-edges',
-              // قص الحواف البيضاء باستخدام CSS
-              transform: 'scale(1.1)', // تكبير الصورة قليلاً لقص الحواف
-              filter: 'contrast(1.1) saturate(1.1)' // تحسين الألوان
+              // تكبير الصورة أكثر لقص الحواف البيضاء تماماً
+              transform: 'scale(1.25)', // زيادة التكبير
+              filter: 'contrast(1.2) saturate(1.2) brightness(1.05)',
+              // قص الحواف باستخدام clip-path
+              clipPath: 'circle(42% at center)',
+              // إزالة أي خلفية بيضاء
+              backgroundColor: 'transparent'
             }}
           />
           
-          {/* طبقة تدرج لوني لإخفاء أي حواف متبقية */}
+          {/* طبقة إضافية لضمان عدم ظهور الحواف البيضاء */}
           <div 
-            className="absolute inset-0 rounded-full"
+            className="absolute inset-0 rounded-full pointer-events-none"
             style={{
-              background: `radial-gradient(circle at center, transparent 85%, ${
+              background: `radial-gradient(circle at center, transparent 80%, ${
                 theme === 'dark' ? '#1F2937' : '#F9FAFB'
-              } 95%)`
+              } 95%)`,
+              mixBlendMode: 'multiply'
             }}
           />
         </motion.div>

@@ -144,12 +144,29 @@ const Landing: React.FC = () => {
           whileTap={{ scale: 0.95 }}
           className="relative cursor-pointer"
         >
-          {/* Main Logo - بدون حواف بيضاء */}
-          <div className="floating-logo w-20 h-20 shadow-2xl">
+          {/* Main Logo - بدون حواف بيضاء نهائياً */}
+          <div className="w-20 h-20 rounded-full overflow-hidden shadow-2xl relative">
             <img 
               src="/logo.png" 
               alt="StockSence Logo" 
               className="w-full h-full object-cover rounded-full"
+              style={{
+                // قص الحواف البيضاء تماماً
+                transform: 'scale(1.4)',
+                filter: 'contrast(1.3) saturate(1.3) brightness(1.1)',
+                clipPath: 'circle(37% at center)',
+                background: 'transparent'
+              }}
+            />
+            
+            {/* طبقة حماية من الحواف البيضاء */}
+            <div 
+              className="absolute inset-0 rounded-full pointer-events-none"
+              style={{
+                background: `radial-gradient(circle at center, transparent 70%, ${
+                  theme === 'dark' ? '#1F2937' : '#F9FAFB'
+                } 95%)`
+              }}
             />
           </div>
           

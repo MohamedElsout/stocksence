@@ -23,7 +23,7 @@ import AnimatedCounter from '../components/UI/AnimatedCounter';
 
 const Sales: React.FC = () => {
   const { t, i18n } = useTranslation();
-  const { products, sales, addSale, deleteSale, theme, formatPrice } = useStore();
+  const { products, sales, addSale, deleteSale, theme, formatPrice, addNotification } = useStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isSaleModalOpen, setIsSaleModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -74,8 +74,17 @@ const Sales: React.FC = () => {
   };
 
   const handleDeleteSale = (saleId: string) => {
-    if (window.confirm(t('confirmDeleteSale'))) {
-      deleteSale(saleId);
+    try {
+      if (window.confirm(t('confirmDeleteSale'))) {
+        deleteSale(saleId);
+        console.log('Sale deleted successfully:', saleId); // للتأكد من التنفيذ
+      }
+    } catch (error) {
+      console.error('Error deleting sale:', error);
+      addNotification({
+        type: 'error',
+        message: isRTL ? 'حدث خطأ أثناء حذف المبيعة' : 'Error occurred while deleting sale'
+      });
     }
   };
 
@@ -198,7 +207,7 @@ const Sales: React.FC = () => {
                 <h2 className={`text-xl font-semibold ${
                   theme === 'dark' ? 'text-white' : 'text-gray-900'
                 }`}>
-                  {t('salesHistory')}
+                  {t('salesHistory')} ({filteredSales.length})
                 </h2>
                 
                 <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
@@ -309,7 +318,16 @@ const Sales: React.FC = () => {
                         <td className={`px-4 sm:px-6 py-4 whitespace-nowrap font-medium ${
                           theme === 'dark' ? 'text-white' : 'text-gray-900'
                         }`}>
-                          {sale.productName}
+                          <div className="flex items-center">
+                            <div>
+                              <div className="font-medium">{sale.productName}</div>
+                              <div className={`text-xs ${
+                                theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                              }`}>
+                                ID: {sale.id.substring(0, 8)}...
+                              </div>
+                            </div>
+                          </div>
                         </td>
                         <td className={`px-4 sm:px-6 py-4 whitespace-nowrap ${
                           theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
@@ -363,7 +381,11 @@ const Sales: React.FC = () => {
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
                             onClick={() => handleDeleteSale(sale.id)}
-                            className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                            className={`p-2 rounded-lg transition-all duration-200 ${
+                              theme === 'dark' 
+                                ? 'text-red-400 hover:text-red-300 hover:bg-red-900/20' 
+                                : 'text-red-500 hover:text-red-600 hover:bg-red-50'
+                            }`}
                             title={t('deleteSale')}
                           >
                             <Trash2 className="w-4 h-4" />

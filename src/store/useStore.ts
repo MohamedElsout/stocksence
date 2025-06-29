@@ -402,7 +402,7 @@ export const useStore = create<StoreState>()(
           companyId: state.currentCompanyId || ''
         };
         set((state) => ({
-          products: [...state.products.filter(p => p.companyId === state.currentCompanyId), newProduct],
+          products: [...state.products, newProduct],
         }));
         get().addNotification({ 
           type: 'success', 
@@ -458,7 +458,7 @@ export const useStore = create<StoreState>()(
           });
           
           set((state) => ({
-            sales: [...state.sales.filter(s => s.companyId === state.currentCompanyId), newSale],
+            sales: [...state.sales, newSale],
           }));
           
           const saleMethod = saleData.barcodeScan ? 
@@ -491,7 +491,12 @@ export const useStore = create<StoreState>()(
       // 🗑️ حذف مبيعة وإرسالها لسلة القمامة
       deleteSale: (id: string) => {
         const state = get();
-        const sale = state.sales.find(s => s.id === id && s.companyId === state.currentCompanyId);
+        console.log('Attempting to delete sale with ID:', id);
+        console.log('Current sales:', state.sales);
+        console.log('Current company ID:', state.currentCompanyId);
+        
+        const sale = state.sales.find(s => s.id === id);
+        console.log('Found sale:', sale);
         
         if (sale) {
           const deletedSale: DeletedSale = {
@@ -505,11 +510,21 @@ export const useStore = create<StoreState>()(
             deletedSales: [...state.deletedSales, deletedSale]
           }));
           
+          console.log('Sale moved to trash successfully');
+          
           get().addNotification({ 
             type: 'success', 
             message: get().language === 'ar' 
               ? '🗑️ تم نقل المبيعة إلى سلة القمامة!' 
               : '🗑️ Sale moved to trash!' 
+          });
+        } else {
+          console.log('Sale not found for deletion');
+          get().addNotification({ 
+            type: 'error', 
+            message: get().language === 'ar' 
+              ? 'لم يتم العثور على المبيعة' 
+              : 'Sale not found' 
           });
         }
       },

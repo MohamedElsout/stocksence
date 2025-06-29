@@ -19,138 +19,174 @@ import {
 } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 
-// Professional Chart Icon Component - نفس الرمز المستخدم في الهيدر
-const ProfessionalChartIcon: React.FC<{ className?: string }> = ({ className = "w-5 h-5" }) => {
+// Circular Chart Icon Component - نفس الرمز المستخدم في الهيدر
+const CircularChartIcon: React.FC<{ className?: string }> = ({ className = "w-5 h-5" }) => {
   const { theme } = useStore();
   
   return (
-    <svg 
-      viewBox="0 0 32 32" 
-      fill="none" 
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
-    >
-      {/* الأعمدة الأربعة بارتفاعات متدرجة */}
-      <motion.rect 
-        x="4" 
-        y="22" 
-        width="4" 
-        height="6" 
-        rx="1"
-        fill="white"
-        initial={{ height: 0, y: 28 }}
-        animate={{ height: 6, y: 22 }}
-        transition={{ duration: 0.8, delay: 0.1 }}
-      />
-      
-      <motion.rect 
-        x="10" 
-        y="18" 
-        width="4" 
-        height="10" 
-        rx="1"
-        fill="white"
-        initial={{ height: 0, y: 28 }}
-        animate={{ height: 10, y: 18 }}
-        transition={{ duration: 0.8, delay: 0.2 }}
-      />
-      
-      <motion.rect 
-        x="16" 
-        y="12" 
-        width="4" 
-        height="16" 
-        rx="1"
-        fill="white"
-        initial={{ height: 0, y: 28 }}
-        animate={{ height: 16, y: 12 }}
-        transition={{ duration: 0.8, delay: 0.3 }}
-      />
-      
-      <motion.rect 
-        x="22" 
-        y="8" 
-        width="4" 
-        height="20" 
-        rx="1"
-        fill="white"
-        initial={{ height: 0, y: 28 }}
-        animate={{ height: 20, y: 8 }}
-        transition={{ duration: 0.8, delay: 0.4 }}
-      />
-      
-      {/* الخط التصاعدي المنحني */}
-      <motion.path 
-        d="M6 23 Q12 19 18 13 Q21 10 24 9" 
-        stroke="white" 
-        strokeWidth="2.5" 
-        strokeLinecap="round" 
-        strokeLinejoin="round"
-        fill="none"
-        initial={{ pathLength: 0 }}
-        animate={{ pathLength: 1 }}
-        transition={{ duration: 1.2, delay: 0.6, ease: "easeInOut" }}
-      />
-      
-      {/* السهم في نهاية الخط */}
-      <motion.path 
-        d="M22 9 L24 9 L24 11" 
-        stroke="white" 
-        strokeWidth="2.5" 
-        strokeLinecap="round" 
-        strokeLinejoin="round"
-        fill="none"
-        initial={{ opacity: 0, scale: 0 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5, delay: 1.8 }}
-      />
-      
-      {/* نقاط متلألئة على الخط */}
-      <motion.circle 
-        cx="6" 
-        cy="23" 
-        r="1.5" 
-        fill="white"
+    <div className={`relative ${className} flex items-center justify-center`}>
+      {/* الدائرة الخارجية */}
+      <motion.div
+        className={`absolute inset-0 rounded-full ${
+          theme === 'dark' 
+            ? 'bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900' 
+            : 'bg-gradient-to-br from-gray-200 via-gray-300 to-gray-400'
+        } shadow-lg`}
         animate={{
-          scale: [1, 1.3, 1],
-          opacity: [0.7, 1, 0.7]
+          boxShadow: [
+            '0 4px 15px rgba(0, 0, 0, 0.2)',
+            '0 6px 20px rgba(0, 0, 0, 0.3)',
+            '0 4px 15px rgba(0, 0, 0, 0.2)'
+          ]
         }}
-        transition={{ duration: 2, repeat: Infinity, delay: 0 }}
+        transition={{ duration: 3, repeat: Infinity }}
       />
-      <motion.circle 
-        cx="12" 
-        cy="19" 
-        r="1.5" 
-        fill="white"
+      
+      {/* محتوى الرسم البياني */}
+      <svg 
+        viewBox="0 0 24 24" 
+        fill="none" 
+        xmlns="http://www.w3.org/2000/svg"
+        className="relative z-10 w-3 h-3"
+      >
+        {/* الأعمدة الأربعة بارتفاعات متدرجة */}
+        <motion.rect 
+          x="3" 
+          y="18" 
+          width="2.5" 
+          height="3" 
+          rx="0.5"
+          fill="white"
+          initial={{ height: 0, y: 21 }}
+          animate={{ height: 3, y: 18 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+        />
+        
+        <motion.rect 
+          x="7" 
+          y="15" 
+          width="2.5" 
+          height="6" 
+          rx="0.5"
+          fill="white"
+          initial={{ height: 0, y: 21 }}
+          animate={{ height: 6, y: 15 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        />
+        
+        <motion.rect 
+          x="11" 
+          y="12" 
+          width="2.5" 
+          height="9" 
+          rx="0.5"
+          fill="white"
+          initial={{ height: 0, y: 21 }}
+          animate={{ height: 9, y: 12 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+        />
+        
+        <motion.rect 
+          x="15" 
+          y="9" 
+          width="2.5" 
+          height="12" 
+          rx="0.5"
+          fill="white"
+          initial={{ height: 0, y: 21 }}
+          animate={{ height: 12, y: 9 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+        />
+        
+        {/* الخط التصاعدي المنحني */}
+        <motion.path 
+          d="M4 19 Q8 16 12 13 Q14 11 16 10" 
+          stroke="white" 
+          strokeWidth="1.5" 
+          strokeLinecap="round" 
+          strokeLinejoin="round"
+          fill="none"
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: 1 }}
+          transition={{ duration: 1, delay: 0.5, ease: "easeInOut" }}
+        />
+        
+        {/* السهم في نهاية الخط */}
+        <motion.path 
+          d="M14.5 10 L16 10 L16 11.5" 
+          stroke="white" 
+          strokeWidth="1.5" 
+          strokeLinecap="round" 
+          strokeLinejoin="round"
+          fill="none"
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.4, delay: 1.5 }}
+        />
+        
+        {/* نقاط متلألئة على الخط */}
+        <motion.circle 
+          cx="4" 
+          cy="19" 
+          r="0.8" 
+          fill="white"
+          animate={{
+            scale: [1, 1.3, 1],
+            opacity: [0.7, 1, 0.7]
+          }}
+          transition={{ duration: 2, repeat: Infinity, delay: 0 }}
+        />
+        <motion.circle 
+          cx="8" 
+          cy="16" 
+          r="0.8" 
+          fill="white"
+          animate={{
+            scale: [1, 1.3, 1],
+            opacity: [0.7, 1, 0.7]
+          }}
+          transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+        />
+        <motion.circle 
+          cx="12" 
+          cy="13" 
+          r="0.8" 
+          fill="white"
+          animate={{
+            scale: [1, 1.3, 1],
+            opacity: [0.7, 1, 0.7]
+          }}
+          transition={{ duration: 2, repeat: Infinity, delay: 1 }}
+        />
+        <motion.circle 
+          cx="16" 
+          cy="10" 
+          r="0.8" 
+          fill="white"
+          animate={{
+            scale: [1, 1.3, 1],
+            opacity: [0.7, 1, 0.7]
+          }}
+          transition={{ duration: 2, repeat: Infinity, delay: 1.5 }}
+        />
+      </svg>
+      
+      {/* تأثير النبض الخارجي */}
+      <motion.div
         animate={{
-          scale: [1, 1.3, 1],
-          opacity: [0.7, 1, 0.7]
+          scale: [1, 1.2, 1],
+          opacity: [0.3, 0, 0.3]
         }}
-        transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
-      />
-      <motion.circle 
-        cx="18" 
-        cy="13" 
-        r="1.5" 
-        fill="white"
-        animate={{
-          scale: [1, 1.3, 1],
-          opacity: [0.7, 1, 0.7]
+        transition={{ 
+          duration: 2.5, 
+          repeat: Infinity,
+          ease: "easeInOut"
         }}
-        transition={{ duration: 2, repeat: Infinity, delay: 1 }}
+        className={`absolute inset-0 rounded-full border-2 ${
+          theme === 'dark' ? 'border-blue-400' : 'border-blue-500'
+        }`}
       />
-      <motion.circle 
-        cx="24" 
-        cy="9" 
-        r="1.5" 
-        fill="white"
-        animate={{
-          scale: [1, 1.3, 1],
-          opacity: [0.7, 1, 0.7]
-        }}
-        transition={{ duration: 2, repeat: Infinity, delay: 1.5 }}
-      />
-    </svg>
+    </div>
   );
 };
 
@@ -316,7 +352,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
                     className="absolute inset-0 rounded-lg"
                   />
                   
-                  {/* Professional Chart Icon */}
+                  {/* Circular Chart Icon */}
                   <motion.div
                     animate={{
                       y: [0, -1, 0],
@@ -329,7 +365,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
                     }}
                     className="relative z-10"
                   >
-                    <ProfessionalChartIcon className="w-5 h-5" />
+                    <CircularChartIcon className="w-5 h-5" />
                   </motion.div>
                 </motion.div>
                 <h2 className={`text-lg font-semibold bg-gradient-to-r ${

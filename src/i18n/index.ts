@@ -16,6 +16,7 @@ const resources = {
       login: 'Login',
       logout: 'Logout',
       register: 'Register',
+      profile: 'Profile',
       
       // Authentication
       username: 'Username',
@@ -45,6 +46,14 @@ const resources = {
       usedAt: 'Used At',
       status: 'Status',
       actions: 'Actions',
+      
+      // User Profile
+      userProfile: 'User Profile',
+      accountInformation: 'Account Information',
+      personalInfo: 'Personal Information',
+      securitySettings: 'Security Settings',
+      userManagement: 'User Management',
+      serialNumbersManagement: 'Serial Numbers Management',
       
       // Landing Page
       heroTitle: 'StockSence',
@@ -217,6 +226,7 @@ const resources = {
       login: 'تسجيل الدخول',
       logout: 'تسجيل الخروج',
       register: 'إنشاء حساب',
+      profile: 'الملف الشخصي',
       
       // Authentication
       username: 'اسم المستخدم',
@@ -246,6 +256,14 @@ const resources = {
       usedAt: 'تاريخ الاستخدام',
       status: 'الحالة',
       actions: 'الإجراءات',
+      
+      // User Profile
+      userProfile: 'الملف الشخصي',
+      accountInformation: 'معلومات الحساب',
+      personalInfo: 'المعلومات الشخصية',
+      securitySettings: 'إعدادات الأمان',
+      userManagement: 'إدارة المستخدمين',
+      serialNumbersManagement: 'إدارة الأرقام التسلسلية',
       
       // Landing Page
       heroTitle: 'ستوك سينس',

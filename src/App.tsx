@@ -15,6 +15,7 @@ const About = React.lazy(() => import('./pages/About'));
 const Settings = React.lazy(() => import('./pages/Settings'));
 const Download = React.lazy(() => import('./pages/Download'));
 const Auth = React.lazy(() => import('./pages/Auth'));
+const UserProfile = React.lazy(() => import('./pages/UserProfile'));
 
 // Loading component
 const LoadingSpinner = () => (
@@ -159,6 +160,11 @@ function App() {
               <Route path="/settings" element={
                 <ProtectedRoute>
                   <Settings />
+                </ProtectedRoute>
+              } />
+              <Route path="/profile" element={
+                <ProtectedRoute>
+                  <UserProfile />
                 </ProtectedRoute>
               } />
               

@@ -15,7 +15,8 @@ import {
   Download,
   LogIn,
   LogOut,
-  User
+  User,
+  UserCircle
 } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 
@@ -168,29 +169,47 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
               <div className={`px-6 py-4 border-b ${
                 theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
               } flex-shrink-0`}>
-                <div className={`flex items-center space-x-3 rtl:space-x-reverse p-3 rounded-lg ${
-                  theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'
-                }`}>
-                  <User className={`w-8 h-8 p-2 rounded-full ${
-                    currentUser.role === 'admin' 
-                      ? 'bg-purple-500 text-white' 
-                      : 'bg-blue-500 text-white'
-                  }`} />
-                  <div className="flex-1">
-                    <p className={`font-medium ${
-                      theme === 'dark' ? 'text-white' : 'text-gray-900'
-                    }`}>
-                      {currentUser.username}
-                    </p>
-                    <span className={`text-xs px-2 py-1 rounded-full ${
-                      currentUser.role === 'admin'
-                        ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400'
-                        : 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400'
-                    }`}>
-                      {currentUser.role === 'admin' ? 'Admin' : 'Employee'}
-                    </span>
-                  </div>
-                </div>
+                <Link to="/profile" onClick={onToggle}>
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className={`flex items-center space-x-3 rtl:space-x-reverse p-3 rounded-lg transition-all duration-300 ${
+                      location.pathname === '/profile'
+                        ? theme === 'dark'
+                          ? 'bg-purple-600 text-white'
+                          : 'bg-purple-500 text-white'
+                        : theme === 'dark'
+                        ? 'bg-gray-800 hover:bg-gray-700'
+                        : 'bg-gray-100 hover:bg-gray-200'
+                    }`}
+                  >
+                    <UserCircle className={`w-8 h-8 ${
+                      location.pathname === '/profile'
+                        ? 'text-white'
+                        : currentUser.role === 'admin' 
+                        ? 'text-purple-500' 
+                        : 'text-blue-500'
+                    }`} />
+                    <div className="flex-1">
+                      <p className={`font-medium ${
+                        theme === 'dark' ? 'text-white' : 'text-gray-900'
+                      }`}>
+                        {currentUser.username}
+                      </p>
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        currentUser.role === 'admin'
+                          ? location.pathname === '/profile'
+                            ? 'bg-white/20 text-white'
+                            : 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400'
+                          : location.pathname === '/profile'
+                          ? 'bg-white/20 text-white'
+                          : 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400'
+                      }`}>
+                        {currentUser.role === 'admin' ? 'Admin' : 'Employee'}
+                      </span>
+                    </div>
+                  </motion.div>
+                </Link>
               </div>
             )}
 

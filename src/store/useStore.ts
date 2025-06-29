@@ -240,54 +240,23 @@ export const useStore = create<StoreState>()(
           return false;
         }
         
-        // Check if this is the first user (admin)
-        if (state.users.length === 0) {
-          const companyId = generateCompanyId();
-          const adminUser: User = {
-            id: generateId(),
-            username,
-            password,
-            role: 'admin',
-            companyId,
-            createdAt: new Date(),
-            isActive: true,
-            email
-          };
-          
-          set(state => ({
-            users: [adminUser],
-            currentUser: adminUser,
-            isAuthenticated: true,
-            currentCompanyId: companyId,
-            products: [],
-            sales: [],
-            serialNumbers: []
-          }));
-          
-          get().addNotification({ 
-            type: 'success', 
-            message: state.language === 'ar' 
-              ? `تم إنشاء حساب الأدمن بنجاح! رقم الشركة: ${companyId}` 
-              : `Admin account created successfully! Company ID: ${companyId}` 
-          });
-          return true;
-        }
+        // إنشاء شركة جديدة لكل مستخدم جديد
+        const companyId = generateCompanyId();
         
-        // For new users (employees)
-        const autoSerialNumber = generateSimpleSerial();
-        const companyId = generateCompanyId(); // Each new registration gets a new company
-        
+        // كل مستخدم جديد يصبح أدمن لشركته الخاصة
         const newUser: User = {
           id: generateId(),
           username,
           password,
-          role: 'employee',
+          role: 'admin', // 🔥 تم التعديل: كل مستخدم جديد يصبح أدمن
           companyId,
           createdAt: new Date(),
           isActive: true,
           email
         };
         
+        // إنشاء رقم تسلسلي تلقائي للمستخدم الجديد
+        const autoSerialNumber = generateSimpleSerial();
         const newSerial: SerialNumber = {
           id: generateId(),
           serialNumber: autoSerialNumber,
@@ -309,8 +278,8 @@ export const useStore = create<StoreState>()(
         get().addNotification({ 
           type: 'success', 
           message: state.language === 'ar' 
-            ? `تم إنشاء حساب الموظف بنجاح! رقم الشركة: ${companyId}` 
-            : `Employee account created successfully! Company ID: ${companyId}` 
+            ? `تم إنشاء حساب الأدمن بنجاح! رقم الشركة: ${companyId}` 
+            : `Admin account created successfully! Company ID: ${companyId}` 
         });
         return true;
       },

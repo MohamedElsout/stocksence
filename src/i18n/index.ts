@@ -47,6 +47,7 @@ const resources = {
       status: 'Status',
       actions: 'Actions',
       testAccountInfo: 'Test Account: Username and Password = "test"',
+      newUsersWillBeAdmins: 'New users will be admins',
       
       // User Profile
       userProfile: 'User Profile',
@@ -259,6 +260,7 @@ const resources = {
       status: 'الحالة',
       actions: 'الإجراءات',
       testAccountInfo: 'حساب تجريبي: اسم المستخدم وكلمة المرور = "test"',
+      newUsersWillBeAdmins: 'المستخدمون الجدد سيكونون أدمن',
       
       // User Profile
       userProfile: 'الملف الشخصي',

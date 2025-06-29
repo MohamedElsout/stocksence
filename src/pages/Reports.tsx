@@ -49,12 +49,14 @@ import Sidebar from '../components/Layout/Sidebar';
 import AnimatedCounter from '../components/UI/AnimatedCounter';
 
 const Reports: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { products, sales, theme, formatPrice } = useStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState('30days');
   const [selectedChart, setSelectedChart] = useState('overview');
   const [isLoading, setIsLoading] = useState(false);
+
+  const isRTL = i18n.language === 'ar';
 
   const analytics = useMemo(() => {
     const totalRevenue = sales.reduce((sum, sale) => sum + sale.totalAmount, 0);
@@ -87,6 +89,7 @@ const Reports: React.FC = () => {
       .sort((a: any, b: any) => b.revenue - a.revenue)
       .slice(0, 5);
 
+    // Improved category data with better colors
     const categoryData = products.reduce((acc: any[], product) => {
       const existing = acc.find(item => item.category === product.category);
       if (existing) {
@@ -95,13 +98,17 @@ const Reports: React.FC = () => {
         existing.quantity += product.quantity;
         existing.avgPrice = existing.value / existing.quantity;
       } else {
+        // Assign a color from the predefined palette
+        const colorIndex = acc.length % COLORS.length;
         acc.push({
           category: product.category,
           count: 1,
           value: product.quantity * product.price,
           quantity: product.quantity,
           avgPrice: product.price,
-          fill: `hsl(${Math.random() * 360}, 70%, 50%)`
+          fill: COLORS[colorIndex],
+          // Add a contrasting text color
+          textColor: isLightColor(COLORS[colorIndex]) ? '#333333' : '#FFFFFF'
         });
       }
       return acc;
@@ -146,9 +153,36 @@ const Reports: React.FC = () => {
       salesTrendData,
       monthlyData
     };
-  }, [products, sales]);
+  }, [products, sales, isRTL]);
 
-  const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#14B8A6', '#F97316'];
+  // Function to determine if a color is light or dark
+  function isLightColor(color: string) {
+    // Convert hex to RGB
+    const hex = color.replace('#', '');
+    const r = parseInt(hex.substr(0, 2), 16);
+    const g = parseInt(hex.substr(2, 2), 16);
+    const b = parseInt(hex.substr(4, 2), 16);
+    
+    // Calculate brightness (YIQ formula)
+    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+    return brightness > 128;
+  }
+
+  // Enhanced color palette with better contrast
+  const COLORS = [
+    '#3B82F6', // blue
+    '#10B981', // green
+    '#F59E0B', // yellow
+    '#EF4444', // red
+    '#8B5CF6', // purple
+    '#EC4899', // pink
+    '#14B8A6', // teal
+    '#F97316', // orange
+    '#6366F1', // indigo
+    '#D946EF', // fuchsia
+    '#0EA5E9', // sky
+    '#84CC16'  // lime
+  ];
 
   const handleRefresh = async () => {
     setIsLoading(true);
@@ -156,7 +190,7 @@ const Reports: React.FC = () => {
     setIsLoading(false);
   };
 
-  const exportReport = (format: 'pdf' | 'excel' | 'csv', chartType?: string) => {
+  const exportReport = (format: 'pdf' | 'csv', chartType?: string) => {
     const fileName = chartType 
       ? `${chartType}-report-${new Date().toISOString().split('T')[0]}.${format}`
       : `full-report-${new Date().toISOString().split('T')[0]}.${format}`;
@@ -190,6 +224,110 @@ const Reports: React.FC = () => {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
+    } else if (format === 'pdf') {
+      // Simple PDF generation using window.print()
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        const html = `
+          <html>
+            <head>
+              <title>${fileName}</title>
+              <style>
+                body { font-family: Arial, sans-serif; padding: 20px; }
+                h1 { color: #3B82F6; }
+                table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th { background-color: #f2f2f2; }
+                .header { display: flex; justify-content: space-between; align-items: center; }
+                .logo { font-size: 24px; font-weight: bold; color: #3B82F6; }
+                .date { color: #666; }
+              </style>
+            </head>
+            <body>
+              <div class="header">
+                <div class="logo">StockSence</div>
+                <div class="date">${new Date().toLocaleDateString()}</div>
+              </div>
+              <h1>${chartType ? `${chartType.charAt(0).toUpperCase() + chartType.slice(1)} Report` : 'Full Report'}</h1>
+              <p>Generated on: ${new Date().toLocaleString()}</p>
+              
+              <h2>Summary</h2>
+              <p>Total Products: ${analytics.totalProducts}</p>
+              <p>Total Sales: ${analytics.totalSales}</p>
+              <p>Total Revenue: ${formatPrice(analytics.totalRevenue)}</p>
+              <p>Inventory Value: ${formatPrice(analytics.totalInventoryValue)}</p>
+              
+              ${chartType === 'categories' ? `
+                <h2>Category Performance</h2>
+                <table>
+                  <tr>
+                    <th>Category</th>
+                    <th>Products</th>
+                    <th>Value</th>
+                    <th>Quantity</th>
+                  </tr>
+                  ${analytics.categoryData.map(cat => `
+                    <tr>
+                      <td>${cat.category}</td>
+                      <td>${cat.count}</td>
+                      <td>${formatPrice(cat.value)}</td>
+                      <td>${cat.quantity}</td>
+                    </tr>
+                  `).join('')}
+                </table>
+              ` : ''}
+              
+              ${chartType === 'performance' || !chartType ? `
+                <h2>Monthly Performance</h2>
+                <table>
+                  <tr>
+                    <th>Month</th>
+                    <th>Revenue</th>
+                    <th>Sales</th>
+                    <th>Profit</th>
+                    <th>Growth</th>
+                  </tr>
+                  ${analytics.monthlyData.map(month => `
+                    <tr>
+                      <td>${month.month}</td>
+                      <td>${formatPrice(month.revenue)}</td>
+                      <td>${month.sales}</td>
+                      <td>${formatPrice(month.profit)}</td>
+                      <td>${month.growth}%</td>
+                    </tr>
+                  `).join('')}
+                </table>
+              ` : ''}
+              
+              <h2>Top Performing Products</h2>
+              <table>
+                <tr>
+                  <th>Product</th>
+                  <th>Quantity Sold</th>
+                  <th>Revenue</th>
+                </tr>
+                ${analytics.topProducts.map((product: any) => `
+                  <tr>
+                    <td>${product.productName}</td>
+                    <td>${product.quantity}</td>
+                    <td>${formatPrice(product.revenue)}</td>
+                  </tr>
+                `).join('')}
+              </table>
+              
+              <div style="margin-top: 50px; text-align: center; color: #666;">
+                <p>© ${new Date().getFullYear()} StockSence - All Rights Reserved</p>
+              </div>
+            </body>
+          </html>
+        `;
+        
+        printWindow.document.write(html);
+        printWindow.document.close();
+        printWindow.onload = function() {
+          printWindow.print();
+        };
+      }
     }
   };
 
@@ -241,6 +379,30 @@ const Reports: React.FC = () => {
     { id: 'performance', label: t('performance'), icon: Target }
   ];
 
+  // Custom tooltip for category pie chart
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      return (
+        <div className={`p-3 rounded-lg shadow-lg ${
+          theme === 'dark' ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'
+        }`}>
+          <p className={`font-bold ${data.textColor}`}>{data.category}</p>
+          <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+            {t('products')}: <span className="font-medium">{data.count}</span>
+          </p>
+          <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+            {t('value')}: <span className="font-medium">{formatPrice(data.value)}</span>
+          </p>
+          <p className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+            {t('quantity')}: <span className="font-medium">{data.quantity}</span>
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <div className={`min-h-screen ${
       theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'
@@ -248,7 +410,7 @@ const Reports: React.FC = () => {
       <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
       
       <div className="w-full" style={{ paddingTop: '4rem' }}>
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -257,7 +419,7 @@ const Reports: React.FC = () => {
           >
             <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6">
               <div>
-                <h1 className={`text-3xl font-bold mb-2 ${
+                <h1 className={`text-2xl sm:text-3xl font-bold mb-2 ${
                   theme === 'dark' ? 'text-white' : 'text-gray-900'
                 }`}>
                   {t('reportsTitle')}
@@ -324,15 +486,6 @@ const Reports: React.FC = () => {
                         {t('exportAsPDF')}
                       </button>
                       <button
-                        onClick={() => exportReport('excel')}
-                        className={`w-full text-left px-4 py-2 text-sm ${
-                          theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-50'
-                        } transition-colors flex items-center`}
-                      >
-                        <FileText className="w-4 h-4 mr-2" />
-                        {t('exportAsExcel')}
-                      </button>
-                      <button
                         onClick={() => exportReport('csv')}
                         className={`w-full text-left px-4 py-2 text-sm ${
                           theme === 'dark' ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-50'
@@ -349,7 +502,7 @@ const Reports: React.FC = () => {
           </motion.div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
             {stats.map((stat, index) => {
               const Icon = stat.icon;
               const TrendIcon = stat.trend === 'up' ? ArrowUpRight : ArrowDownRight;
@@ -361,7 +514,7 @@ const Reports: React.FC = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
                   whileHover={{ scale: 1.02, y: -5 }}
-                  className={`p-6 rounded-xl shadow-lg ${
+                  className={`p-4 sm:p-6 rounded-xl shadow-lg ${
                     theme === 'dark' ? 'bg-gray-800' : 'bg-white'
                   } border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} hover:shadow-xl transition-all duration-300`}
                 >
@@ -389,7 +542,7 @@ const Reports: React.FC = () => {
                     }`}>
                       {stat.label}
                     </p>
-                    <div className={`text-2xl font-bold ${stat.color}`}>
+                    <div className={`text-xl sm:text-2xl font-bold ${stat.color}`}>
                       {stat.isPrice ? (
                         formatPrice(stat.value)
                       ) : (
@@ -410,9 +563,9 @@ const Reports: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="mb-6"
+            className="mb-6 overflow-x-auto"
           >
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-nowrap gap-2 min-w-max">
               {chartOptions.map((option) => {
                 const Icon = option.icon;
                 return (
@@ -438,12 +591,12 @@ const Reports: React.FC = () => {
           </motion.div>
 
           {/* Main Charts Section */}
-          <div className="grid lg:grid-cols-3 gap-8 mb-8">
+          <div className="grid lg:grid-cols-3 gap-6 sm:gap-8 mb-8">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.5 }}
-              className={`lg:col-span-2 p-6 rounded-xl shadow-lg ${
+              className={`lg:col-span-2 p-4 sm:p-6 rounded-xl shadow-lg ${
                 theme === 'dark' ? 'bg-gray-800' : 'bg-white'
               } border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}
             >
@@ -460,127 +613,141 @@ const Reports: React.FC = () => {
                   <motion.button
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
+                    onClick={() => exportReport('pdf', selectedChart)}
+                    className={`p-2 rounded-lg ${
+                      theme === 'dark' ? 'hover:bg-gray-700 text-gray-400' : 'hover:bg-gray-100 text-gray-500'
+                    } transition-colors`}
+                    title="Export as PDF"
+                  >
+                    <FileText className="w-4 h-4" />
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
                     onClick={() => exportReport('csv', selectedChart)}
                     className={`p-2 rounded-lg ${
-                      theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
+                      theme === 'dark' ? 'hover:bg-gray-700 text-gray-400' : 'hover:bg-gray-100 text-gray-500'
                     } transition-colors`}
-                    title="Download Chart Data"
+                    title="Export as CSV"
                   >
-                    <Download className={`w-4 h-4 ${
-                      theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
-                    }`} />
+                    <Download className="w-4 h-4" />
                   </motion.button>
                 </div>
               </div>
               
-              <ResponsiveContainer width="100%" height={400}>
-                {selectedChart === 'overview' && (
-                  <ComposedChart data={analytics.monthlyData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? '#374151' : '#E5E7EB'} />
-                    <XAxis 
-                      dataKey="month" 
-                      stroke={theme === 'dark' ? '#9CA3AF' : '#6B7280'}
-                      fontSize={12}
-                    />
-                    <YAxis 
-                      stroke={theme === 'dark' ? '#9CA3AF' : '#6B7280'}
-                      fontSize={12}
-                    />
-                    <Tooltip 
-                      contentStyle={{
-                        backgroundColor: theme === 'dark' ? '#1F2937' : '#FFFFFF',
-                        border: `1px solid ${theme === 'dark' ? '#374151' : '#E5E7EB'}`,
-                        borderRadius: '8px',
-                        color: theme === 'dark' ? '#FFFFFF' : '#000000'
-                      }}
-                    />
-                    <Legend />
-                    <Bar dataKey="revenue" fill="#3B82F6" name={t('totalRevenue')} />
-                    <Line type="monotone" dataKey="profit" stroke="#10B981" strokeWidth={3} name={t('profitMargin')} />
-                  </ComposedChart>
-                )}
+              <div className="h-[400px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  {selectedChart === 'overview' && (
+                    <ComposedChart data={analytics.monthlyData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? '#374151' : '#E5E7EB'} />
+                      <XAxis 
+                        dataKey="month" 
+                        stroke={theme === 'dark' ? '#9CA3AF' : '#6B7280'}
+                        fontSize={12}
+                      />
+                      <YAxis 
+                        stroke={theme === 'dark' ? '#9CA3AF' : '#6B7280'}
+                        fontSize={12}
+                      />
+                      <Tooltip 
+                        contentStyle={{
+                          backgroundColor: theme === 'dark' ? '#1F2937' : '#FFFFFF',
+                          border: `1px solid ${theme === 'dark' ? '#374151' : '#E5E7EB'}`,
+                          borderRadius: '8px',
+                          color: theme === 'dark' ? '#FFFFFF' : '#000000'
+                        }}
+                      />
+                      <Legend />
+                      <Bar dataKey="revenue" fill="#3B82F6" name={t('totalRevenue')} />
+                      <Line type="monotone" dataKey="profit" stroke="#10B981" strokeWidth={3} name={t('profitMargin')} />
+                    </ComposedChart>
+                  )}
 
-                {selectedChart === 'sales' && (
-                  <AreaChart data={analytics.salesTrendData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? '#374151' : '#E5E7EB'} />
-                    <XAxis 
-                      dataKey="day" 
-                      stroke={theme === 'dark' ? '#9CA3AF' : '#6B7280'}
-                      fontSize={12}
-                    />
-                    <YAxis 
-                      stroke={theme === 'dark' ? '#9CA3AF' : '#6B7280'}
-                      fontSize={12}
-                    />
-                    <Tooltip 
-                      contentStyle={{
-                        backgroundColor: theme === 'dark' ? '#1F2937' : '#FFFFFF',
-                        border: `1px solid ${theme === 'dark' ? '#374151' : '#E5E7EB'}`,
-                        borderRadius: '8px',
-                        color: theme === 'dark' ? '#FFFFFF' : '#000000'
-                      }}
-                    />
-                    <Area 
-                      type="monotone" 
-                      dataKey="revenue" 
-                      stroke="#3B82F6" 
-                      fill="#3B82F6" 
-                      fillOpacity={0.3}
-                      name={t('totalRevenue')}
-                    />
-                    <Area 
-                      type="monotone" 
-                      dataKey="profit" 
-                      stroke="#10B981" 
-                      fill="#10B981" 
-                      fillOpacity={0.3}
-                      name={t('profitMargin')}
-                    />
-                  </AreaChart>
-                )}
+                  {selectedChart === 'sales' && (
+                    <AreaChart data={analytics.salesTrendData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? '#374151' : '#E5E7EB'} />
+                      <XAxis 
+                        dataKey="day" 
+                        stroke={theme === 'dark' ? '#9CA3AF' : '#6B7280'}
+                        fontSize={12}
+                      />
+                      <YAxis 
+                        stroke={theme === 'dark' ? '#9CA3AF' : '#6B7280'}
+                        fontSize={12}
+                      />
+                      <Tooltip 
+                        contentStyle={{
+                          backgroundColor: theme === 'dark' ? '#1F2937' : '#FFFFFF',
+                          border: `1px solid ${theme === 'dark' ? '#374151' : '#E5E7EB'}`,
+                          borderRadius: '8px',
+                          color: theme === 'dark' ? '#FFFFFF' : '#000000'
+                        }}
+                      />
+                      <Area 
+                        type="monotone" 
+                        dataKey="revenue" 
+                        stroke="#3B82F6" 
+                        fill="#3B82F6" 
+                        fillOpacity={0.3}
+                        name={t('totalRevenue')}
+                      />
+                      <Area 
+                        type="monotone" 
+                        dataKey="profit" 
+                        stroke="#10B981" 
+                        fill="#10B981" 
+                        fillOpacity={0.3}
+                        name={t('profitMargin')}
+                      />
+                    </AreaChart>
+                  )}
 
-                {selectedChart === 'categories' && (
-                  <RechartsPieChart>
-                    <Pie
-                      data={analytics.categoryData}
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={120}
-                      fill="#8884d8"
-                      dataKey="value"
-                      label={({ category, percent }) => `${category} ${(percent * 100).toFixed(0)}%`}
-                    >
-                      {analytics.categoryData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip 
-                      contentStyle={{
-                        backgroundColor: theme === 'dark' ? '#1F2937' : '#FFFFFF',
-                        border: `1px solid ${theme === 'dark' ? '#374151' : '#E5E7EB'}`,
-                        borderRadius: '8px',
-                        color: theme === 'dark' ? '#FFFFFF' : '#000000'
-                      }}
-                      formatter={(value: any, name: string) => [
-                        formatPrice(value),
-                        name === 'value' ? 'Total Value' : name
-                      ]}
-                    />
-                  </RechartsPieChart>
-                )}
+                  {selectedChart === 'categories' && (
+                    <RechartsPieChart>
+                      <Pie
+                        data={analytics.categoryData}
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={120}
+                        fill="#8884d8"
+                        dataKey="value"
+                        nameKey="category"
+                        label={({ category, percent, textColor }) => (
+                          <text 
+                            x={0} 
+                            y={0} 
+                            fill={textColor || '#FFFFFF'} 
+                            textAnchor="middle" 
+                            dominantBaseline="central"
+                            fontSize={12}
+                            fontWeight="bold"
+                          >
+                            {`${category} ${(percent * 100).toFixed(0)}%`}
+                          </text>
+                        )}
+                      >
+                        {analytics.categoryData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.fill} />
+                        ))}
+                      </Pie>
+                      <Tooltip content={<CustomTooltip />} />
+                    </RechartsPieChart>
+                  )}
 
-                {selectedChart === 'performance' && (
-                  <RadialBarChart cx="50%" cy="50%" innerRadius="20%" outerRadius="90%" data={[
-                    { name: t('totalRevenue'), value: 85, fill: '#3B82F6' },
-                    { name: t('totalSales'), value: 70, fill: '#10B981' },
-                    { name: t('profitMargin'), value: 60, fill: '#F59E0B' },
-                    { name: 'Growth', value: 90, fill: '#8B5CF6' }
-                  ]}>
-                    <RadialBar dataKey="value" cornerRadius={10} fill="#8884d8" />
-                    <Tooltip />
-                  </RadialBarChart>
-                )}
-              </ResponsiveContainer>
+                  {selectedChart === 'performance' && (
+                    <RadialBarChart cx="50%" cy="50%" innerRadius="20%" outerRadius="90%" data={[
+                      { name: t('totalRevenue'), value: 85, fill: '#3B82F6' },
+                      { name: t('totalSales'), value: 70, fill: '#10B981' },
+                      { name: t('profitMargin'), value: 60, fill: '#F59E0B' },
+                      { name: 'Growth', value: 90, fill: '#8B5CF6' }
+                    ]}>
+                      <RadialBar dataKey="value" cornerRadius={10} label={{ fill: theme === 'dark' ? '#FFFFFF' : '#000000', position: 'insideStart' }} />
+                      <Tooltip />
+                      <Legend iconSize={10} layout="vertical" verticalAlign="middle" align="right" />
+                    </RadialBarChart>
+                  )}
+                </ResponsiveContainer>
+              </div>
             </motion.div>
 
             <motion.div
@@ -589,7 +756,7 @@ const Reports: React.FC = () => {
               transition={{ delay: 0.6 }}
               className="space-y-6"
             >
-              <div className={`p-6 rounded-xl shadow-lg ${
+              <div className={`p-4 sm:p-6 rounded-xl shadow-lg ${
                 theme === 'dark' ? 'bg-gray-800' : 'bg-white'
               } border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
                 <h3 className={`text-lg font-semibold mb-6 ${
@@ -642,7 +809,7 @@ const Reports: React.FC = () => {
                 </div>
               </div>
 
-              <div className={`p-6 rounded-xl shadow-lg ${
+              <div className={`p-4 sm:p-6 rounded-xl shadow-lg ${
                 theme === 'dark' ? 'bg-gray-800' : 'bg-white'
               } border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
                 <h3 className={`text-lg font-semibold mb-6 ${
@@ -664,7 +831,7 @@ const Reports: React.FC = () => {
                       <span className={`font-bold ${
                         theme === 'dark' ? 'text-blue-400' : 'text-blue-600'
                       }`}>
-                        {formatPrice(analytics.totalRevenue / analytics.totalSales)}
+                        {formatPrice(analytics.totalSales ? analytics.totalRevenue / analytics.totalSales : 0)}
                       </span>
                     </div>
                   </div>
@@ -708,12 +875,12 @@ const Reports: React.FC = () => {
           </div>
 
           {/* Bottom Section */}
-          <div className="grid lg:grid-cols-2 gap-8">
+          <div className="grid lg:grid-cols-2 gap-6 sm:gap-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7 }}
-              className={`p-6 rounded-xl shadow-lg ${
+              className={`p-4 sm:p-6 rounded-xl shadow-lg ${
                 theme === 'dark' ? 'bg-gray-800' : 'bg-white'
               } border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}
             >
@@ -785,7 +952,7 @@ const Reports: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8 }}
-              className={`p-6 rounded-xl shadow-lg ${
+              className={`p-4 sm:p-6 rounded-xl shadow-lg ${
                 theme === 'dark' ? 'bg-gray-800' : 'bg-white'
               } border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}
             >
@@ -798,7 +965,7 @@ const Reports: React.FC = () => {
                 <motion.button
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
-                  onClick={() => exportReport('csv', 'categories')}
+                  onClick={() => exportReport('pdf', 'categories')}
                   className={`p-2 rounded-lg ${
                     theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
                   } transition-colors`}
@@ -849,7 +1016,7 @@ const Reports: React.FC = () => {
                           animate={{ width: `${percentage}%` }}
                           transition={{ delay: 0.5 + index * 0.1, duration: 1 }}
                           className="h-3 rounded-full"
-                          style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                          style={{ backgroundColor: category.fill }}
                         />
                       </div>
                       

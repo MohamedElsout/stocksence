@@ -15,7 +15,8 @@ import {
   Download,
   Hash,
   Copy,
-  CheckCircle
+  CheckCircle,
+  Info
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import Sidebar from '../components/Layout/Sidebar';
@@ -23,7 +24,7 @@ import Modal from '../components/UI/Modal';
 import AnimatedCounter from '../components/UI/AnimatedCounter';
 
 const Dashboard: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { 
     products, 
     addProduct, 
@@ -50,6 +51,8 @@ const Dashboard: React.FC = () => {
     price: 0,
     category: ''
   });
+
+  const isRTL = i18n.language === 'ar';
 
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -167,9 +170,8 @@ const Dashboard: React.FC = () => {
     }`}>
       <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
       
-      {/* Main Content - No margin adjustments */}
       <div className="w-full" style={{ paddingTop: '4rem' }}>
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -178,7 +180,7 @@ const Dashboard: React.FC = () => {
           >
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
-                <h1 className={`text-3xl font-bold mb-2 ${
+                <h1 className={`text-2xl sm:text-3xl font-bold mb-2 ${
                   theme === 'dark' ? 'text-white' : 'text-gray-900'
                 }`}>
                   {t('dashboardTitle')}
@@ -203,7 +205,7 @@ const Dashboard: React.FC = () => {
           </motion.div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
             {stats.map((stat, index) => {
               const Icon = stat.icon;
               return (
@@ -213,7 +215,7 @@ const Dashboard: React.FC = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
                   whileHover={{ scale: 1.02, y: -5 }}
-                  className={`p-6 rounded-xl shadow-lg ${
+                  className={`p-4 sm:p-6 rounded-xl shadow-lg ${
                     theme === 'dark' ? 'bg-gray-800' : 'bg-white'
                   } border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} hover:shadow-xl transition-all duration-300`}
                 >
@@ -240,7 +242,7 @@ const Dashboard: React.FC = () => {
                     }`}>
                       {stat.label}
                     </p>
-                    <div className={`text-2xl font-bold ${stat.color}`}>
+                    <div className={`text-xl sm:text-2xl font-bold ${stat.color}`}>
                       {stat.isPrice ? (
                         formatPrice(stat.value)
                       ) : (
@@ -266,7 +268,7 @@ const Dashboard: React.FC = () => {
             } border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}
           >
             {/* Products Header */}
-            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+            <div className="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
               <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                 <h2 className={`text-xl font-semibold ${
                   theme === 'dark' ? 'text-white' : 'text-gray-900'
@@ -274,10 +276,10 @@ const Dashboard: React.FC = () => {
                   {t('productsManagement')} ({filteredProducts.length})
                 </h2>
                 
-                <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
+                <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
                   {/* Search */}
                   <div className="relative">
-                    <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
+                    <Search className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 w-4 h-4 ${
                       theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
                     }`} />
                     <input
@@ -285,7 +287,7 @@ const Dashboard: React.FC = () => {
                       placeholder={t('search')}
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className={`pl-10 pr-4 py-2 border rounded-lg w-full sm:w-64 ${
+                      className={`${isRTL ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-2 border rounded-lg w-full sm:w-64 ${
                         theme === 'dark'
                           ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                           : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
@@ -295,13 +297,13 @@ const Dashboard: React.FC = () => {
 
                   {/* Category Filter */}
                   <div className="relative">
-                    <Filter className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
+                    <Filter className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 w-4 h-4 ${
                       theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
                     }`} />
                     <select
                       value={categoryFilter}
                       onChange={(e) => setCategoryFilter(e.target.value)}
-                      className={`pl-10 pr-4 py-2 border rounded-lg w-full sm:w-48 ${
+                      className={`${isRTL ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-2 border rounded-lg w-full sm:w-48 ${
                         theme === 'dark'
                           ? 'bg-gray-700 border-gray-600 text-white'
                           : 'bg-white border-gray-300 text-gray-900'
@@ -319,7 +321,7 @@ const Dashboard: React.FC = () => {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setIsAddModalOpen(true)}
-                    className="flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-lg"
+                    className="flex items-center justify-center px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-lg"
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     {t('addProduct')}
@@ -350,37 +352,37 @@ const Dashboard: React.FC = () => {
                     theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'
                   }`}>
                     <tr>
-                      <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                      <th className={`px-4 sm:px-6 py-3 text-${isRTL ? 'right' : 'left'} text-xs font-medium uppercase tracking-wider ${
                         theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
                       }`}>
                         {t('productName')}
                       </th>
-                      <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                      <th className={`px-4 sm:px-6 py-3 text-${isRTL ? 'right' : 'left'} text-xs font-medium uppercase tracking-wider ${
                         theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
                       }`}>
                         {t('serialNumber')}
                       </th>
-                      <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                      <th className={`px-4 sm:px-6 py-3 text-${isRTL ? 'right' : 'left'} text-xs font-medium uppercase tracking-wider ${
                         theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
                       }`}>
                         {t('category')}
                       </th>
-                      <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                      <th className={`px-4 sm:px-6 py-3 text-${isRTL ? 'right' : 'left'} text-xs font-medium uppercase tracking-wider ${
                         theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
                       }`}>
                         {t('quantity')}
                       </th>
-                      <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                      <th className={`px-4 sm:px-6 py-3 text-${isRTL ? 'right' : 'left'} text-xs font-medium uppercase tracking-wider ${
                         theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
                       }`}>
                         {t('price')}
                       </th>
-                      <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                      <th className={`px-4 sm:px-6 py-3 text-${isRTL ? 'right' : 'left'} text-xs font-medium uppercase tracking-wider ${
                         theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
                       }`}>
                         {t('totalValueProduct')}
                       </th>
-                      <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                      <th className={`px-4 sm:px-6 py-3 text-${isRTL ? 'right' : 'left'} text-xs font-medium uppercase tracking-wider ${
                         theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
                       }`}>
                         {t('actions')}
@@ -400,7 +402,7 @@ const Dashboard: React.FC = () => {
                           theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'
                         } transition-colors`}
                       >
-                        <td className={`px-6 py-4 whitespace-nowrap ${
+                        <td className={`px-4 sm:px-6 py-4 whitespace-nowrap ${
                           theme === 'dark' ? 'text-white' : 'text-gray-900'
                         }`}>
                           <div>
@@ -414,7 +416,7 @@ const Dashboard: React.FC = () => {
                             </div>
                           </div>
                         </td>
-                        <td className={`px-6 py-4 whitespace-nowrap ${
+                        <td className={`px-4 sm:px-6 py-4 whitespace-nowrap ${
                           theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
                         }`}>
                           <div className="flex items-center space-x-2">
@@ -444,7 +446,7 @@ const Dashboard: React.FC = () => {
                             </motion.button>
                           </div>
                         </td>
-                        <td className={`px-6 py-4 whitespace-nowrap ${
+                        <td className={`px-4 sm:px-6 py-4 whitespace-nowrap ${
                           theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
                         }`}>
                           <span className={`px-3 py-1 text-xs font-medium rounded-full ${
@@ -455,7 +457,7 @@ const Dashboard: React.FC = () => {
                             {product.category}
                           </span>
                         </td>
-                        <td className={`px-6 py-4 whitespace-nowrap ${
+                        <td className={`px-4 sm:px-6 py-4 whitespace-nowrap ${
                           theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
                         }`}>
                           <span className={`px-3 py-1 text-xs font-medium rounded-full ${
@@ -468,17 +470,17 @@ const Dashboard: React.FC = () => {
                             {product.quantity}
                           </span>
                         </td>
-                        <td className={`px-6 py-4 whitespace-nowrap font-medium ${
+                        <td className={`px-4 sm:px-6 py-4 whitespace-nowrap font-medium ${
                           theme === 'dark' ? 'text-white' : 'text-gray-900'
                         }`}>
                           {formatPrice(product.price)}
                         </td>
-                        <td className={`px-6 py-4 whitespace-nowrap font-semibold ${
+                        <td className={`px-4 sm:px-6 py-4 whitespace-nowrap font-semibold ${
                           theme === 'dark' ? 'text-green-400' : 'text-green-600'
                         }`}>
                           {formatPrice(product.quantity * product.price)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
                           <div className="flex space-x-2">
                             <motion.button
                               whileHover={{ scale: 1.1 }}
@@ -630,12 +632,12 @@ const Dashboard: React.FC = () => {
             <div className={`p-3 rounded-lg ${
               theme === 'dark' ? 'bg-blue-900/20' : 'bg-blue-50'
             } border border-blue-500/30`}>
-              <div className="flex items-center space-x-2">
-                <Hash className="w-5 h-5 text-blue-500" />
+              <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                <Info className="w-5 h-5 text-blue-500" />
                 <span className={`text-sm font-medium ${
                   theme === 'dark' ? 'text-blue-400' : 'text-blue-600'
                 }`}>
-                  سيتم إنشاء رقم تسلسلي تلقائياً للمنتج
+                  {t('serialNumberAutoGenerated')}
                 </span>
               </div>
             </div>

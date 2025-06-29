@@ -110,16 +110,15 @@ const Sales: React.FC = () => {
     }`}>
       <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
       
-      {/* Main Content - No margin adjustments */}
       <div className="w-full" style={{ paddingTop: '4rem' }}>
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="mb-8"
           >
-            <h1 className={`text-3xl font-bold mb-2 ${
+            <h1 className={`text-2xl sm:text-3xl font-bold mb-2 ${
               theme === 'dark' ? 'text-white' : 'text-gray-900'
             }`}>
               {t('salesTitle')}
@@ -132,7 +131,7 @@ const Sales: React.FC = () => {
           </motion.div>
 
           {/* Stats Cards */}
-          <div className="grid md:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-8">
             {stats.map((stat, index) => {
               const Icon = stat.icon;
               return (
@@ -142,7 +141,7 @@ const Sales: React.FC = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
                   whileHover={{ scale: 1.02 }}
-                  className={`p-6 rounded-xl shadow-lg ${
+                  className={`p-4 sm:p-6 rounded-xl shadow-lg ${
                     theme === 'dark' ? 'bg-gray-800' : 'bg-white'
                   } border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}
                 >
@@ -153,7 +152,7 @@ const Sales: React.FC = () => {
                       }`}>
                         {stat.label}
                       </p>
-                      <div className={`text-2xl font-bold ${stat.color}`}>
+                      <div className={`text-xl sm:text-2xl font-bold ${stat.color}`}>
                         {stat.isPrice ? (
                           formatPrice(stat.value)
                         ) : (
@@ -187,7 +186,7 @@ const Sales: React.FC = () => {
             } border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}
           >
             {/* Sales Header */}
-            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+            <div className="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <h2 className={`text-xl font-semibold ${
                   theme === 'dark' ? 'text-white' : 'text-gray-900'
@@ -219,7 +218,7 @@ const Sales: React.FC = () => {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setIsSaleModalOpen(true)}
-                    className="flex items-center px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all duration-300 shadow-lg"
+                    className="flex items-center justify-center px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all duration-300 shadow-lg"
                   >
                     <ShoppingCart className="w-4 h-4 mr-2" />
                     {t('sellProduct')}
@@ -250,32 +249,32 @@ const Sales: React.FC = () => {
                     theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'
                   }`}>
                     <tr>
-                      <th className={`px-6 py-3 text-${isRTL ? 'right' : 'left'} text-xs font-medium uppercase tracking-wider ${
+                      <th className={`px-4 sm:px-6 py-3 text-${isRTL ? 'right' : 'left'} text-xs font-medium uppercase tracking-wider ${
                         theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
                       }`}>
                         {t('productName')}
                       </th>
-                      <th className={`px-6 py-3 text-${isRTL ? 'right' : 'left'} text-xs font-medium uppercase tracking-wider ${
+                      <th className={`px-4 sm:px-6 py-3 text-${isRTL ? 'right' : 'left'} text-xs font-medium uppercase tracking-wider ${
                         theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
                       }`}>
                         {t('quantity')}
                       </th>
-                      <th className={`px-6 py-3 text-${isRTL ? 'right' : 'left'} text-xs font-medium uppercase tracking-wider ${
+                      <th className={`px-4 sm:px-6 py-3 text-${isRTL ? 'right' : 'left'} text-xs font-medium uppercase tracking-wider ${
                         theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
                       }`}>
                         {t('unitPrice')}
                       </th>
-                      <th className={`px-6 py-3 text-${isRTL ? 'right' : 'left'} text-xs font-medium uppercase tracking-wider ${
+                      <th className={`px-4 sm:px-6 py-3 text-${isRTL ? 'right' : 'left'} text-xs font-medium uppercase tracking-wider ${
                         theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
                       }`}>
                         {t('totalAmount')}
                       </th>
-                      <th className={`px-6 py-3 text-${isRTL ? 'right' : 'left'} text-xs font-medium uppercase tracking-wider ${
+                      <th className={`px-4 sm:px-6 py-3 text-${isRTL ? 'right' : 'left'} text-xs font-medium uppercase tracking-wider ${
                         theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
                       }`}>
                         {isRTL ? 'طريقة البيع' : 'Sale Method'}
                       </th>
-                      <th className={`px-6 py-3 text-${isRTL ? 'right' : 'left'} text-xs font-medium uppercase tracking-wider ${
+                      <th className={`px-4 sm:px-6 py-3 text-${isRTL ? 'right' : 'left'} text-xs font-medium uppercase tracking-wider ${
                         theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
                       }`}>
                         {t('saleDate')}
@@ -295,12 +294,12 @@ const Sales: React.FC = () => {
                           theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'
                         } transition-colors`}
                       >
-                        <td className={`px-6 py-4 whitespace-nowrap font-medium ${
+                        <td className={`px-4 sm:px-6 py-4 whitespace-nowrap font-medium ${
                           theme === 'dark' ? 'text-white' : 'text-gray-900'
                         }`}>
                           {sale.productName}
                         </td>
-                        <td className={`px-6 py-4 whitespace-nowrap ${
+                        <td className={`px-4 sm:px-6 py-4 whitespace-nowrap ${
                           theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
                         }`}>
                           <span className={`px-2 py-1 text-xs font-medium rounded-full ${
@@ -311,17 +310,17 @@ const Sales: React.FC = () => {
                             {sale.quantity}
                           </span>
                         </td>
-                        <td className={`px-6 py-4 whitespace-nowrap ${
+                        <td className={`px-4 sm:px-6 py-4 whitespace-nowrap ${
                           theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
                         }`}>
                           {formatPrice(sale.price)}
                         </td>
-                        <td className={`px-6 py-4 whitespace-nowrap font-semibold ${
+                        <td className={`px-4 sm:px-6 py-4 whitespace-nowrap font-semibold ${
                           theme === 'dark' ? 'text-green-400' : 'text-green-600'
                         }`}>
                           {formatPrice(sale.totalAmount)}
                         </td>
-                        <td className={`px-6 py-4 whitespace-nowrap ${
+                        <td className={`px-4 sm:px-6 py-4 whitespace-nowrap ${
                           theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
                         }`}>
                           <span className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${
@@ -342,7 +341,7 @@ const Sales: React.FC = () => {
                             )}
                           </span>
                         </td>
-                        <td className={`px-6 py-4 whitespace-nowrap text-sm ${
+                        <td className={`px-4 sm:px-6 py-4 whitespace-nowrap text-sm ${
                           theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
                         }`}>
                           {new Date(sale.saleDate).toLocaleDateString()}

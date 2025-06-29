@@ -19,95 +19,11 @@ import {
   XCircle,
   Info,
   Mail,
-  Globe
+  Globe,
+  Building,
+  AlertTriangle
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
-
-// Declare Google types
-declare global {
-  interface Window {
-    google?: {
-      accounts: {
-        id: {
-          initialize: (config: any) => void;
-          prompt: () => void;
-        };
-      };
-    };
-  }
-}
-
-// Google OAuth Component
-const GoogleSignIn: React.FC<{ onSuccess: (email: string) => void; onError: () => void }> = ({ onSuccess, onError }) => {
-  const { theme } = useStore();
-  const { i18n } = useTranslation();
-  const isRTL = i18n.language === 'ar';
-
-  useEffect(() => {
-    // Load Google Identity Services
-    const script = document.createElement('script');
-    script.src = 'https://accounts.google.com/gsi/client';
-    script.async = true;
-    script.defer = true;
-    document.head.appendChild(script);
-
-    script.onload = () => {
-      if (window.google) {
-        window.google.accounts.id.initialize({
-          // 🔥 هنا تضع Google Client ID الحقيقي بعد الرفع
-          client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID || 'YOUR_GOOGLE_CLIENT_ID_HERE',
-          callback: (response: any) => {
-            try {
-              const payload = JSON.parse(atob(response.credential.split('.')[1]));
-              onSuccess(payload.email);
-            } catch (error) {
-              console.error('Google Sign-In error:', error);
-              onError();
-            }
-          }
-        });
-      }
-    };
-
-    return () => {
-      if (document.head.contains(script)) {
-        document.head.removeChild(script);
-      }
-    };
-  }, [onSuccess, onError]);
-
-  const handleGoogleSignIn = () => {
-    if (window.google) {
-      window.google.accounts.id.prompt();
-    } else {
-      onError();
-    }
-  };
-
-  return (
-    <motion.button
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-      type="button"
-      onClick={handleGoogleSignIn}
-      className={`w-full flex items-center justify-center px-4 py-3 border-2 rounded-lg transition-all duration-300 ${
-        theme === 'dark'
-          ? 'border-gray-600 bg-gray-700 text-white hover:bg-gray-600 hover:border-gray-500'
-          : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-400'
-      } shadow-sm hover:shadow-md`}
-    >
-      <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
-        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-      </svg>
-      <span className="font-medium">
-        {isRTL ? 'تسجيل الدخول بـ Google' : 'Sign in with Google'}
-      </span>
-    </motion.button>
-  );
-};
 
 const Auth: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -136,7 +52,7 @@ const Auth: React.FC = () => {
   const [formData, setFormData] = useState({
     username: '',
     password: '',
-    serialNumber: '',
+    companyId: '',
     email: ''
   });
 
@@ -150,10 +66,8 @@ const Auth: React.FC = () => {
       let success = false;
       
       if (isLogin) {
-        // تسجيل الدخول - مع الرقم التسلسلي
-        success = await login(formData.username, formData.password, formData.serialNumber);
+        success = await login(formData.username, formData.password, formData.companyId);
       } else {
-        // إنشاء حساب - بدون رقم تسلسلي
         success = await register(formData.username, formData.password, formData.email);
       }
 
@@ -168,25 +82,10 @@ const Auth: React.FC = () => {
   };
 
   const handleAddSerialNumber = () => {
-    if (newSerialNumber.trim()) {
+    if (newSerialNumber.trim() && /^\d{6}$/.test(newSerialNumber.trim())) {
       addSerialNumber(newSerialNumber.trim());
       setNewSerialNumber('');
     }
-  };
-
-  const handleGoogleSuccess = (email: string) => {
-    setFormData({ ...formData, email });
-    addNotification({
-      type: 'success',
-      message: isRTL ? `تم ربط الإيميل: ${email}` : `Email linked: ${email}`
-    });
-  };
-
-  const handleGoogleError = () => {
-    addNotification({
-      type: 'error',
-      message: isRTL ? 'فشل في ربط حساب Google' : 'Failed to link Google account'
-    });
   };
 
   // If user is already authenticated, redirect to dashboard
@@ -228,6 +127,26 @@ const Auth: React.FC = () => {
             </h1>
           </div>
 
+          {/* Test Account Info */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`p-4 rounded-xl border-2 ${
+              theme === 'dark' 
+                ? 'bg-green-900/20 border-green-500/50' 
+                : 'bg-green-50 border-green-300'
+            }`}
+          >
+            <div className="flex items-center space-x-2 rtl:space-x-reverse">
+              <Info className="w-5 h-5 text-green-500" />
+              <span className={`text-sm font-medium ${
+                theme === 'dark' ? 'text-green-400' : 'text-green-600'
+              }`}>
+                {t('testAccountInfo')}
+              </span>
+            </div>
+          </motion.div>
+
           {/* Form Header */}
           <div className="text-center">
             <h2 className={`text-2xl font-bold mb-2 ${
@@ -251,11 +170,11 @@ const Auth: React.FC = () => {
                 } border border-blue-500/30`}
               >
                 <div className="flex items-center justify-center space-x-2 rtl:space-x-reverse">
-                  <Hash className="w-5 h-5 text-blue-500" />
+                  <Building className="w-5 h-5 text-blue-500" />
                   <span className={`text-sm font-medium ${
                     theme === 'dark' ? 'text-blue-400' : 'text-blue-600'
                   }`}>
-                    {isRTL ? 'مطلوب: اسم المستخدم، كلمة المرور، والرقم التسلسلي' : 'Required: Username, Password, and Serial Number'}
+                    {isRTL ? 'مطلوب: اسم المستخدم، كلمة المرور، ورقم الشركة' : 'Required: Username, Password, and Company ID'}
                   </span>
                 </div>
               </motion.div>
@@ -281,108 +200,6 @@ const Auth: React.FC = () => {
               </motion.div>
             )}
           </div>
-
-          {/* Google Auto-Login Option - محسّن */}
-          {!isLogin && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className={`p-4 rounded-xl border-2 transition-all duration-300 ${
-                autoLoginWithGoogle
-                  ? theme === 'dark' 
-                    ? 'bg-blue-900/20 border-blue-500/50' 
-                    : 'bg-blue-50 border-blue-300'
-                  : theme === 'dark' 
-                  ? 'bg-gray-800 border-gray-700' 
-                  : 'bg-gray-100 border-gray-200'
-              }`}
-            >
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center space-x-3 rtl:space-x-reverse">
-                  <motion.div
-                    animate={autoLoginWithGoogle ? { scale: [1, 1.1, 1] } : {}}
-                    transition={{ duration: 0.3 }}
-                    className={`p-2 rounded-lg ${
-                      autoLoginWithGoogle
-                        ? 'bg-blue-500 text-white'
-                        : theme === 'dark' 
-                        ? 'bg-gray-600 text-gray-300' 
-                        : 'bg-gray-200 text-gray-600'
-                    }`}
-                  >
-                    <Globe className="w-5 h-5" />
-                  </motion.div>
-                  <div>
-                    <p className={`font-semibold ${
-                      autoLoginWithGoogle
-                        ? theme === 'dark' ? 'text-blue-300' : 'text-blue-700'
-                        : theme === 'dark' ? 'text-white' : 'text-gray-900'
-                    }`}>
-                      {isRTL ? 'تسجيل دخول تلقائي بـ Google' : 'Auto-login with Google'}
-                    </p>
-                    <p className={`text-sm ${
-                      theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
-                    }`}>
-                      {isRTL ? 'سيتم حفظ إيميل Google للتسجيل السريع' : 'Google email will be saved for quick login'}
-                    </p>
-                  </div>
-                </div>
-                
-                {/* Toggle Switch محسّن */}
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setAutoLoginWithGoogle(!autoLoginWithGoogle)}
-                  className={`relative inline-flex h-7 w-12 items-center rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                    autoLoginWithGoogle 
-                      ? 'bg-blue-600 shadow-lg' 
-                      : theme === 'dark' ? 'bg-gray-600' : 'bg-gray-300'
-                  }`}
-                >
-                  <motion.span
-                    animate={{ 
-                      x: autoLoginWithGoogle ? (isRTL ? -20 : 20) : 0,
-                      scale: autoLoginWithGoogle ? 1.1 : 1
-                    }}
-                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                    className={`inline-block h-5 w-5 transform rounded-full transition-all duration-300 ${
-                      autoLoginWithGoogle ? 'bg-white shadow-lg' : 'bg-white'
-                    }`}
-                    style={{ 
-                      marginLeft: isRTL ? (autoLoginWithGoogle ? '4px' : '24px') : '4px',
-                      marginRight: isRTL ? '4px' : (autoLoginWithGoogle ? '4px' : '24px')
-                    }}
-                  />
-                </motion.button>
-              </div>
-              
-              {/* Google Sign-In Button */}
-              {autoLoginWithGoogle && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <GoogleSignIn onSuccess={handleGoogleSuccess} onError={handleGoogleError} />
-                  {formData.email && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="mt-2 flex items-center space-x-2 rtl:space-x-reverse"
-                    >
-                      <CheckCircle className="w-4 h-4 text-green-500" />
-                      <span className={`text-sm ${
-                        theme === 'dark' ? 'text-green-400' : 'text-green-600'
-                      }`}>
-                        {isRTL ? `مرتبط: ${formData.email}` : `Linked: ${formData.email}`}
-                      </span>
-                    </motion.div>
-                  )}
-                </motion.div>
-              )}
-            </motion.div>
-          )}
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -476,35 +293,35 @@ const Auth: React.FC = () => {
               </div>
             )}
 
-            {/* Serial Number - فقط في تسجيل الدخول */}
+            {/* Company ID - فقط في تسجيل الدخول */}
             {isLogin && (
               <div>
                 <label className={`block text-sm font-medium mb-2 ${
                   theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
                 }`}>
-                  {t('serialNumber')} *
+                  {t('companyId')} *
                 </label>
                 <div className="relative">
-                  <Hash className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 w-5 h-5 ${
+                  <Building className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 w-5 h-5 ${
                     theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
                   }`} />
                   <input
                     type="text"
-                    value={formData.serialNumber}
-                    onChange={(e) => setFormData({ ...formData, serialNumber: e.target.value })}
+                    value={formData.companyId}
+                    onChange={(e) => setFormData({ ...formData, companyId: e.target.value })}
                     className={`w-full ${isRTL ? 'pr-10 pl-4' : 'pl-10 pr-4'} py-3 border rounded-lg ${
                       theme === 'dark'
                         ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400'
                         : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
                     } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300`}
-                    placeholder={t('serialNumberPlaceholder')}
+                    placeholder={t('companyIdPlaceholder')}
                     required
                   />
                 </div>
                 <p className={`text-xs mt-1 ${
                   theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
                 }`}>
-                  {isRTL ? 'الرقم التسلسلي مطلوب لتسجيل الدخول' : 'Serial number required for login'}
+                  {isRTL ? 'رقم الشركة مطلوب لتسجيل الدخول' : 'Company ID required for login'}
                 </p>
               </div>
             )}
@@ -541,7 +358,7 @@ const Auth: React.FC = () => {
                 type="button"
                 onClick={() => {
                   setIsLogin(!isLogin);
-                  setFormData({ username: '', password: '', serialNumber: '', email: '' });
+                  setFormData({ username: '', password: '', companyId: '', email: '' });
                 }}
                 className={`text-sm ${
                   theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-500'
@@ -582,7 +399,7 @@ const Auth: React.FC = () => {
       >
         <div className="max-w-md text-center">
           <motion.div
-            animate={{ y: [0, -10, 0], rotate: [0, 5, -5, 0] }}
+            animate={{ y: [0, -20, 0], rotate: [0, 5, -5, 0] }}
             transition={{ duration: 6, repeat: Infinity }}
             className="mb-8"
           >
@@ -625,13 +442,13 @@ const Auth: React.FC = () => {
             <div className={`p-4 rounded-lg ${
               theme === 'dark' ? 'bg-gray-700' : 'bg-white'
             } shadow-lg`}>
-              <Users className={`w-8 h-8 mx-auto mb-2 ${
+              <Building className={`w-8 h-8 mx-auto mb-2 ${
                 theme === 'dark' ? 'text-green-400' : 'text-green-500'
               }`} />
               <h4 className={`font-semibold ${
                 theme === 'dark' ? 'text-white' : 'text-gray-900'
               }`}>
-                {isRTL ? 'متعدد المستخدمين' : 'Multi-User'}
+                {isRTL ? 'إدارة الشركات' : 'Company Management'}
               </h4>
             </div>
           </div>
@@ -650,10 +467,10 @@ const Auth: React.FC = () => {
                 {isRTL ? '• إنشاء حساب: اسم مستخدم + كلمة مرور فقط' : '• Register: Username + Password only'}
               </p>
               <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                {isRTL ? '• تسجيل دخول: اسم مستخدم + كلمة مرور + رقم تسلسلي' : '• Login: Username + Password + Serial Number'}
+                {isRTL ? '• تسجيل دخول: اسم مستخدم + كلمة مرور + رقم الشركة' : '• Login: Username + Password + Company ID'}
               </p>
               <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
-                {isRTL ? '• الرقم التسلسلي يُعطى تلقائياً عند التسجيل' : '• Serial number is auto-generated on registration'}
+                {isRTL ? '• رقم الشركة يُعطى تلقائياً عند التسجيل' : '• Company ID is auto-generated on registration'}
               </p>
               <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                 {isRTL ? '• أول مستخدم يصبح أدمن تلقائياً' : '• First user becomes admin automatically'}
@@ -705,23 +522,38 @@ const Auth: React.FC = () => {
                   <input
                     type="text"
                     value={newSerialNumber}
-                    onChange={(e) => setNewSerialNumber(e.target.value)}
-                    placeholder={t('serialNumberPlaceholder')}
-                    className={`flex-1 px-3 py-2 border rounded-lg ${
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, '').slice(0, 6);
+                      setNewSerialNumber(value);
+                    }}
+                    placeholder={isRTL ? 'مثال: 123456' : 'Example: 123456'}
+                    className={`flex-1 px-3 py-2 border rounded-lg font-mono ${
                       theme === 'dark'
                         ? 'bg-gray-600 border-gray-500 text-white placeholder-gray-400'
                         : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                    } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                    } focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      newSerialNumber && !/^\d{6}$/.test(newSerialNumber) 
+                        ? 'border-red-500 focus:ring-red-500' 
+                        : ''
+                    }`}
+                    maxLength={6}
                   />
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={handleAddSerialNumber}
-                    className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all duration-300"
+                    disabled={!newSerialNumber.trim() || !/^\d{6}$/.test(newSerialNumber)}
+                    className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:from-green-600 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
                   >
                     <Plus className="w-5 h-5" />
                   </motion.button>
                 </div>
+                {newSerialNumber && !/^\d{6}$/.test(newSerialNumber) && (
+                  <p className="text-red-500 text-sm mt-1 flex items-center space-x-1 rtl:space-x-reverse">
+                    <XCircle className="w-4 h-4" />
+                    <span>{isRTL ? 'يجب أن يكون 6 أرقام فقط' : 'Must be exactly 6 digits'}</span>
+                  </p>
+                )}
               </div>
 
               {/* Serial Numbers List */}
@@ -767,7 +599,7 @@ const Auth: React.FC = () => {
                         <tr key={serial.id} className={`hover:${
                           theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'
                         } transition-colors`}>
-                          <td className={`px-4 py-4 whitespace-nowrap font-mono ${
+                          <td className={`px-4 py-4 whitespace-nowrap font-mono text-lg font-bold ${
                             theme === 'dark' ? 'text-white' : 'text-gray-900'
                           }`}>
                             {serial.serialNumber}

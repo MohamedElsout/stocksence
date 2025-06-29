@@ -17,9 +17,11 @@ import { useStore } from '../store/useStore';
 import Sidebar from '../components/Layout/Sidebar';
 
 const About: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { theme } = useStore();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  
+  const isRTL = i18n.language === 'ar';
 
   const features = [
     {
@@ -387,7 +389,7 @@ const About: React.FC = () => {
                     <span className={`${
                       theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
                     }`}>
-                      contact@stocksence.com
+                      mhmdahmdalswt@gmail.com
                     </span>
                   </div>
                   
@@ -398,7 +400,7 @@ const About: React.FC = () => {
                     <span className={`${
                       theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
                     }`}>
-                      +1 (555) 123-4567
+                      01557175859
                     </span>
                   </div>
                   
@@ -409,7 +411,7 @@ const About: React.FC = () => {
                     <span className={`${
                       theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
                     }`}>
-                      123 Business Ave, Tech City, TC 12345
+                      Rashid
                     </span>
                   </div>
                 </div>

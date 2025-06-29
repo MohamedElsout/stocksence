@@ -22,7 +22,8 @@ import {
   Lock,
   UserPlus,
   Settings as SettingsIcon,
-  AlertTriangle
+  AlertTriangle,
+  Building
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import Sidebar from '../components/Layout/Sidebar';
@@ -64,7 +65,7 @@ const UserProfile: React.FC = () => {
   };
 
   const handleAddSerialNumber = () => {
-    if (newSerialNumber.trim()) {
+    if (newSerialNumber.trim() && /^\d{6}$/.test(newSerialNumber)) {
       addSerialNumber(newSerialNumber.trim());
       setNewSerialNumber('');
       setIsAddSerialModalOpen(false);
@@ -135,7 +136,7 @@ const UserProfile: React.FC = () => {
       <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
       
       <div className="w-full" style={{ paddingTop: '4rem' }}>
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -144,7 +145,7 @@ const UserProfile: React.FC = () => {
           >
             <div className="flex items-center justify-between">
               <div>
-                <h1 className={`text-3xl font-bold mb-2 ${
+                <h1 className={`text-2xl sm:text-3xl font-bold mb-2 ${
                   theme === 'dark' ? 'text-white' : 'text-gray-900'
                 }`}>
                   {isRTL ? 'الملف الشخصي' : 'User Profile'}
@@ -173,7 +174,7 @@ const UserProfile: React.FC = () => {
           </motion.div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
             {filteredStats.map((stat, index) => {
               const Icon = stat.icon;
               return (
@@ -183,7 +184,7 @@ const UserProfile: React.FC = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
                   whileHover={{ scale: 1.02, y: -5 }}
-                  className={`p-6 rounded-xl shadow-lg ${
+                  className={`p-4 sm:p-6 rounded-xl shadow-lg ${
                     theme === 'dark' ? 'bg-gray-800' : 'bg-white'
                   } border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} hover:shadow-xl transition-all duration-300`}
                 >
@@ -203,7 +204,7 @@ const UserProfile: React.FC = () => {
                     }`}>
                       {stat.label}
                     </p>
-                    <div className={`text-2xl font-bold ${stat.color}`}>
+                    <div className={`text-xl sm:text-2xl font-bold ${stat.color}`}>
                       {stat.value}
                     </div>
                   </div>
@@ -213,7 +214,7 @@ const UserProfile: React.FC = () => {
           </div>
 
           {/* Main Content */}
-          <div className="grid lg:grid-cols-3 gap-8">
+          <div className="grid lg:grid-cols-3 gap-6 sm:gap-8">
             {/* User Information */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
@@ -223,7 +224,7 @@ const UserProfile: React.FC = () => {
                 theme === 'dark' ? 'bg-gray-800' : 'bg-white'
               } border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}
             >
-              <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+              <div className="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
                 <div className="flex items-center justify-between">
                   <h3 className={`text-xl font-semibold ${
                     theme === 'dark' ? 'text-white' : 'text-gray-900'
@@ -256,7 +257,7 @@ const UserProfile: React.FC = () => {
                 </div>
               </div>
 
-              <div className="p-6 space-y-6">
+              <div className="p-4 sm:p-6 space-y-6">
                 {/* Profile Picture & Role */}
                 <div className="flex items-center space-x-6 rtl:space-x-reverse">
                   <motion.div
@@ -412,39 +413,37 @@ const UserProfile: React.FC = () => {
                     )}
                   </div>
 
-                  {/* Serial Number */}
+                  {/* Company ID */}
                   <div className="md:col-span-2">
                     <label className={`block text-sm font-medium mb-2 ${
                       theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
                     }`}>
-                      {isRTL ? 'الرقم التسلسلي' : 'Serial Number'}
+                      {isRTL ? 'رقم الشركة' : 'Company ID'}
                     </label>
                     <div className={`flex items-center space-x-2 rtl:space-x-reverse px-3 py-2 border rounded-lg ${
                       theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-300'
                     }`}>
-                      <Hash className={`w-5 h-5 ${
+                      <Building className={`w-5 h-5 ${
                         theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
                       }`} />
                       <span className={`font-mono text-lg ${
                         theme === 'dark' ? 'text-white' : 'text-gray-900'
                       }`}>
-                        {currentUser.serialNumber || (isRTL ? 'غير محدد' : 'Not assigned')}
+                        {currentUser.companyId || (isRTL ? 'غير محدد' : 'Not assigned')}
                       </span>
                       <span className={`ml-auto px-2 py-1 text-xs rounded-full ${
-                        currentUser.serialNumber
+                        currentUser.companyId
                           ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
                           : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
                       }`}>
-                        {currentUser.serialNumber ? (isRTL ? 'مُعيّن' : 'Assigned') : (isRTL ? 'غير مُعيّن' : 'Unassigned')}
+                        {currentUser.companyId ? (isRTL ? 'مُعيّن' : 'Assigned') : (isRTL ? 'غير مُعيّن' : 'Unassigned')}
                       </span>
                     </div>
-                    {currentUser.serialNumber && (
-                      <p className={`text-xs mt-1 ${
-                        theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
-                      }`}>
-                        {isRTL ? 'رقم تسلسلي بسيط من 6 أرقام' : 'Simple 6-digit serial number'}
-                      </p>
-                    )}
+                    <p className={`text-xs mt-1 ${
+                      theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                    }`}>
+                      {isRTL ? 'رقم الشركة مطلوب لتسجيل الدخول' : 'Company ID required for login'}
+                    </p>
                   </div>
 
                   {/* Created At */}
@@ -533,7 +532,7 @@ const UserProfile: React.FC = () => {
                   theme === 'dark' ? 'bg-gray-800' : 'bg-white'
                 } border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}
               >
-                <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+                <div className="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
                   <div className="flex items-center justify-between">
                     <h3 className={`text-xl font-semibold ${
                       theme === 'dark' ? 'text-white' : 'text-gray-900'
@@ -551,9 +550,11 @@ const UserProfile: React.FC = () => {
                       {isRTL ? 'إضافة' : 'Add'}
                     </motion.button>
                   </div>
-                  
+                </div>
+
+                <div className="p-4 sm:p-6">
                   {/* تنبيه حول الأرقام التسلسلية */}
-                  <div className={`mt-4 p-3 rounded-lg ${
+                  <div className={`mb-4 p-3 rounded-lg ${
                     theme === 'dark' ? 'bg-blue-900/20' : 'bg-blue-50'
                   } border border-blue-500/30`}>
                     <div className="flex items-center space-x-2 rtl:space-x-reverse">
@@ -565,9 +566,7 @@ const UserProfile: React.FC = () => {
                       </span>
                     </div>
                   </div>
-                </div>
-
-                <div className="p-6">
+                  
                   <div className="space-y-4 max-h-96 overflow-y-auto">
                     {serialNumbers.map((serial, index) => (
                       <motion.div
@@ -659,7 +658,7 @@ const UserProfile: React.FC = () => {
                   theme === 'dark' ? 'bg-gray-800' : 'bg-white'
                 } border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}
               >
-                <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+                <div className="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
                   <h3 className={`text-xl font-semibold ${
                     theme === 'dark' ? 'text-white' : 'text-gray-900'
                   }`}>
@@ -667,7 +666,7 @@ const UserProfile: React.FC = () => {
                   </h3>
                 </div>
 
-                <div className="p-6 space-y-4">
+                <div className="p-4 sm:p-6 space-y-4">
                   <div className={`p-4 rounded-lg ${
                     theme === 'dark' ? 'bg-blue-900/20' : 'bg-blue-50'
                   } border border-blue-500/30`}>
@@ -704,8 +703,8 @@ const UserProfile: React.FC = () => {
                       theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
                     }`}>
                       {isRTL 
-                        ? 'حسابك محمي برقم تسلسلي فريد من 6 أرقام وكلمة مرور آمنة'
-                        : 'Your account is protected with a unique 6-digit serial number and secure password'
+                        ? 'حسابك محمي برقم شركة فريد وكلمة مرور آمنة'
+                        : 'Your account is protected with a unique company ID and secure password'
                       }
                     </p>
                   </div>

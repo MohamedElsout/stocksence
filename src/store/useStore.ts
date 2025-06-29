@@ -379,7 +379,7 @@ export const useStore = create<StoreState>()(
           companyId: state.currentCompanyId || ''
         };
         set((state) => ({
-          products: [...state.products, newProduct],
+          products: [...state.products.filter(p => p.companyId === state.currentCompanyId), newProduct],
         }));
         get().addNotification({ 
           type: 'success', 
@@ -392,7 +392,7 @@ export const useStore = create<StoreState>()(
       updateProduct: (id, productData) => {
         set((state) => ({
           products: state.products.map((product) =>
-            product.id === id
+            product.id === id && product.companyId === state.currentCompanyId
               ? { ...product, ...productData, updatedAt: new Date() }
               : product
           ),
@@ -405,7 +405,9 @@ export const useStore = create<StoreState>()(
       
       deleteProduct: (id) => {
         set((state) => ({
-          products: state.products.filter((product) => product.id !== id),
+          products: state.products.filter((product) => 
+            !(product.id === id && product.companyId === state.currentCompanyId)
+          ),
         }));
         get().addNotification({ 
           type: 'success', 
@@ -425,14 +427,14 @@ export const useStore = create<StoreState>()(
           companyId: state.currentCompanyId || ''
         };
         
-        const product = get().products.find(p => p.id === saleData.productId);
+        const product = get().products.find(p => p.id === saleData.productId && p.companyId === state.currentCompanyId);
         if (product && product.quantity >= saleData.quantity) {
           get().updateProduct(saleData.productId, { 
             quantity: product.quantity - saleData.quantity 
           });
           
           set((state) => ({
-            sales: [...state.sales, newSale],
+            sales: [...state.sales.filter(s => s.companyId === state.currentCompanyId), newSale],
           }));
           
           const saleMethod = saleData.barcodeScan ? 

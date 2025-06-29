@@ -104,6 +104,11 @@ const generateId = () => Math.random().toString(36).substr(2, 9);
 const generateProductSerial = () => `PRD${Date.now()}${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
 const generateCompanyId = () => `COMP${Date.now()}${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
 
+// دالة لإنشاء رقم تسلسلي بسيط من 6 أرقام
+const generateSimpleSerial = () => {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
 const currencies: Currency[] = [
   {
     code: 'EGP',
@@ -180,10 +185,10 @@ const getGoogleEmail = async (): Promise<string | null> => {
 export const useStore = create<StoreState>()(
   persist(
     (set, get) => ({
-      // Authentication state
+      // Authentication state - مسح جميع البيانات
       currentUser: null,
-      users: [],
-      serialNumbers: [],
+      users: [], // مسح جميع المستخدمين
+      serialNumbers: [], // مسح جميع الأرقام التسلسلية
       isAuthenticated: false,
       autoLoginWithGoogle: false,
       currentCompanyId: null,
@@ -295,7 +300,7 @@ export const useStore = create<StoreState>()(
         }
         
         // للمستخدمين الجدد (ليس الأدمن الأول) - إنشاء حساب موظف
-        const autoSerialNumber = `USER${Date.now()}`;
+        const autoSerialNumber = generateSimpleSerial(); // استخدام الرقم التسلسلي البسيط
         
         const newUser: User = {
           id: generateId(),
@@ -351,6 +356,29 @@ export const useStore = create<StoreState>()(
 
       addSerialNumber: (serialNumber: string) => {
         const state = get();
+        
+        // التحقق من أن الرقم التسلسلي يتكون من 6 أرقام فقط
+        if (!/^\d{6}$/.test(serialNumber)) {
+          get().addNotification({ 
+            type: 'error', 
+            message: state.language === 'ar' 
+              ? 'الرقم التسلسلي يجب أن يكون 6 أرقام فقط' 
+              : 'Serial number must be exactly 6 digits' 
+          });
+          return;
+        }
+        
+        // التحقق من عدم وجود الرقم التسلسلي مسبقاً
+        if (state.serialNumbers.find(s => s.serialNumber === serialNumber)) {
+          get().addNotification({ 
+            type: 'error', 
+            message: state.language === 'ar' 
+              ? 'هذا الرقم التسلسلي موجود بالفعل' 
+              : 'This serial number already exists' 
+          });
+          return;
+        }
+        
         const newSerial: SerialNumber = {
           id: generateId(),
           serialNumber,
@@ -401,7 +429,7 @@ export const useStore = create<StoreState>()(
         });
       },
       
-      products: [],
+      products: [], // مسح جميع المنتجات
       
       addProduct: (productData) => {
         const state = get();
@@ -448,7 +476,7 @@ export const useStore = create<StoreState>()(
         });
       },
       
-      sales: [],
+      sales: [], // مسح جميع المبيعات
       
       addSale: (saleData) => {
         const state = get();

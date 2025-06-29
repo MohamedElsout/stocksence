@@ -21,7 +21,8 @@ import {
   Briefcase,
   Lock,
   UserPlus,
-  Settings as SettingsIcon
+  Settings as SettingsIcon,
+  AlertTriangle
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import Sidebar from '../components/Layout/Sidebar';
@@ -68,6 +69,11 @@ const UserProfile: React.FC = () => {
       setNewSerialNumber('');
       setIsAddSerialModalOpen(false);
     }
+  };
+
+  // التحقق من صحة الرقم التسلسلي (6 أرقام فقط)
+  const isValidSerial = (serial: string) => {
+    return /^\d{6}$/.test(serial);
   };
 
   const userStats = [
@@ -419,7 +425,7 @@ const UserProfile: React.FC = () => {
                       <Hash className={`w-5 h-5 ${
                         theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
                       }`} />
-                      <span className={`font-mono ${
+                      <span className={`font-mono text-lg ${
                         theme === 'dark' ? 'text-white' : 'text-gray-900'
                       }`}>
                         {currentUser.serialNumber || (isRTL ? 'غير محدد' : 'Not assigned')}
@@ -432,6 +438,13 @@ const UserProfile: React.FC = () => {
                         {currentUser.serialNumber ? (isRTL ? 'مُعيّن' : 'Assigned') : (isRTL ? 'غير مُعيّن' : 'Unassigned')}
                       </span>
                     </div>
+                    {currentUser.serialNumber && (
+                      <p className={`text-xs mt-1 ${
+                        theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                      }`}>
+                        {isRTL ? 'رقم تسلسلي بسيط من 6 أرقام' : 'Simple 6-digit serial number'}
+                      </p>
+                    )}
                   </div>
 
                   {/* Created At */}
@@ -538,6 +551,20 @@ const UserProfile: React.FC = () => {
                       {isRTL ? 'إضافة' : 'Add'}
                     </motion.button>
                   </div>
+                  
+                  {/* تنبيه حول الأرقام التسلسلية */}
+                  <div className={`mt-4 p-3 rounded-lg ${
+                    theme === 'dark' ? 'bg-blue-900/20' : 'bg-blue-50'
+                  } border border-blue-500/30`}>
+                    <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                      <AlertTriangle className="w-4 h-4 text-blue-500" />
+                      <span className={`text-sm font-medium ${
+                        theme === 'dark' ? 'text-blue-400' : 'text-blue-600'
+                      }`}>
+                        {isRTL ? 'الأرقام التسلسلية يجب أن تكون 6 أرقام فقط' : 'Serial numbers must be exactly 6 digits'}
+                      </span>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="p-6">
@@ -560,11 +587,14 @@ const UserProfile: React.FC = () => {
                               <Hash className={`w-4 h-4 ${
                                 theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
                               }`} />
-                              <span className={`font-mono text-sm ${
+                              <span className={`font-mono text-lg font-bold ${
                                 theme === 'dark' ? 'text-white' : 'text-gray-900'
                               }`}>
                                 {serial.serialNumber}
                               </span>
+                              {serial.serialNumber.length === 6 && /^\d{6}$/.test(serial.serialNumber) && (
+                                <CheckCircle className="w-4 h-4 text-green-500" />
+                              )}
                             </div>
                             <div className="flex items-center space-x-2 rtl:space-x-reverse mt-2">
                               <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
@@ -674,8 +704,8 @@ const UserProfile: React.FC = () => {
                       theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
                     }`}>
                       {isRTL 
-                        ? 'حسابك محمي برقم تسلسلي فريد وكلمة مرور آمنة'
-                        : 'Your account is protected with a unique serial number and secure password'
+                        ? 'حسابك محمي برقم تسلسلي فريد من 6 أرقام وكلمة مرور آمنة'
+                        : 'Your account is protected with a unique 6-digit serial number and secure password'
                       }
                     </p>
                   </div>
@@ -721,19 +751,55 @@ const UserProfile: React.FC = () => {
             <label className={`block text-sm font-medium mb-2 ${
               theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
             }`}>
-              {isRTL ? 'الرقم التسلسلي' : 'Serial Number'}
+              {isRTL ? 'الرقم التسلسلي (6 أرقام)' : 'Serial Number (6 digits)'}
             </label>
             <input
               type="text"
               value={newSerialNumber}
-              onChange={(e) => setNewSerialNumber(e.target.value)}
-              placeholder={isRTL ? 'أدخل الرقم التسلسلي الجديد' : 'Enter new serial number'}
-              className={`w-full px-3 py-2 border rounded-lg ${
+              onChange={(e) => {
+                // السماح بالأرقام فقط وحد أقصى 6 أرقام
+                const value = e.target.value.replace(/\D/g, '').slice(0, 6);
+                setNewSerialNumber(value);
+              }}
+              placeholder={isRTL ? 'مثال: 123456' : 'Example: 123456'}
+              className={`w-full px-3 py-2 border rounded-lg font-mono text-lg ${
                 theme === 'dark'
                   ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                   : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-              } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+              } focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                newSerialNumber && !isValidSerial(newSerialNumber) 
+                  ? 'border-red-500 focus:ring-red-500' 
+                  : ''
+              }`}
+              maxLength={6}
             />
+            
+            {/* Validation Message */}
+            {newSerialNumber && !isValidSerial(newSerialNumber) && (
+              <motion.p
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-red-500 text-sm mt-1 flex items-center space-x-1 rtl:space-x-reverse"
+              >
+                <XCircle className="w-4 h-4" />
+                <span>
+                  {isRTL ? 'يجب أن يكون 6 أرقام فقط' : 'Must be exactly 6 digits'}
+                </span>
+              </motion.p>
+            )}
+            
+            {newSerialNumber && isValidSerial(newSerialNumber) && (
+              <motion.p
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-green-500 text-sm mt-1 flex items-center space-x-1 rtl:space-x-reverse"
+              >
+                <CheckCircle className="w-4 h-4" />
+                <span>
+                  {isRTL ? 'رقم تسلسلي صحيح' : 'Valid serial number'}
+                </span>
+              </motion.p>
+            )}
           </div>
           
           <div className="flex justify-end space-x-3 rtl:space-x-reverse pt-4">
@@ -756,7 +822,7 @@ const UserProfile: React.FC = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleAddSerialNumber}
-              disabled={!newSerialNumber.trim()}
+              disabled={!newSerialNumber.trim() || !isValidSerial(newSerialNumber)}
               className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:from-green-600 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center space-x-2 rtl:space-x-reverse"
             >
               <Plus className="w-4 h-4" />

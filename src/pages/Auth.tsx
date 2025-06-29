@@ -16,7 +16,8 @@ import {
   Plus,
   Trash2,
   CheckCircle,
-  XCircle
+  XCircle,
+  Info
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 
@@ -133,8 +134,8 @@ const Auth: React.FC = () => {
               {isLogin ? t('loginSubtitle') : t('registerSubtitle')}
             </p>
 
-            {/* رسالة توضيحية لتسجيل الدخول */}
-            {isLogin && (
+            {/* رسالة توضيحية */}
+            {isLogin ? (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -148,6 +149,23 @@ const Auth: React.FC = () => {
                     theme === 'dark' ? 'text-blue-400' : 'text-blue-600'
                   }`}>
                     {isRTL ? 'مطلوب: اسم المستخدم، كلمة المرور، والرقم التسلسلي' : 'Required: Username, Password, and Serial Number'}
+                  </span>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`mt-4 p-3 rounded-lg ${
+                  theme === 'dark' ? 'bg-green-900/20' : 'bg-green-50'
+                } border border-green-500/30`}
+              >
+                <div className="flex items-center justify-center space-x-2 rtl:space-x-reverse">
+                  <Info className="w-5 h-5 text-green-500" />
+                  <span className={`text-sm font-medium ${
+                    theme === 'dark' ? 'text-green-400' : 'text-green-600'
+                  }`}>
+                    {isRTL ? 'فقط اسم المستخدم وكلمة المرور مطلوبان' : 'Only username and password required'}
                   </span>
                 </div>
               </motion.div>
@@ -376,6 +394,28 @@ const Auth: React.FC = () => {
               }`}>
                 {isRTL ? 'متعدد المستخدمين' : 'Multi-User'}
               </h4>
+            </div>
+          </div>
+
+          {/* معلومات إضافية */}
+          <div className={`mt-8 p-4 rounded-lg ${
+            theme === 'dark' ? 'bg-gray-700/50' : 'bg-white/50'
+          } backdrop-blur-sm`}>
+            <h4 className={`font-semibold mb-2 ${
+              theme === 'dark' ? 'text-white' : 'text-gray-900'
+            }`}>
+              {isRTL ? 'كيف يعمل النظام؟' : 'How does it work?'}
+            </h4>
+            <div className="text-sm space-y-2">
+              <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                {isRTL ? '• إنشاء حساب: اسم مستخدم + كلمة مرور فقط' : '• Register: Username + Password only'}
+              </p>
+              <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                {isRTL ? '• تسجيل دخول: اسم مستخدم + كلمة مرور + رقم تسلسلي' : '• Login: Username + Password + Serial Number'}
+              </p>
+              <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                {isRTL ? '• الرقم التسلسلي يُعطى تلقائياً عند التسجيل' : '• Serial number is auto-generated on registration'}
+              </p>
             </div>
           </div>
         </div>

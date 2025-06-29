@@ -203,6 +203,7 @@ export const useStore = create<StoreState>()(
         
         // Check if this is the first user (admin) - no serial number required
         if (state.users.length === 0) {
+          // إنشاء أول مستخدم (أدمن) - بدون رقم تسلسلي
           const adminUser: User = {
             id: generateId(),
             username,
@@ -225,51 +226,42 @@ export const useStore = create<StoreState>()(
           return true;
         }
         
-        // For subsequent users, serial number is required
-        if (!serialNumber) {
-          get().addNotification({ 
-            type: 'error', 
-            message: state.language === 'ar' ? 'الرقم التسلسلي مطلوب' : 'Serial number is required' 
-          });
-          return false;
-        }
-        
-        const serial = state.serialNumbers.find(s => s.serialNumber === serialNumber && !s.isUsed);
-        if (!serial) {
-          get().addNotification({ 
-            type: 'error', 
-            message: state.language === 'ar' ? 'الرقم التسلسلي غير صحيح أو مستخدم بالفعل' : 'Invalid or used serial number' 
-          });
-          return false;
-        }
-        
-        // Determine role based on serial number
-        const role: 'admin' | 'employee' = serialNumber.includes('ADMIN') ? 'admin' : 'employee';
+        // للمستخدمين الجدد (ليس الأدمن الأول) - إنشاء حساب بدون رقم تسلسلي
+        // سيتم ربط رقم تسلسلي تلقائياً
+        const autoSerialNumber = `USER${Date.now()}`;
         
         const newUser: User = {
           id: generateId(),
           username,
           password,
-          role,
-          serialNumber,
+          role: 'employee',
+          serialNumber: autoSerialNumber,
           createdAt: new Date(),
           isActive: true
+        };
+        
+        // إضافة الرقم التسلسلي التلقائي للقائمة
+        const newSerial: SerialNumber = {
+          id: generateId(),
+          serialNumber: autoSerialNumber,
+          isUsed: true,
+          createdAt: new Date(),
+          usedBy: newUser.id,
+          usedAt: new Date()
         };
         
         set(state => ({
           users: [...state.users, newUser],
           currentUser: newUser,
           isAuthenticated: true,
-          serialNumbers: state.serialNumbers.map(s => 
-            s.id === serial.id 
-              ? { ...s, isUsed: true, usedBy: newUser.id, usedAt: new Date() }
-              : s
-          )
+          serialNumbers: [...state.serialNumbers, newSerial]
         }));
         
         get().addNotification({ 
           type: 'success', 
-          message: state.language === 'ar' ? 'تم إنشاء الحساب بنجاح!' : 'Account created successfully!' 
+          message: state.language === 'ar' 
+            ? `تم إنشاء الحساب بنجاح! رقمك التسلسلي: ${autoSerialNumber}` 
+            : `Account created successfully! Your serial number: ${autoSerialNumber}` 
         });
         return true;
       },

@@ -23,6 +23,20 @@ import {
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 
+// Declare Google types
+declare global {
+  interface Window {
+    google?: {
+      accounts: {
+        id: {
+          initialize: (config: any) => void;
+          prompt: () => void;
+        };
+      };
+    };
+  }
+}
+
 // Google OAuth Component
 const GoogleSignIn: React.FC<{ onSuccess: (email: string) => void; onError: () => void }> = ({ onSuccess, onError }) => {
   const { theme } = useStore();
@@ -40,7 +54,7 @@ const GoogleSignIn: React.FC<{ onSuccess: (email: string) => void; onError: () =
     script.onload = () => {
       if (window.google) {
         window.google.accounts.id.initialize({
-          client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID || 'YOUR_GOOGLE_CLIENT_ID',
+          client_id: '1234567890-abcdefghijklmnopqrstuvwxyz.apps.googleusercontent.com', // Example client ID
           callback: (response: any) => {
             try {
               const payload = JSON.parse(atob(response.credential.split('.')[1]));
@@ -55,7 +69,9 @@ const GoogleSignIn: React.FC<{ onSuccess: (email: string) => void; onError: () =
     };
 
     return () => {
-      document.head.removeChild(script);
+      if (document.head.contains(script)) {
+        document.head.removeChild(script);
+      }
     };
   }, [onSuccess, onError]);
 

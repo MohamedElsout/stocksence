@@ -27,185 +27,194 @@ const Logo: React.FC<LogoProps> = ({
   
   return (
     <div className={`flex items-center space-x-2 rtl:space-x-reverse ${className}`}>
-      {/* Logo Circle */}
+      {/* Logo Circle - Based on the provided image */}
       <motion.div
         whileHover={{ 
           scale: 1.05,
-          rotate: [0, 5, -5, 0]
+          rotate: [0, 2, -2, 0]
         }}
         transition={{ 
           scale: { duration: 0.2 },
-          rotate: { duration: 0.6, repeat: Infinity }
+          rotate: { duration: 0.8, repeat: Infinity }
         }}
         className={`relative ${container} rounded-full shadow-lg overflow-hidden`}
       >
-        {/* Background Gradient */}
+        {/* Gradient Background - Matching the image */}
         <motion.div
           animate={{
-            background: theme === 'dark' 
-              ? [
-                  'linear-gradient(45deg, #1E40AF, #7C3AED, #1E40AF)',
-                  'linear-gradient(45deg, #7C3AED, #1E40AF, #7C3AED)',
-                  'linear-gradient(45deg, #1E40AF, #7C3AED, #1E40AF)'
-                ]
-              : [
-                  'linear-gradient(45deg, #3B82F6, #8B5CF6, #3B82F6)',
-                  'linear-gradient(45deg, #8B5CF6, #3B82F6, #8B5CF6)',
-                  'linear-gradient(45deg, #3B82F6, #8B5CF6, #3B82F6)'
-                ]
+            background: [
+              'linear-gradient(135deg, #00D4FF 0%, #3B82F6 25%, #8B5CF6 50%, #EC4899 75%, #F59E0B 100%)',
+              'linear-gradient(135deg, #3B82F6 0%, #8B5CF6 25%, #EC4899 50%, #F59E0B 75%, #00D4FF 100%)',
+              'linear-gradient(135deg, #8B5CF6 0%, #EC4899 25%, #F59E0B 50%, #00D4FF 75%, #3B82F6 100%)',
+              'linear-gradient(135deg, #00D4FF 0%, #3B82F6 25%, #8B5CF6 50%, #EC4899 75%, #F59E0B 100%)'
+            ]
           }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
           className="absolute inset-0 rounded-full"
         />
         
-        {/* Chart Icon */}
+        {/* Chart Icon - Recreating the bar chart from the image */}
         <div className="absolute inset-0 flex items-center justify-center">
           <svg 
-            viewBox="0 0 24 24" 
+            viewBox="0 0 32 32" 
             fill="none" 
             xmlns="http://www.w3.org/2000/svg"
             className={`${icon} relative z-10`}
           >
-            {/* Bar 1 - Shortest */}
+            {/* Bar 1 - Shortest (Left) */}
             <motion.rect 
-              x="3" 
-              y="18" 
-              width="2.5" 
-              height="3" 
-              rx="0.5"
-              fill="white"
-              initial={{ height: 0, y: 21 }}
-              animate={{ height: 3, y: 18 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
+              x="6" 
+              y="22" 
+              width="3" 
+              height="6" 
+              rx="1.5"
+              fill="rgba(255, 255, 255, 0.9)"
+              initial={{ height: 0, y: 28 }}
+              animate={{ height: 6, y: 22 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
             />
             
             {/* Bar 2 - Medium */}
             <motion.rect 
-              x="7" 
-              y="15" 
-              width="2.5" 
-              height="6" 
-              rx="0.5"
-              fill="white"
-              initial={{ height: 0, y: 21 }}
-              animate={{ height: 6, y: 15 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              x="11" 
+              y="18" 
+              width="3" 
+              height="10" 
+              rx="1.5"
+              fill="rgba(255, 255, 255, 0.9)"
+              initial={{ height: 0, y: 28 }}
+              animate={{ height: 10, y: 18 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
             />
             
             {/* Bar 3 - Taller */}
             <motion.rect 
-              x="11" 
-              y="13" 
-              width="2.5" 
-              height="8" 
-              rx="0.5"
-              fill="white"
-              initial={{ height: 0, y: 21 }}
-              animate={{ height: 8, y: 13 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
+              x="16" 
+              y="14" 
+              width="3" 
+              height="14" 
+              rx="1.5"
+              fill="rgba(255, 255, 255, 0.9)"
+              initial={{ height: 0, y: 28 }}
+              animate={{ height: 14, y: 14 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
             />
             
-            {/* Bar 4 - Tallest */}
+            {/* Bar 4 - Tallest (Right) */}
             <motion.rect 
-              x="15" 
-              y="9" 
-              width="2.5" 
-              height="12" 
-              rx="0.5"
-              fill="white"
-              initial={{ height: 0, y: 21 }}
-              animate={{ height: 12, y: 9 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
+              x="21" 
+              y="10" 
+              width="3" 
+              height="18" 
+              rx="1.5"
+              fill="rgba(255, 255, 255, 0.9)"
+              initial={{ height: 0, y: 28 }}
+              animate={{ height: 18, y: 10 }}
+              transition={{ duration: 0.8, delay: 0.8 }}
             />
             
-            {/* Trend Line */}
+            {/* Curved Trend Line - Following the bar tops */}
             <motion.path 
-              d="M4 18 L8 15 L12 12 L16 8" 
-              stroke="white" 
-              strokeWidth="1.5" 
+              d="M7.5 22 Q12.5 18 17.5 14 Q22.5 10 26 8" 
+              stroke="rgba(255, 255, 255, 0.95)" 
+              strokeWidth="2" 
               strokeLinecap="round" 
               strokeLinejoin="round"
               fill="none"
-              initial={{ pathLength: 0 }}
-              animate={{ pathLength: 1 }}
-              transition={{ duration: 1, delay: 0.5, ease: "easeInOut" }}
+              initial={{ pathLength: 0, opacity: 0 }}
+              animate={{ pathLength: 1, opacity: 1 }}
+              transition={{ duration: 1.5, delay: 1, ease: "easeInOut" }}
             />
             
-            {/* Arrow at end of line */}
+            {/* Arrow Head - Pointing upward and to the right */}
             <motion.path 
-              d="M14 8 L16 8 L16 10" 
-              stroke="white" 
-              strokeWidth="1.5" 
+              d="M24 8 L26 8 L26 10 M26 8 L28 6" 
+              stroke="rgba(255, 255, 255, 0.95)" 
+              strokeWidth="2.5" 
               strokeLinecap="round" 
               strokeLinejoin="round"
               fill="none"
               initial={{ opacity: 0, scale: 0 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.4, delay: 1.5 }}
+              transition={{ duration: 0.6, delay: 2.5, type: "spring", stiffness: 200 }}
             />
             
-            {/* Glowing points on the line */}
+            {/* Glowing dots on trend line */}
             <motion.circle 
-              cx="4" 
+              cx="7.5" 
+              cy="22" 
+              r="1.2" 
+              fill="white"
+              animate={{
+                scale: [1, 1.4, 1],
+                opacity: [0.8, 1, 0.8]
+              }}
+              transition={{ duration: 2.5, repeat: Infinity, delay: 0 }}
+            />
+            <motion.circle 
+              cx="12.5" 
               cy="18" 
-              r="0.8" 
+              r="1.2" 
               fill="white"
               animate={{
-                scale: [1, 1.3, 1],
-                opacity: [0.7, 1, 0.7]
+                scale: [1, 1.4, 1],
+                opacity: [0.8, 1, 0.8]
               }}
-              transition={{ duration: 2, repeat: Infinity, delay: 0 }}
+              transition={{ duration: 2.5, repeat: Infinity, delay: 0.6 }}
             />
             <motion.circle 
-              cx="8" 
-              cy="15" 
-              r="0.8" 
+              cx="17.5" 
+              cy="14" 
+              r="1.2" 
               fill="white"
               animate={{
-                scale: [1, 1.3, 1],
-                opacity: [0.7, 1, 0.7]
+                scale: [1, 1.4, 1],
+                opacity: [0.8, 1, 0.8]
               }}
-              transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+              transition={{ duration: 2.5, repeat: Infinity, delay: 1.2 }}
             />
             <motion.circle 
-              cx="12" 
-              cy="12" 
-              r="0.8" 
+              cx="22.5" 
+              cy="10" 
+              r="1.2" 
               fill="white"
               animate={{
-                scale: [1, 1.3, 1],
-                opacity: [0.7, 1, 0.7]
+                scale: [1, 1.4, 1],
+                opacity: [0.8, 1, 0.8]
               }}
-              transition={{ duration: 2, repeat: Infinity, delay: 1 }}
-            />
-            <motion.circle 
-              cx="16" 
-              cy="8" 
-              r="0.8" 
-              fill="white"
-              animate={{
-                scale: [1, 1.3, 1],
-                opacity: [0.7, 1, 0.7]
-              }}
-              transition={{ duration: 2, repeat: Infinity, delay: 1.5 }}
+              transition={{ duration: 2.5, repeat: Infinity, delay: 1.8 }}
             />
           </svg>
         </div>
         
-        {/* Pulse Effect */}
+        {/* Outer Glow Ring */}
         <motion.div
           animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.3, 0, 0.3]
+            scale: [1, 1.15, 1],
+            opacity: [0.4, 0.1, 0.4]
           }}
           transition={{ 
-            duration: 2.5, 
+            duration: 3, 
             repeat: Infinity,
             ease: "easeInOut"
           }}
-          className={`absolute inset-0 rounded-full border-2 ${
-            theme === 'dark' ? 'border-blue-400' : 'border-blue-500'
-          }`}
+          className="absolute inset-0 rounded-full border-2 border-white/30"
+        />
+        
+        {/* Inner Shine Effect */}
+        <motion.div
+          animate={{
+            rotate: [0, 360]
+          }}
+          transition={{ 
+            duration: 8, 
+            repeat: Infinity,
+            ease: "linear"
+          }}
+          className="absolute inset-1 rounded-full"
+          style={{
+            background: 'conic-gradient(from 0deg, transparent 0deg, rgba(255,255,255,0.1) 45deg, transparent 90deg, rgba(255,255,255,0.1) 135deg, transparent 180deg, rgba(255,255,255,0.1) 225deg, transparent 270deg, rgba(255,255,255,0.1) 315deg, transparent 360deg)'
+          }}
         />
       </motion.div>
       
@@ -214,11 +223,11 @@ const Logo: React.FC<LogoProps> = ({
         <motion.h2 
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
           className={`font-bold ${text} bg-gradient-to-r ${
             theme === 'dark' 
-              ? 'from-blue-400 to-purple-400' 
-              : 'from-blue-600 to-purple-600'
+              ? 'from-blue-400 via-purple-400 to-pink-400' 
+              : 'from-blue-600 via-purple-600 to-pink-600'
           } bg-clip-text text-transparent`}
         >
           StockSence

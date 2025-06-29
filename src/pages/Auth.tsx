@@ -58,13 +58,15 @@ const Auth: React.FC = () => {
       let success = false;
       
       if (isLogin) {
-        success = await login(formData.username, formData.password);
+        // تسجيل الدخول - مع الرقم التسلسلي
+        success = await login(formData.username, formData.password, formData.serialNumber);
       } else {
-        // For first user (admin), no serial number required
+        // إنشاء حساب
         if (isFirstUser) {
+          // المستخدم الأول (الأدمن) - بدون رقم تسلسلي
           success = await register(formData.username, formData.password);
         } else {
-          // For subsequent users, serial number is required
+          // المستخدمون الآخرون - مع رقم تسلسلي
           success = await register(formData.username, formData.password, formData.serialNumber);
         }
       }
@@ -138,6 +140,7 @@ const Auth: React.FC = () => {
               {isLogin ? t('loginSubtitle') : t('registerSubtitle')}
             </p>
             
+            {/* رسالة خاصة للمستخدم الأول */}
             {isFirstUser && !isLogin && (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
@@ -152,6 +155,26 @@ const Auth: React.FC = () => {
                     theme === 'dark' ? 'text-green-400' : 'text-green-600'
                   }`}>
                     {isRTL ? 'إنشاء حساب الأدمن الأول - بدون رقم تسلسلي' : 'Creating First Admin Account - No Serial Required'}
+                  </span>
+                </div>
+              </motion.div>
+            )}
+
+            {/* رسالة توضيحية لتسجيل الدخول */}
+            {isLogin && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`mt-4 p-3 rounded-lg ${
+                  theme === 'dark' ? 'bg-blue-900/20' : 'bg-blue-50'
+                } border border-blue-500/30`}
+              >
+                <div className="flex items-center justify-center space-x-2 rtl:space-x-reverse">
+                  <Hash className="w-5 h-5 text-blue-500" />
+                  <span className={`text-sm font-medium ${
+                    theme === 'dark' ? 'text-blue-400' : 'text-blue-600'
+                  }`}>
+                    {isRTL ? 'مطلوب: اسم المستخدم، كلمة المرور، والرقم التسلسلي' : 'Required: Username, Password, and Serial Number'}
                   </span>
                 </div>
               </motion.div>
@@ -223,13 +246,13 @@ const Auth: React.FC = () => {
               </div>
             </div>
 
-            {/* Serial Number - Only for non-first users in register mode */}
-            {!isLogin && !isFirstUser && (
+            {/* Serial Number - Required for login and non-first user registration */}
+            {(isLogin || (!isLogin && !isFirstUser)) && (
               <div>
                 <label className={`block text-sm font-medium mb-2 ${
                   theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
                 }`}>
-                  {t('serialNumber')}
+                  {t('serialNumber')} *
                 </label>
                 <div className="relative">
                   <Hash className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 w-5 h-5 ${
@@ -248,6 +271,14 @@ const Auth: React.FC = () => {
                     required
                   />
                 </div>
+                <p className={`text-xs mt-1 ${
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                }`}>
+                  {isLogin 
+                    ? (isRTL ? 'الرقم التسلسلي مطلوب لتسجيل الدخول' : 'Serial number required for login')
+                    : (isRTL ? 'الرقم التسلسلي مطلوب لإنشاء حساب جديد' : 'Serial number required for new account')
+                  }
+                </p>
               </div>
             )}
 

@@ -55,7 +55,7 @@ interface StoreState {
   users: User[];
   serialNumbers: SerialNumber[];
   isAuthenticated: boolean;
-  login: (username: string, password: string) => Promise<boolean>;
+  login: (username: string, password: string, serialNumber?: string) => Promise<boolean>;
   logout: () => void;
   register: (username: string, password: string, serialNumber?: string) => Promise<boolean>;
   addSerialNumber: (serialNumber: string) => void;
@@ -150,25 +150,37 @@ export const useStore = create<StoreState>()(
       ],
       isAuthenticated: false,
 
-      login: async (username: string, password: string) => {
+      login: async (username: string, password: string, serialNumber?: string) => {
         const state = get();
         
-        // Regular login - find user by username and password
+        // Find user by username and password
         const user = state.users.find(u => u.username === username && u.password === password && u.isActive);
-        if (user) {
-          set({ currentUser: user, isAuthenticated: true });
+        if (!user) {
           get().addNotification({ 
-            type: 'success', 
-            message: state.language === 'ar' ? 'تم تسجيل الدخول بنجاح!' : 'Login successful!' 
+            type: 'error', 
+            message: state.language === 'ar' ? 'اسم المستخدم أو كلمة المرور غير صحيحة' : 'Invalid username or password' 
           });
-          return true;
+          return false;
+        }
+
+        // Check serial number if provided
+        if (serialNumber) {
+          // Verify that the serial number matches the user's serial number
+          if (user.serialNumber !== serialNumber) {
+            get().addNotification({ 
+              type: 'error', 
+              message: state.language === 'ar' ? 'الرقم التسلسلي غير صحيح' : 'Invalid serial number' 
+            });
+            return false;
+          }
         }
         
+        set({ currentUser: user, isAuthenticated: true });
         get().addNotification({ 
-          type: 'error', 
-          message: state.language === 'ar' ? 'اسم المستخدم أو كلمة المرور غير صحيحة' : 'Invalid username or password' 
+          type: 'success', 
+          message: state.language === 'ar' ? 'تم تسجيل الدخول بنجاح!' : 'Login successful!' 
         });
-        return false;
+        return true;
       },
 
       register: async (username: string, password: string, serialNumber?: string) => {

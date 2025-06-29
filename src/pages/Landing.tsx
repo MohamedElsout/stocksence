@@ -112,14 +112,15 @@ const Landing: React.FC = () => {
             repeat: Infinity, 
             ease: "linear"
           }}
+          whileHover={{ scale: 1.1, boxShadow: "0 0 15px rgba(59, 130, 246, 0.5)" }}
           className={`w-12 h-12 rounded-full shadow-lg cursor-pointer ${
             theme === 'dark' 
               ? 'bg-blue-600' 
               : 'bg-blue-500'
-          } p-2 hover:shadow-xl transition-shadow duration-300`}
+          } flex items-center justify-center hover:shadow-xl transition-shadow duration-300`}
           title="Powered by Bolt"
         >
-          <Zap className="w-full h-full text-white" />
+          <img src="/bolt-logo.svg" alt="Bolt Logo" className="w-10 h-10" />
         </motion.div>
       </motion.div>
       

@@ -28,6 +28,11 @@ export interface Sale {
   companyId?: string;
 }
 
+export interface DeletedSale extends Sale {
+  deletedAt: Date;
+  deletedBy?: string;
+}
+
 export interface Currency {
   code: string;
   symbol: string;
@@ -80,7 +85,12 @@ interface StoreState {
   deleteProduct: (id: string) => void;
   
   sales: Sale[];
+  deletedSales: DeletedSale[]; // سلة القمامة للمبيعات
   addSale: (sale: Omit<Sale, 'id' | 'saleDate' | 'soldBy' | 'companyId'>) => void;
+  deleteSale: (id: string) => void; // حذف مبيعة وإرسالها لسلة القمامة
+  restoreSale: (id: string) => void; // استعادة مبيعة من سلة القمامة
+  permanentlyDeleteSale: (id: string) => void; // حذف نهائي من سلة القمامة
+  emptyTrash: () => void; // إفراغ سلة القمامة نهائياً
   
   theme: 'light' | 'dark';
   language: 'en' | 'ar';
@@ -357,6 +367,7 @@ export const useStore = create<StoreState>()(
           isAuthenticated: false,
           products: [],
           sales: [],
+          deletedSales: [],
           currentCompanyId: null
         });
         
@@ -427,7 +438,8 @@ export const useStore = create<StoreState>()(
         });
       },
       
-      sales: [], // 🔥 مسح نهائي لجميع المبيعات
+      sales: [],
+      deletedSales: [], // سلة القمامة للمبيعات
       
       addSale: (saleData) => {
         const state = get();
@@ -474,6 +486,85 @@ export const useStore = create<StoreState>()(
             message: get().language === 'ar' ? 'المخزون غير كافي!' : 'Insufficient stock available!' 
           });
         }
+      },
+
+      // 🗑️ حذف مبيعة وإرسالها لسلة القمامة
+      deleteSale: (id: string) => {
+        const state = get();
+        const sale = state.sales.find(s => s.id === id && s.companyId === state.currentCompanyId);
+        
+        if (sale) {
+          const deletedSale: DeletedSale = {
+            ...sale,
+            deletedAt: new Date(),
+            deletedBy: state.currentUser?.id
+          };
+          
+          set(state => ({
+            sales: state.sales.filter(s => s.id !== id),
+            deletedSales: [...state.deletedSales, deletedSale]
+          }));
+          
+          get().addNotification({ 
+            type: 'success', 
+            message: get().language === 'ar' 
+              ? '🗑️ تم نقل المبيعة إلى سلة القمامة!' 
+              : '🗑️ Sale moved to trash!' 
+          });
+        }
+      },
+
+      // ♻️ استعادة مبيعة من سلة القمامة
+      restoreSale: (id: string) => {
+        const state = get();
+        const deletedSale = state.deletedSales.find(s => s.id === id && s.companyId === state.currentCompanyId);
+        
+        if (deletedSale) {
+          const { deletedAt, deletedBy, ...restoredSale } = deletedSale;
+          
+          set(state => ({
+            deletedSales: state.deletedSales.filter(s => s.id !== id),
+            sales: [...state.sales, restoredSale]
+          }));
+          
+          get().addNotification({ 
+            type: 'success', 
+            message: get().language === 'ar' 
+              ? '♻️ تم استعادة المبيعة من سلة القمامة!' 
+              : '♻️ Sale restored from trash!' 
+          });
+        }
+      },
+
+      // 🔥 حذف نهائي من سلة القمامة
+      permanentlyDeleteSale: (id: string) => {
+        set(state => ({
+          deletedSales: state.deletedSales.filter(s => s.id !== id)
+        }));
+        
+        get().addNotification({ 
+          type: 'warning', 
+          message: get().language === 'ar' 
+            ? '🔥 تم حذف المبيعة نهائياً!' 
+            : '🔥 Sale permanently deleted!' 
+        });
+      },
+
+      // 🗑️ إفراغ سلة القمامة نهائياً
+      emptyTrash: () => {
+        const state = get();
+        const trashCount = state.deletedSales.filter(s => s.companyId === state.currentCompanyId).length;
+        
+        set(state => ({
+          deletedSales: state.deletedSales.filter(s => s.companyId !== state.currentCompanyId)
+        }));
+        
+        get().addNotification({ 
+          type: 'warning', 
+          message: get().language === 'ar' 
+            ? `🗑️ تم إفراغ سلة القمامة! حُذف ${trashCount} عنصر نهائياً` 
+            : `🗑️ Trash emptied! ${trashCount} items permanently deleted` 
+        });
       },
       
       theme: 'light',
@@ -546,7 +637,8 @@ export const useStore = create<StoreState>()(
       name: 'stocksence-store',
       partialize: (state) => ({
         products: state.products,
-        sales: [], // 🔥 عدم حفظ المبيعات في التخزين المحلي
+        sales: state.sales,
+        deletedSales: state.deletedSales, // حفظ سلة القمامة
         theme: state.theme,
         language: state.language,
         currentCurrency: state.currentCurrency,

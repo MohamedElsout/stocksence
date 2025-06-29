@@ -19,7 +19,12 @@ import {
   Download,
   Upload,
   Trash2,
-  AlertTriangle
+  AlertTriangle,
+  Package,
+  RefreshCw,
+  Eye,
+  Calendar,
+  RotateCcw as RestoreIcon
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import Sidebar from '../components/Layout/Sidebar';
@@ -37,16 +42,25 @@ const Settings: React.FC = () => {
     setCurrency,
     addNotification,
     products,
-    sales
+    sales,
+    deletedSales,
+    restoreSale,
+    permanentlyDeleteSale,
+    emptyTrash,
+    formatPrice
   } = useStore();
   
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
+  const [isTrashModalOpen, setIsTrashModalOpen] = useState(false);
+  const [isEmptyTrashModalOpen, setIsEmptyTrashModalOpen] = useState(false);
   const [tempSettings, setTempSettings] = useState({
     theme,
     language,
     currency: currentCurrency
   });
+
+  const isRTL = i18n.language === 'ar';
 
   const handleSaveSettings = () => {
     if (tempSettings.theme !== theme) {
@@ -87,6 +101,7 @@ const Settings: React.FC = () => {
     const data = {
       products,
       sales,
+      deletedSales,
       settings: {
         theme,
         language,
@@ -110,6 +125,21 @@ const Settings: React.FC = () => {
       type: 'success', 
       message: language === 'ar' ? 'تم تصدير البيانات بنجاح!' : 'Data exported successfully!' 
     });
+  };
+
+  const handleRestoreSale = (saleId: string) => {
+    restoreSale(saleId);
+  };
+
+  const handlePermanentlyDeleteSale = (saleId: string) => {
+    if (window.confirm(language === 'ar' ? 'هل أنت متأكد من الحذف النهائي؟' : 'Are you sure you want to permanently delete this sale?')) {
+      permanentlyDeleteSale(saleId);
+    }
+  };
+
+  const handleEmptyTrash = () => {
+    emptyTrash();
+    setIsEmptyTrashModalOpen(false);
   };
 
   const settingsSections = [
@@ -147,9 +177,15 @@ const Settings: React.FC = () => {
     },
     {
       id: 'data',
-      title: language === 'ar' ? 'إدارة البيانات' : 'Data Management',
+      title: t('dataManagement'),
       icon: Database,
       items: [
+        {
+          id: 'salesTrash',
+          title: t('salesTrash'),
+          description: t('salesTrashDesc'),
+          type: 'salesTrash'
+        },
         {
           id: 'export',
           title: language === 'ar' ? 'تصدير البيانات' : 'Export Data',
@@ -173,7 +209,7 @@ const Settings: React.FC = () => {
       <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
       
       <div className="w-full" style={{ paddingTop: '4rem' }}>
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -182,7 +218,7 @@ const Settings: React.FC = () => {
           >
             <div className="flex items-center justify-between">
               <div>
-                <h1 className={`text-3xl font-bold mb-2 ${
+                <h1 className={`text-2xl sm:text-3xl font-bold mb-2 ${
                   theme === 'dark' ? 'text-white' : 'text-gray-900'
                 }`}>
                   {t('settings')}
@@ -221,7 +257,7 @@ const Settings: React.FC = () => {
                   } border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}
                 >
                   {/* Section Header */}
-                  <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+                  <div className="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
                     <div className="flex items-center space-x-3 rtl:space-x-reverse">
                       <motion.div
                         whileHover={{ rotate: 360 }}
@@ -243,7 +279,7 @@ const Settings: React.FC = () => {
                   </div>
 
                   {/* Section Items */}
-                  <div className="p-6 space-y-6">
+                  <div className="p-4 sm:p-6 space-y-6">
                     {section.items.map((item, itemIndex) => (
                       <motion.div
                         key={item.id}
@@ -358,6 +394,28 @@ const Settings: React.FC = () => {
                               </select>
                             )}
 
+                            {/* Sales Trash */}
+                            {item.type === 'salesTrash' && (
+                              <div className="flex items-center space-x-3 rtl:space-x-reverse">
+                                <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+                                  deletedSales.length > 0
+                                    ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
+                                    : 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+                                }`}>
+                                  {deletedSales.length} {t('trashItems')}
+                                </div>
+                                <motion.button
+                                  whileHover={{ scale: 1.05 }}
+                                  whileTap={{ scale: 0.95 }}
+                                  onClick={() => setIsTrashModalOpen(true)}
+                                  className="flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-lg"
+                                >
+                                  <Eye className="w-4 h-4 mr-2" />
+                                  {t('viewTrash')}
+                                </motion.button>
+                              </div>
+                            )}
+
                             {/* Export Button */}
                             {item.type === 'export' && (
                               <motion.button
@@ -416,7 +474,7 @@ const Settings: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            className={`mt-8 p-6 rounded-xl ${
+            className={`mt-8 p-4 sm:p-6 rounded-xl ${
               theme === 'dark' ? 'bg-gray-800' : 'bg-white'
             } border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'} shadow-lg`}
           >
@@ -426,7 +484,7 @@ const Settings: React.FC = () => {
               {language === 'ar' ? 'معلومات النظام' : 'System Information'}
             </h3>
             
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className={`p-4 rounded-lg ${
                 theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'
               }`}>
@@ -478,12 +536,12 @@ const Settings: React.FC = () => {
                 <p className={`text-sm font-medium ${
                   theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
                 }`}>
-                  {language === 'ar' ? 'العملة' : 'Currency'}
+                  {language === 'ar' ? 'سلة القمامة' : 'Trash'}
                 </p>
                 <p className={`text-lg font-bold ${
-                  theme === 'dark' ? 'text-purple-400' : 'text-purple-600'
+                  theme === 'dark' ? 'text-red-400' : 'text-red-600'
                 }`}>
-                  {currentCurrency}
+                  {deletedSales.length}
                 </p>
               </div>
             </div>
@@ -537,6 +595,162 @@ const Settings: React.FC = () => {
               className="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-300"
             >
               {language === 'ar' ? 'إعادة تعيين' : 'Reset'}
+            </motion.button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Sales Trash Modal */}
+      <Modal
+        isOpen={isTrashModalOpen}
+        onClose={() => setIsTrashModalOpen(false)}
+        title={`${t('salesTrash')} (${deletedSales.length})`}
+      >
+        <div className="space-y-4">
+          {/* Empty Trash Button */}
+          {deletedSales.length > 0 && (
+            <div className="flex justify-between items-center pb-4 border-b border-gray-200 dark:border-gray-700">
+              <p className={`text-sm ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}>
+                {deletedSales.length} {t('trashItems')}
+              </p>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setIsEmptyTrashModalOpen(true)}
+                className="flex items-center px-3 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-300 text-sm"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                {t('emptyTrash')}
+              </motion.button>
+            </div>
+          )}
+
+          {/* Deleted Sales List */}
+          <div className="max-h-96 overflow-y-auto space-y-3">
+            {deletedSales.length === 0 ? (
+              <div className={`text-center py-8 ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+              }`}>
+                <Trash2 className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                <p>{t('noItemsInTrash')}</p>
+              </div>
+            ) : (
+              deletedSales.map((sale) => (
+                <motion.div
+                  key={sale.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={`p-4 rounded-lg border ${
+                    theme === 'dark' 
+                      ? 'border-gray-700 bg-gray-700/50' 
+                      : 'border-gray-200 bg-gray-50'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <h4 className={`font-medium ${
+                        theme === 'dark' ? 'text-white' : 'text-gray-900'
+                      }`}>
+                        {sale.productName}
+                      </h4>
+                      <div className="flex items-center space-x-4 rtl:space-x-reverse mt-1">
+                        <span className={`text-sm ${
+                          theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                        }`}>
+                          {t('quantity')}: {sale.quantity}
+                        </span>
+                        <span className={`text-sm font-medium ${
+                          theme === 'dark' ? 'text-green-400' : 'text-green-600'
+                        }`}>
+                          {formatPrice(sale.totalAmount)}
+                        </span>
+                      </div>
+                      <div className="flex items-center space-x-2 rtl:space-x-reverse mt-2">
+                        <Calendar className="w-4 h-4 text-gray-400" />
+                        <span className={`text-xs ${
+                          theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                        }`}>
+                          {t('deletedOn')}: {new Date(sale.deletedAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center space-x-2 rtl:space-x-reverse ml-4">
+                      <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => handleRestoreSale(sale.id)}
+                        className="p-2 text-green-500 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors"
+                        title={t('restoreSale')}
+                      >
+                        <RestoreIcon className="w-4 h-4" />
+                      </motion.button>
+                      <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => handlePermanentlyDeleteSale(sale.id)}
+                        className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                        title={t('permanentlyDelete')}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </motion.button>
+                    </div>
+                  </div>
+                </motion.div>
+              ))
+            )}
+          </div>
+        </div>
+      </Modal>
+
+      {/* Empty Trash Confirmation Modal */}
+      <Modal
+        isOpen={isEmptyTrashModalOpen}
+        onClose={() => setIsEmptyTrashModalOpen(false)}
+        title={t('emptyTrash')}
+      >
+        <div className="space-y-4">
+          <div className="flex items-center space-x-3 rtl:space-x-reverse">
+            <AlertTriangle className="w-8 h-8 text-red-500" />
+            <div>
+              <h3 className={`text-lg font-semibold ${
+                theme === 'dark' ? 'text-white' : 'text-gray-900'
+              }`}>
+                {t('confirmEmptyTrash')}
+              </h3>
+              <p className={`text-sm ${
+                theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}>
+                {language === 'ar' 
+                  ? `سيتم حذف ${deletedSales.length} عنصر نهائياً. لا يمكن التراجع عن هذا الإجراء.`
+                  : `${deletedSales.length} items will be permanently deleted. This action cannot be undone.`
+                }
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex justify-end space-x-3 rtl:space-x-reverse pt-4">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setIsEmptyTrashModalOpen(false)}
+              className={`px-4 py-2 border rounded-lg ${
+                theme === 'dark'
+                  ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
+                  : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+              } transition-colors`}
+            >
+              {language === 'ar' ? 'إلغاء' : 'Cancel'}
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleEmptyTrash}
+              className="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-300"
+            >
+              {t('emptyTrash')}
             </motion.button>
           </div>
         </div>

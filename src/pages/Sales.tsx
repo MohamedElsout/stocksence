@@ -13,7 +13,8 @@ import {
   Scan,
   Hash,
   CheckCircle,
-  XCircle
+  XCircle,
+  Trash2
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import Sidebar from '../components/Layout/Sidebar';
@@ -22,7 +23,7 @@ import AnimatedCounter from '../components/UI/AnimatedCounter';
 
 const Sales: React.FC = () => {
   const { t, i18n } = useTranslation();
-  const { products, sales, addSale, theme, formatPrice } = useStore();
+  const { products, sales, addSale, deleteSale, theme, formatPrice } = useStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isSaleModalOpen, setIsSaleModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -70,6 +71,12 @@ const Sales: React.FC = () => {
 
     setSaleForm({ productId: '', quantity: 1, barcodeScan: false });
     setIsSaleModalOpen(false);
+  };
+
+  const handleDeleteSale = (saleId: string) => {
+    if (window.confirm(t('confirmDeleteSale'))) {
+      deleteSale(saleId);
+    }
   };
 
   const stats = [
@@ -279,6 +286,11 @@ const Sales: React.FC = () => {
                       }`}>
                         {t('saleDate')}
                       </th>
+                      <th className={`px-4 sm:px-6 py-3 text-${isRTL ? 'right' : 'left'} text-xs font-medium uppercase tracking-wider ${
+                        theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
+                      }`}>
+                        {t('actions')}
+                      </th>
                     </tr>
                   </thead>
                   <tbody className={`divide-y ${
@@ -345,6 +357,17 @@ const Sales: React.FC = () => {
                           theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
                         }`}>
                           {new Date(sale.saleDate).toLocaleDateString()}
+                        </td>
+                        <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
+                          <motion.button
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={() => handleDeleteSale(sale.id)}
+                            className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                            title={t('deleteSale')}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </motion.button>
                         </td>
                       </motion.tr>
                     ))}

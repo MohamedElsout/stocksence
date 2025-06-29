@@ -135,6 +135,8 @@ const resources = {
       stock: 'Stock',
       availableStock: 'Available Stock',
       confirmSale: 'Confirm Sale',
+      deleteSale: 'Delete Sale',
+      confirmDeleteSale: 'Are you sure you want to delete this sale?',
       
       // Reports
       reportsTitle: 'Reports & Analytics',
@@ -197,6 +199,18 @@ const resources = {
       
       // Settings
       version: 'Version 1.0.0',
+      dataManagement: 'Data Management',
+      salesTrash: 'Sales Trash',
+      salesTrashDesc: 'Manage deleted sales and restore them if needed',
+      viewTrash: 'View Trash',
+      emptyTrash: 'Empty Trash',
+      trashItems: 'items in trash',
+      restoreSale: 'Restore',
+      permanentlyDelete: 'Delete Forever',
+      confirmEmptyTrash: 'Are you sure you want to permanently delete all items in trash?',
+      trashEmptied: 'Trash has been emptied',
+      noItemsInTrash: 'No items in trash',
+      deletedOn: 'Deleted on',
       
       // Download
       
@@ -348,6 +362,8 @@ const resources = {
       stock: 'المخزون',
       availableStock: 'المخزون المتاح',
       confirmSale: 'تأكيد البيع',
+      deleteSale: 'حذف المبيعة',
+      confirmDeleteSale: 'هل أنت متأكد من حذف هذه المبيعة؟',
       
       // Reports
       reportsTitle: 'التقارير والتحليلات',
@@ -410,6 +426,18 @@ const resources = {
       
       // Settings
       version: 'الإصدار 1.0.0',
+      dataManagement: 'إدارة البيانات',
+      salesTrash: 'سلة قمامة المبيعات',
+      salesTrashDesc: 'إدارة المبيعات المحذوفة واستعادتها عند الحاجة',
+      viewTrash: 'عرض سلة القمامة',
+      emptyTrash: 'إفراغ سلة القمامة',
+      trashItems: 'عناصر في سلة القمامة',
+      restoreSale: 'استعادة',
+      permanentlyDelete: 'حذف نهائي',
+      confirmEmptyTrash: 'هل أنت متأكد من الحذف النهائي لجميع العناصر في سلة القمامة؟',
+      trashEmptied: 'تم إفراغ سلة القمامة',
+      noItemsInTrash: 'لا توجد عناصر في سلة القمامة',
+      deletedOn: 'حُذف في',
       
       // Download
       

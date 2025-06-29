@@ -98,29 +98,28 @@ const Landing: React.FC = () => {
       {/* Sidebar */}
       <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
       
-      {/* Bolt Logo - Simple rotating logo in bottom right */}
+      {/* Circular Rotating Bolt Logo */}
       <motion.div
         initial={{ opacity: 0, scale: 0.5 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1, delay: 2 }}
+        transition={{ duration: 1, delay: 0.5 }}
         className={`fixed bottom-6 ${isRTL ? 'left-6' : 'right-6'} z-40`}
       >
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ 
-            duration: 8, 
+            duration: 10, 
             repeat: Infinity, 
             ease: "linear"
           }}
-          whileHover={{ scale: 1.1, boxShadow: "0 0 15px rgba(59, 130, 246, 0.5)" }}
-          className={`w-12 h-12 rounded-full shadow-lg cursor-pointer ${
-            theme === 'dark' 
-              ? 'bg-blue-600' 
-              : 'bg-blue-500'
-          } flex items-center justify-center hover:shadow-xl transition-shadow duration-300`}
-          title="Powered by Bolt"
+          whileHover={{ scale: 1.1 }}
+          className="w-20 h-20"
         >
-          <img src="/bolt-logo.svg" alt="Bolt Logo" className="w-10 h-10" />
+          <img 
+            src="/download copy.png" 
+            alt="Powered by Bolt" 
+            className="w-full h-full"
+          />
         </motion.div>
       </motion.div>
       

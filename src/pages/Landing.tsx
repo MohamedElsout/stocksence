@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
@@ -20,7 +20,24 @@ const Landing: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { theme } = useStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showLogo, setShowLogo] = useState(false);
   const isRTL = i18n.language === 'ar';
+
+  // مراقبة التمرير لإظهار الشعار
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      
+      // إظهار الشعار عندما يصل المستخدم إلى 70% من الصفحة أو أكثر
+      const scrollPercentage = (scrollPosition + windowHeight) / documentHeight;
+      setShowLogo(scrollPercentage > 0.7);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const stats = [
     { 
@@ -98,23 +115,47 @@ const Landing: React.FC = () => {
       {/* Sidebar */}
       <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
       
-      {/* Circular Rotating Bolt Logo */}
+      {/* Circular Rotating Bolt Logo - يظهر فقط عند النزول للأسفل */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.5 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1, delay: 0.5 }}
-        className={`fixed bottom-6 ${isRTL ? 'left-6' : 'right-6'} z-40`}
-        style={{ borderRadius: '50%', overflow: 'hidden', width: '80px', height: '80px' }}
+        initial={{ opacity: 0, scale: 0.5, y: 100 }}
+        animate={{ 
+          opacity: showLogo ? 1 : 0, 
+          scale: showLogo ? 1 : 0.5,
+          y: showLogo ? 0 : 100
+        }}
+        transition={{ 
+          duration: 0.6, 
+          type: "spring", 
+          stiffness: 300, 
+          damping: 30 
+        }}
+        className={`fixed bottom-6 ${isRTL ? 'left-6' : 'right-6'} z-40 ${
+          showLogo ? 'pointer-events-auto' : 'pointer-events-none'
+        }`}
+        style={{ 
+          borderRadius: '50%', 
+          overflow: 'hidden', 
+          width: '80px', 
+          height: '80px',
+          filter: 'drop-shadow(0 8px 16px rgba(0, 0, 0, 0.3))'
+        }}
       >
         <motion.div
-          animate={{ rotate: 360 }}
+          animate={{ rotate: showLogo ? 360 : 0 }}
           transition={{ 
             duration: 10, 
-            repeat: Infinity, 
+            repeat: showLogo ? Infinity : 0, 
             ease: "linear"
           }}
           whileHover={{ scale: 1.1 }}
-          style={{ width: '100%', height: '100%', borderRadius: '50%' }}
+          whileTap={{ scale: 0.95 }}
+          style={{ 
+            width: '100%', 
+            height: '100%', 
+            borderRadius: '50%',
+            cursor: 'pointer'
+          }}
+          className="relative"
         >
           <img 
             src="/download copy.png" 
@@ -122,6 +163,45 @@ const Landing: React.FC = () => {
             className="w-full h-full rounded-full"
             style={{ objectFit: 'cover' }}
           />
+          
+          {/* تأثير النبض */}
+          <motion.div
+            animate={showLogo ? {
+              scale: [1, 1.2, 1],
+              opacity: [0.5, 0, 0.5]
+            } : {}}
+            transition={{
+              duration: 2,
+              repeat: showLogo ? Infinity : 0,
+              ease: "easeInOut"
+            }}
+            className="absolute inset-0 rounded-full border-2 border-blue-500"
+            style={{ 
+              borderRadius: '50%',
+              pointerEvents: 'none'
+            }}
+          />
+          
+          {/* تأثير الإضاءة عند التحويم */}
+          <motion.div
+            className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 opacity-0 hover:opacity-100 transition-opacity duration-300"
+            style={{ borderRadius: '50%' }}
+          />
+        </motion.div>
+        
+        {/* نص صغير تحت الشعار */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ 
+            opacity: showLogo ? 1 : 0,
+            y: showLogo ? 0 : 10
+          }}
+          transition={{ delay: 0.3, duration: 0.4 }}
+          className={`absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-xs font-medium whitespace-nowrap ${
+            theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+          }`}
+        >
+          Powered by Bolt
         </motion.div>
       </motion.div>
       

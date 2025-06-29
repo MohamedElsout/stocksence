@@ -11,6 +11,7 @@ export interface Product {
   serialNumber: string; // إضافة رقم تسلسلي للمنتج
   createdAt: Date;
   updatedAt: Date;
+  createdBy?: string; // إضافة معرف المستخدم الذي أضاف المنتج
 }
 
 export interface Sale {
@@ -22,6 +23,7 @@ export interface Sale {
   totalAmount: number;
   saleDate: Date;
   barcodeScan?: boolean; // إضافة خيار مسح الباركود
+  soldBy?: string; // إضافة معرف المستخدم الذي باع المنتج
 }
 
 export interface Currency {
@@ -41,6 +43,7 @@ export interface User {
   createdAt: Date;
   isActive: boolean;
   email?: string; // إضافة الإيميل للتسجيل التلقائي
+  companyId?: string; // إضافة معرف الشركة
 }
 
 export interface SerialNumber {
@@ -50,6 +53,7 @@ export interface SerialNumber {
   createdAt: Date;
   usedBy?: string;
   usedAt?: Date;
+  companyId?: string; // إضافة معرف الشركة
 }
 
 interface StoreState {
@@ -59,6 +63,7 @@ interface StoreState {
   serialNumbers: SerialNumber[];
   isAuthenticated: boolean;
   autoLoginWithGoogle: boolean;
+  currentCompanyId: string | null; // إضافة معرف الشركة الحالية
   login: (username: string, password: string, serialNumber?: string) => Promise<boolean>;
   logout: () => void;
   register: (username: string, password: string, email?: string) => Promise<boolean>;
@@ -68,12 +73,12 @@ interface StoreState {
   clearAllData: () => void;
   
   products: Product[];
-  addProduct: (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt' | 'serialNumber'>) => void;
+  addProduct: (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt' | 'serialNumber' | 'createdBy'>) => void;
   updateProduct: (id: string, product: Partial<Product>) => void;
   deleteProduct: (id: string) => void;
   
   sales: Sale[];
-  addSale: (sale: Omit<Sale, 'id' | 'saleDate'>) => void;
+  addSale: (sale: Omit<Sale, 'id' | 'saleDate' | 'soldBy'>) => void;
   
   theme: 'light' | 'dark';
   language: 'en' | 'ar';
@@ -97,6 +102,7 @@ interface StoreState {
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 const generateProductSerial = () => `PRD${Date.now()}${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
+const generateCompanyId = () => `COMP${Date.now()}${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
 
 const currencies: Currency[] = [
   {
@@ -174,12 +180,13 @@ const getGoogleEmail = async (): Promise<string | null> => {
 export const useStore = create<StoreState>()(
   persist(
     (set, get) => ({
-      // Authentication state - مسح البيانات
+      // Authentication state
       currentUser: null,
       users: [],
       serialNumbers: [],
       isAuthenticated: false,
       autoLoginWithGoogle: false,
+      currentCompanyId: null,
 
       login: async (username: string, password: string, serialNumber?: string) => {
         const state = get();
@@ -212,7 +219,11 @@ export const useStore = create<StoreState>()(
           return false;
         }
         
-        set({ currentUser: user, isAuthenticated: true });
+        set({ 
+          currentUser: user, 
+          isAuthenticated: true,
+          currentCompanyId: user.companyId || null
+        });
         
         // إذا كان التسجيل التلقائي مفعل، احفظ الإيميل
         if (state.autoLoginWithGoogle && user.email) {
@@ -251,6 +262,7 @@ export const useStore = create<StoreState>()(
         // Check if this is the first user (admin) - no serial number required
         if (state.users.length === 0) {
           // إنشاء أول مستخدم (أدمن) - بدون رقم تسلسلي
+          const companyId = generateCompanyId();
           const adminUser: User = {
             id: generateId(),
             username,
@@ -258,18 +270,26 @@ export const useStore = create<StoreState>()(
             role: 'admin',
             createdAt: new Date(),
             isActive: true,
-            email: userEmail
+            email: userEmail,
+            companyId
           };
           
+          // مسح جميع المنتجات والمبيعات عند تسجيل أدمن جديد (مشروع جديد)
           set(state => ({
             users: [adminUser],
             currentUser: adminUser,
-            isAuthenticated: true
+            isAuthenticated: true,
+            currentCompanyId: companyId,
+            products: [], // مسح المنتجات
+            sales: [], // مسح المبيعات
+            serialNumbers: [] // مسح الأرقام التسلسلية
           }));
           
           get().addNotification({ 
             type: 'success', 
-            message: state.language === 'ar' ? 'تم إنشاء حساب الأدمن بنجاح!' : 'Admin account created successfully!' 
+            message: state.language === 'ar' 
+              ? 'تم إنشاء حساب الأدمن بنجاح! تم مسح البيانات السابقة لبدء مشروع جديد.' 
+              : 'Admin account created successfully! Previous data cleared for new project.' 
           });
           return true;
         }
@@ -285,7 +305,8 @@ export const useStore = create<StoreState>()(
           serialNumber: autoSerialNumber,
           createdAt: new Date(),
           isActive: true,
-          email: userEmail
+          email: userEmail,
+          companyId: state.currentCompanyId || generateCompanyId()
         };
         
         // إضافة الرقم التسلسلي التلقائي للقائمة
@@ -295,21 +316,25 @@ export const useStore = create<StoreState>()(
           isUsed: true,
           createdAt: new Date(),
           usedBy: newUser.id,
-          usedAt: new Date()
+          usedAt: new Date(),
+          companyId: newUser.companyId
         };
         
+        // الموظفون يحتفظون بنفس المنتجات والمبيعات
         set(state => ({
           users: [...state.users, newUser],
           currentUser: newUser,
           isAuthenticated: true,
+          currentCompanyId: newUser.companyId,
           serialNumbers: [...state.serialNumbers, newSerial]
+          // لا نمسح المنتجات والمبيعات للموظفين
         }));
         
         get().addNotification({ 
           type: 'success', 
           message: state.language === 'ar' 
-            ? `تم إنشاء الحساب بنجاح! رقمك التسلسلي: ${autoSerialNumber}` 
-            : `Account created successfully! Your serial number: ${autoSerialNumber}` 
+            ? `تم إنشاء حساب الموظف بنجاح! رقمك التسلسلي: ${autoSerialNumber}` 
+            : `Employee account created successfully! Your serial number: ${autoSerialNumber}` 
         });
         return true;
       },
@@ -325,11 +350,13 @@ export const useStore = create<StoreState>()(
       },
 
       addSerialNumber: (serialNumber: string) => {
+        const state = get();
         const newSerial: SerialNumber = {
           id: generateId(),
           serialNumber,
           isUsed: false,
-          createdAt: new Date()
+          createdAt: new Date(),
+          companyId: state.currentCompanyId || undefined
         };
         
         set(state => ({
@@ -364,7 +391,8 @@ export const useStore = create<StoreState>()(
           serialNumbers: [],
           isAuthenticated: false,
           products: [],
-          sales: []
+          sales: [],
+          currentCompanyId: null
         });
         
         get().addNotification({ 
@@ -376,12 +404,14 @@ export const useStore = create<StoreState>()(
       products: [],
       
       addProduct: (productData) => {
+        const state = get();
         const newProduct: Product = {
           ...productData,
           id: generateId(),
           serialNumber: generateProductSerial(), // إضافة رقم تسلسلي تلقائي
           createdAt: new Date(),
           updatedAt: new Date(),
+          createdBy: state.currentUser?.id
         };
         set((state) => ({
           products: [...state.products, newProduct],
@@ -402,23 +432,31 @@ export const useStore = create<StoreState>()(
               : product
           ),
         }));
-        get().addNotification({ type: 'success', message: 'Product updated successfully!' });
+        get().addNotification({ 
+          type: 'success', 
+          message: get().language === 'ar' ? 'تم تحديث المنتج بنجاح!' : 'Product updated successfully!' 
+        });
       },
       
       deleteProduct: (id) => {
         set((state) => ({
           products: state.products.filter((product) => product.id !== id),
         }));
-        get().addNotification({ type: 'success', message: 'Product deleted successfully!' });
+        get().addNotification({ 
+          type: 'success', 
+          message: get().language === 'ar' ? 'تم حذف المنتج بنجاح!' : 'Product deleted successfully!' 
+        });
       },
       
       sales: [],
       
       addSale: (saleData) => {
+        const state = get();
         const newSale: Sale = {
           ...saleData,
           id: generateId(),
           saleDate: new Date(),
+          soldBy: state.currentUser?.id
         };
         
         const product = get().products.find(p => p.id === saleData.productId);
@@ -537,6 +575,7 @@ export const useStore = create<StoreState>()(
         currentUser: state.currentUser,
         isAuthenticated: state.isAuthenticated,
         autoLoginWithGoogle: state.autoLoginWithGoogle,
+        currentCompanyId: state.currentCompanyId,
       }),
     }
   )

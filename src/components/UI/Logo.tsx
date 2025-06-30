@@ -27,7 +27,7 @@ const Logo: React.FC<LogoProps> = ({
   
   return (
     <div className={`flex items-center space-x-2 rtl:space-x-reverse ${className}`}>
-      {/* Logo Image - الصورة الجديدة مع تحسينات بصرية */}
+      {/* Logo Image - الصورة الجديدة بدون حواف */}
       <motion.div
         whileHover={{ 
           scale: 1.05,
@@ -53,7 +53,7 @@ const Logo: React.FC<LogoProps> = ({
             background: 'transparent'
           }}
         >
-          {/* الصورة الجديدة */}
+          {/* الصورة الجديدة بدون حواف بيضاء */}
           <img 
             src="/logo.png" 
             alt="StockSence Logo" 
@@ -61,9 +61,9 @@ const Logo: React.FC<LogoProps> = ({
             style={{
               imageRendering: 'crisp-edges',
               WebkitImageRendering: 'crisp-edges',
-              // تحسين عرض الصورة الجديدة
-              transform: 'scale(1.0)', // بدون تكبير للصورة الجديدة
-              filter: 'contrast(1.05) saturate(1.05) brightness(1.02)',
+              // عرض الصورة كما هي بدون تكبير أو تصغير
+              transform: 'scale(1.0)',
+              filter: 'contrast(1.02) saturate(1.02) brightness(1.01)',
               backgroundColor: 'transparent'
             }}
           />

@@ -27,7 +27,7 @@ const Logo: React.FC<LogoProps> = ({
   
   return (
     <div className={`flex items-center space-x-2 rtl:space-x-reverse ${className}`}>
-      {/* Logo Image - بدون حواف بيضاء نهائياً */}
+      {/* Logo Image - إزالة الحواف البيضاء نهائياً */}
       <motion.div
         whileHover={{ 
           scale: 1.05,
@@ -39,21 +39,24 @@ const Logo: React.FC<LogoProps> = ({
         }}
         className={`relative ${container} rounded-full overflow-hidden`}
         style={{ 
-          filter: 'drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15))'
+          filter: 'drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15))',
+          background: 'transparent'
         }}
       >
-        {/* Main Logo Image - قص الحواف البيضاء تماماً */}
+        {/* Main Logo Image - قص أقوى للحواف البيضاء */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="w-full h-full rounded-full overflow-hidden relative"
           style={{
-            // إخفاء الحواف البيضاء بشكل كامل
-            background: 'transparent'
+            background: 'transparent',
+            // إضافة قناع دائري إضافي
+            mask: 'radial-gradient(circle at center, black 85%, transparent 90%)',
+            WebkitMask: 'radial-gradient(circle at center, black 85%, transparent 90%)'
           }}
         >
-          {/* الصورة مع قص الحواف البيضاء */}
+          {/* الصورة مع قص أقوى للحواف البيضاء */}
           <img 
             src="/logo.png" 
             alt="StockSence Logo" 
@@ -61,24 +64,42 @@ const Logo: React.FC<LogoProps> = ({
             style={{
               imageRendering: 'crisp-edges',
               WebkitImageRendering: 'crisp-edges',
-              // تكبير الصورة أكثر لقص الحواف البيضاء تماماً
-              transform: 'scale(1.25)', // زيادة التكبير
-              filter: 'contrast(1.2) saturate(1.2) brightness(1.05)',
-              // قص الحواف باستخدام clip-path
-              clipPath: 'circle(42% at center)',
+              // تكبير أقوى لقص الحواف البيضاء تماماً
+              transform: 'scale(1.6)', // زيادة التكبير أكثر
+              filter: 'contrast(1.4) saturate(1.4) brightness(1.1)',
+              // قص أقوى باستخدام clip-path
+              clipPath: 'circle(32% at center)', // تقليل النسبة لقص أكثر
               // إزالة أي خلفية بيضاء
-              backgroundColor: 'transparent'
+              backgroundColor: 'transparent',
+              // إضافة تأثير blur خفيف للحواف
+              WebkitFilter: 'contrast(1.4) saturate(1.4) brightness(1.1) blur(0.2px)'
             }}
           />
           
-          {/* طبقة إضافية لضمان عدم ظهور الحواف البيضاء */}
+          {/* طبقة قناع إضافية لضمان عدم ظهور الحواف البيضاء */}
           <div 
             className="absolute inset-0 rounded-full pointer-events-none"
             style={{
-              background: `radial-gradient(circle at center, transparent 80%, ${
+              background: `radial-gradient(circle at center, transparent 70%, ${
                 theme === 'dark' ? '#1F2937' : '#F9FAFB'
-              } 95%)`,
-              mixBlendMode: 'multiply'
+              } 85%)`,
+              mixBlendMode: 'multiply',
+              zIndex: 1
+            }}
+          />
+          
+          {/* طبقة حماية إضافية */}
+          <div 
+            className="absolute inset-0 rounded-full pointer-events-none"
+            style={{
+              background: `conic-gradient(from 0deg, transparent 0deg, ${
+                theme === 'dark' ? 'rgba(31, 41, 55, 0.1)' : 'rgba(249, 250, 251, 0.1)'
+              } 90deg, transparent 180deg, ${
+                theme === 'dark' ? 'rgba(31, 41, 55, 0.1)' : 'rgba(249, 250, 251, 0.1)'
+              } 270deg, transparent 360deg)`,
+              mask: 'radial-gradient(circle, transparent 80%, black 90%)',
+              WebkitMask: 'radial-gradient(circle, transparent 80%, black 90%)',
+              zIndex: 2
             }}
           />
         </motion.div>
@@ -101,7 +122,8 @@ const Logo: React.FC<LogoProps> = ({
               theme === 'dark' ? 'rgba(139, 92, 246, 0.3)' : 'rgba(139, 92, 246, 0.2)'
             } 270deg, transparent 360deg)`,
             mask: 'radial-gradient(circle, transparent 88%, black 90%)',
-            WebkitMask: 'radial-gradient(circle, transparent 88%, black 90%)'
+            WebkitMask: 'radial-gradient(circle, transparent 88%, black 90%)',
+            zIndex: 3
           }}
         />
         
@@ -121,6 +143,7 @@ const Logo: React.FC<LogoProps> = ({
               ? 'bg-blue-400/20' 
               : 'bg-blue-500/20'
           }`}
+          style={{ zIndex: 4 }}
         />
         
         {/* Shine Effect */}
@@ -137,7 +160,8 @@ const Logo: React.FC<LogoProps> = ({
           className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12 rounded-full"
           style={{ 
             width: '50%',
-            height: '100%'
+            height: '100%',
+            zIndex: 5
           }}
         />
       </motion.div>

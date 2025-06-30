@@ -1,4 +1,4 @@
-/* Custom styles for the new logo - بدون حواف بيضاء */
+/* Custom styles for the new logo */
 .circular-logo {
   border-radius: 50%;
   overflow: hidden;
@@ -11,7 +11,7 @@
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
-  /* عرض الصورة الجديدة كما هي بدون تعديل */
+  /* عرض الصورة الجديدة كما هي */
   transform: scale(1.0);
   filter: contrast(1.02) saturate(1.02) brightness(1.01);
   background: transparent;
@@ -36,7 +36,7 @@
   animation: pulse 2s infinite;
 }
 
-/* تحسين عرض اللوجو الجديد بدون حواف */
+/* تحسين عرض اللوجو الجديد */
 .logo-clean {
   position: relative;
   overflow: hidden;
@@ -49,7 +49,7 @@
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
-  /* عرض الصورة الجديدة بدون تكبير */
+  /* عرض الصورة الجديدة كما هي */
   transform: scale(1.0);
   filter: contrast(1.02) saturate(1.02) brightness(1.01);
   background: transparent;
@@ -112,7 +112,7 @@
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
-  /* عرض الصورة الجديدة بدون تعديل */
+  /* عرض الصورة الجديدة كما هي */
   transform: scale(1.0);
   filter: contrast(1.02) saturate(1.02) brightness(1.01);
   background: transparent;

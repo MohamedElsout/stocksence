@@ -24,6 +24,7 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
+import GoogleLoginButton from '../components/Auth/GoogleLoginButton';
 
 const Auth: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -199,6 +200,36 @@ const Auth: React.FC = () => {
                 </div>
               </motion.div>
             )}
+          </div>
+
+          {/* Google Login Button */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <GoogleLoginButton 
+              onSuccess={() => navigate('/dashboard')}
+              onError={(error) => console.error('Google login error:', error)}
+            />
+          </motion.div>
+
+          {/* Divider */}
+          <div className="relative">
+            <div className={`absolute inset-0 flex items-center ${
+              theme === 'dark' ? 'text-gray-600' : 'text-gray-400'
+            }`}>
+              <div className={`w-full border-t ${
+                theme === 'dark' ? 'border-gray-600' : 'border-gray-300'
+              }`} />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className={`px-2 ${
+                theme === 'dark' ? 'bg-gray-900 text-gray-400' : 'bg-gray-50 text-gray-500'
+              }`}>
+                {isRTL ? 'أو' : 'OR'}
+              </span>
+            </div>
           </div>
 
           {/* Form */}
@@ -474,6 +505,9 @@ const Auth: React.FC = () => {
               </p>
               <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
                 {isRTL ? '• أول مستخدم يصبح أدمن تلقائياً' : '• First user becomes admin automatically'}
+              </p>
+              <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                {isRTL ? '• تسجيل دخول سريع بحساب Google' : '• Quick login with Google account'}
               </p>
             </div>
           </div>

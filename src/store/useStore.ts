@@ -50,6 +50,9 @@ export interface User {
   createdAt: Date;
   isActive: boolean;
   email?: string;
+  googleId?: string;
+  picture?: string;
+  isGoogleUser?: boolean;
 }
 
 export interface SerialNumber {
@@ -62,6 +65,14 @@ export interface SerialNumber {
   companyId: string;
 }
 
+interface GoogleUser {
+  id: string;
+  email: string;
+  name: string;
+  picture?: string;
+  verified_email?: boolean;
+}
+
 interface StoreState {
   // Authentication
   currentUser: User | null;
@@ -71,6 +82,7 @@ interface StoreState {
   autoLoginWithGoogle: boolean;
   currentCompanyId: string | null;
   login: (username: string, password: string, companyId?: string) => Promise<boolean>;
+  loginWithGoogle: (googleUser: GoogleUser) => Promise<boolean>;
   logout: () => void;
   register: (username: string, password: string, email?: string) => Promise<boolean>;
   addSerialNumber: (serialNumber: string) => void;
@@ -248,6 +260,90 @@ export const useStore = create<StoreState>()(
           message: state.language === 'ar' ? 'تم تسجيل الدخول بنجاح!' : 'Login successful!' 
         });
         return true;
+      },
+
+      loginWithGoogle: async (googleUser: GoogleUser) => {
+        const state = get();
+        
+        try {
+          // 🧹 تنظيف المبيعات القديمة عند تسجيل الدخول
+          get().cleanupOldDeletedSales();
+          
+          // Check if user already exists with this Google ID
+          let existingUser = state.users.find(u => u.googleId === googleUser.id && u.isActive);
+          
+          if (existingUser) {
+            // User exists, log them in
+            set({ 
+              currentUser: existingUser, 
+              isAuthenticated: true,
+              currentCompanyId: existingUser.companyId
+            });
+            return true;
+          }
+          
+          // Check if user exists with same email
+          existingUser = state.users.find(u => u.email === googleUser.email && u.isActive);
+          
+          if (existingUser) {
+            // Link Google account to existing user
+            const updatedUser = {
+              ...existingUser,
+              googleId: googleUser.id,
+              picture: googleUser.picture,
+              isGoogleUser: true
+            };
+            
+            set(state => ({
+              users: state.users.map(u => u.id === existingUser!.id ? updatedUser : u),
+              currentUser: updatedUser,
+              isAuthenticated: true,
+              currentCompanyId: updatedUser.companyId
+            }));
+            return true;
+          }
+          
+          // Create new user with Google account
+          const companyId = generateCompanyId();
+          const newUser: User = {
+            id: generateId(),
+            username: googleUser.name.replace(/\s+/g, '').toLowerCase() + '_' + generateId().substring(0, 4),
+            password: generateId(), // Random password for Google users
+            role: 'admin', // First user becomes admin
+            companyId,
+            createdAt: new Date(),
+            isActive: true,
+            email: googleUser.email,
+            googleId: googleUser.id,
+            picture: googleUser.picture,
+            isGoogleUser: true
+          };
+          
+          // إنشاء رقم تسلسلي تلقائي للمستخدم الجديد
+          const autoSerialNumber = generateSimpleSerial();
+          const newSerial: SerialNumber = {
+            id: generateId(),
+            serialNumber: autoSerialNumber,
+            isUsed: true,
+            createdAt: new Date(),
+            usedBy: newUser.id,
+            usedAt: new Date(),
+            companyId
+          };
+          
+          set(state => ({
+            users: [...state.users, newUser],
+            currentUser: newUser,
+            isAuthenticated: true,
+            currentCompanyId: companyId,
+            serialNumbers: [...state.serialNumbers, newSerial]
+          }));
+          
+          return true;
+        } catch (error) {
+          console.error('Google login error:', error);
+          return false;
+        }
       },
 
       register: async (username: string, password: string, email?: string) => {

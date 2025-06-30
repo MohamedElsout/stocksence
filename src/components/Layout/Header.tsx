@@ -10,7 +10,6 @@ import {
   Moon
 } from 'lucide-react';
 import { useStore } from '../../store/useStore';
-import Logo from '../UI/Logo';
 
 const Header: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -36,7 +35,18 @@ const Header: React.FC = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo - يؤدي للصفحة الرئيسية */}
           <Link to="/">
-            <Logo size="md" />
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              className="flex items-center cursor-pointer"
+            >
+              <div className="w-10 h-10 rounded-full overflow-hidden">
+                <img 
+                  src="/logo.png" 
+                  alt="StockSence Logo" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </motion.div>
           </Link>
 
           {/* Auth Section with Theme Toggle */}

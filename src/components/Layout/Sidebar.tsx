@@ -18,7 +18,6 @@ import {
   UserCircle
 } from 'lucide-react';
 import { useStore } from '../../store/useStore';
-import Logo from '../UI/Logo';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -147,7 +146,15 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
             <div className={`px-6 py-4 border-b ${
               theme === 'dark' ? 'border-gray-700/50' : 'border-gray-200/50'
             } flex-shrink-0`}>
-              <Logo size="md" />
+              <div className="flex items-center space-x-3 rtl:space-x-reverse">
+                <div className="w-10 h-10 rounded-full overflow-hidden">
+                  <img 
+                    src="/logo.png" 
+                    alt="StockSence Logo" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
             </div>
 
             {/* User Info Section */}

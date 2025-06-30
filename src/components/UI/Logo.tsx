@@ -27,7 +27,7 @@ const Logo: React.FC<LogoProps> = ({
   
   return (
     <div className={`flex items-center space-x-2 rtl:space-x-reverse ${className}`}>
-      {/* Logo Image - إزالة الحواف البيضاء نهائياً */}
+      {/* Logo Image - إظهار الصورة كاملة مع إزالة الحواف البيضاء فقط */}
       <motion.div
         whileHover={{ 
           scale: 1.05,
@@ -43,20 +43,17 @@ const Logo: React.FC<LogoProps> = ({
           background: 'transparent'
         }}
       >
-        {/* Main Logo Image - قص أقوى للحواف البيضاء */}
+        {/* Main Logo Image - إظهار الصورة كاملة */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="w-full h-full rounded-full overflow-hidden relative"
           style={{
-            background: 'transparent',
-            // إضافة قناع دائري إضافي
-            mask: 'radial-gradient(circle at center, black 85%, transparent 90%)',
-            WebkitMask: 'radial-gradient(circle at center, black 85%, transparent 90%)'
+            background: 'transparent'
           }}
         >
-          {/* الصورة مع قص أقوى للحواف البيضاء */}
+          {/* الصورة مع إزالة الحواف البيضاء فقط وإظهار المحتوى كاملاً */}
           <img 
             src="/logo.png" 
             alt="StockSence Logo" 
@@ -64,42 +61,23 @@ const Logo: React.FC<LogoProps> = ({
             style={{
               imageRendering: 'crisp-edges',
               WebkitImageRendering: 'crisp-edges',
-              // تكبير أقوى لقص الحواف البيضاء تماماً
-              transform: 'scale(1.6)', // زيادة التكبير أكثر
-              filter: 'contrast(1.4) saturate(1.4) brightness(1.1)',
-              // قص أقوى باستخدام clip-path
-              clipPath: 'circle(32% at center)', // تقليل النسبة لقص أكثر
+              // تكبير خفيف فقط لإزالة الحواف البيضاء دون قص المحتوى
+              transform: 'scale(1.05)', // تكبير خفيف جداً
+              filter: 'contrast(1.1) saturate(1.1) brightness(1.05)',
               // إزالة أي خلفية بيضاء
-              backgroundColor: 'transparent',
-              // إضافة تأثير blur خفيف للحواف
-              WebkitFilter: 'contrast(1.4) saturate(1.4) brightness(1.1) blur(0.2px)'
+              backgroundColor: 'transparent'
             }}
           />
           
-          {/* طبقة قناع إضافية لضمان عدم ظهور الحواف البيضاء */}
+          {/* قناع دائري خفيف لإزالة الحواف البيضاء فقط */}
           <div 
             className="absolute inset-0 rounded-full pointer-events-none"
             style={{
-              background: `radial-gradient(circle at center, transparent 70%, ${
+              background: `radial-gradient(circle at center, transparent 92%, ${
                 theme === 'dark' ? '#1F2937' : '#F9FAFB'
-              } 85%)`,
+              } 98%)`,
               mixBlendMode: 'multiply',
               zIndex: 1
-            }}
-          />
-          
-          {/* طبقة حماية إضافية */}
-          <div 
-            className="absolute inset-0 rounded-full pointer-events-none"
-            style={{
-              background: `conic-gradient(from 0deg, transparent 0deg, ${
-                theme === 'dark' ? 'rgba(31, 41, 55, 0.1)' : 'rgba(249, 250, 251, 0.1)'
-              } 90deg, transparent 180deg, ${
-                theme === 'dark' ? 'rgba(31, 41, 55, 0.1)' : 'rgba(249, 250, 251, 0.1)'
-              } 270deg, transparent 360deg)`,
-              mask: 'radial-gradient(circle, transparent 80%, black 90%)',
-              WebkitMask: 'radial-gradient(circle, transparent 80%, black 90%)',
-              zIndex: 2
             }}
           />
         </motion.div>

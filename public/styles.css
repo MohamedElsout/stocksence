@@ -1,4 +1,4 @@
-/* Custom styles for circular logo - إزالة الحواف البيضاء فقط مع إظهار المحتوى كاملاً */
+/* Custom styles for circular logo - الصورة الجديدة */
 .circular-logo {
   border-radius: 50%;
   overflow: hidden;
@@ -11,9 +11,9 @@
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
-  /* تكبير خفيف جداً فقط لإزالة الحواف البيضاء */
-  transform: scale(1.02);
-  filter: contrast(1.05) saturate(1.05) brightness(1.02);
+  /* بدون تكبير للصورة الجديدة */
+  transform: scale(1.0);
+  filter: contrast(1.02) saturate(1.02) brightness(1.01);
   background: transparent;
 }
 
@@ -34,7 +34,7 @@
   animation: pulse 2s infinite;
 }
 
-/* تحسين عرض اللوجو بدون حواف بيضاء - إظهار المحتوى كاملاً */
+/* تحسين عرض اللوجو الجديد */
 .logo-no-white-edges {
   position: relative;
   overflow: hidden;
@@ -47,15 +47,15 @@
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
-  /* تكبير خفيف جداً فقط */
-  transform: scale(1.03);
-  filter: contrast(1.08) saturate(1.08) brightness(1.04);
+  /* بدون تكبير للصورة الجديدة */
+  transform: scale(1.0);
+  filter: contrast(1.03) saturate(1.03) brightness(1.02);
   background: transparent;
   image-rendering: crisp-edges;
   -webkit-image-rendering: crisp-edges;
 }
 
-/* تحسين الشعار العائم - إظهار المحتوى كاملاً */
+/* تحسين الشعار العائم - الصورة الجديدة */
 .floating-logo {
   position: relative;
   border-radius: 50%;
@@ -69,9 +69,9 @@
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
-  /* تكبير خفيف فقط لإزالة الحواف البيضاء */
-  transform: scale(1.04);
-  filter: contrast(1.1) saturate(1.1) brightness(1.05);
+  /* بدون تكبير للصورة الجديدة */
+  transform: scale(1.0);
+  filter: contrast(1.04) saturate(1.04) brightness(1.03);
   background: transparent;
   image-rendering: crisp-edges;
   -webkit-image-rendering: crisp-edges;
@@ -97,7 +97,7 @@
   }
 }
 
-/* تحسين عام للصور الدائرية - إظهار المحتوى كاملاً */
+/* تحسين عام للصور الدائرية - الصورة الجديدة */
 .circular-image-no-white {
   border-radius: 50%;
   overflow: hidden;
@@ -110,15 +110,15 @@
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
-  /* تكبير خفيف جداً */
-  transform: scale(1.02);
-  filter: contrast(1.06) saturate(1.06) brightness(1.03);
+  /* بدون تكبير للصورة الجديدة */
+  transform: scale(1.0);
+  filter: contrast(1.02) saturate(1.02) brightness(1.01);
   background: transparent;
   image-rendering: crisp-edges;
   -webkit-image-rendering: crisp-edges;
 }
 
-/* تحسين إضافي للوجو في الصفحة الرئيسية - إظهار المحتوى كاملاً */
+/* تحسين إضافي للوجو في الصفحة الرئيسية - الصورة الجديدة */
 .landing-logo-enhanced {
   position: relative;
   border-radius: 50%;
@@ -131,9 +131,9 @@
   height: 100%;
   object-fit: cover;
   border-radius: 50%;
-  /* تكبير خفيف فقط لإزالة الحواف البيضاء */
-  transform: scale(1.05);
-  filter: contrast(1.12) saturate(1.12) brightness(1.06);
+  /* بدون تكبير للصورة الجديدة */
+  transform: scale(1.0);
+  filter: contrast(1.05) saturate(1.05) brightness(1.03);
   background: transparent;
   image-rendering: crisp-edges;
   -webkit-image-rendering: crisp-edges;

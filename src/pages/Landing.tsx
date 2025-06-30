@@ -115,7 +115,7 @@ const Landing: React.FC = () => {
       {/* Sidebar */}
       <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
       
-      {/* Floating Logo - يظهر فقط عند النزول للأسفل - بدون حواف بيضاء نهائياً */}
+      {/* Floating Logo - يظهر فقط عند النزول للأسفل - إظهار المحتوى كاملاً */}
       <motion.div
         initial={{ opacity: 0, scale: 0.5, y: 100 }}
         animate={{ 
@@ -144,14 +144,11 @@ const Landing: React.FC = () => {
           whileTap={{ scale: 0.95 }}
           className="relative cursor-pointer"
         >
-          {/* Main Logo - بدون حواف بيضاء نهائياً مع تحسينات إضافية */}
+          {/* Main Logo - إظهار المحتوى كاملاً مع إزالة الحواف البيضاء فقط */}
           <div 
-            className="w-20 h-20 rounded-full overflow-hidden shadow-2xl relative landing-logo-enhanced"
+            className="w-20 h-20 rounded-full overflow-hidden shadow-2xl relative"
             style={{
-              background: 'transparent',
-              // قناع دائري متقدم للشعار العائم
-              mask: 'radial-gradient(circle at center, black 72%, transparent 77%)',
-              WebkitMask: 'radial-gradient(circle at center, black 72%, transparent 77%)'
+              background: 'transparent'
             }}
           >
             <img 
@@ -159,42 +156,24 @@ const Landing: React.FC = () => {
               alt="StockSence Logo" 
               className="w-full h-full object-cover rounded-full"
               style={{
-                // تكبير قوي جداً لإزالة الحواف البيضاء نهائياً
-                transform: 'scale(2.2)',
-                filter: 'contrast(1.8) saturate(1.8) brightness(1.3) blur(0.03px)',
-                clipPath: 'circle(22% at center)',
+                // تكبير خفيف جداً فقط لإزالة الحواف البيضاء
+                transform: 'scale(1.03)',
+                filter: 'contrast(1.1) saturate(1.1) brightness(1.05)',
                 background: 'transparent',
                 imageRendering: 'crisp-edges',
                 WebkitImageRendering: 'crisp-edges'
               }}
             />
             
-            {/* طبقة حماية متقدمة من الحواف البيضاء */}
+            {/* طبقة حماية خفيفة من الحواف البيضاء فقط */}
             <div 
               className="absolute inset-0 rounded-full pointer-events-none"
               style={{
-                background: `radial-gradient(circle at center, transparent 55%, ${
-                  theme === 'dark' ? 'rgba(31, 41, 55, 0.2)' : 'rgba(249, 250, 251, 0.2)'
-                } 70%, ${
-                  theme === 'dark' ? 'rgba(31, 41, 55, 0.5)' : 'rgba(249, 250, 251, 0.5)'
-                } 80%)`,
+                background: `radial-gradient(circle at center, transparent 94%, ${
+                  theme === 'dark' ? 'rgba(31, 41, 55, 0.1)' : 'rgba(249, 250, 251, 0.1)'
+                } 98%)`,
                 mixBlendMode: 'multiply',
                 zIndex: 1
-              }}
-            />
-            
-            {/* طبقة إضافية للتأكد من عدم ظهور الحواف */}
-            <div 
-              className="absolute inset-0 rounded-full pointer-events-none"
-              style={{
-                background: `conic-gradient(from 0deg, transparent 0deg, ${
-                  theme === 'dark' ? 'rgba(31, 41, 55, 0.1)' : 'rgba(249, 250, 251, 0.1)'
-                } 90deg, transparent 180deg, ${
-                  theme === 'dark' ? 'rgba(31, 41, 55, 0.1)' : 'rgba(249, 250, 251, 0.1)'
-                } 270deg, transparent 360deg)`,
-                mask: 'radial-gradient(circle, transparent 70%, black 85%)',
-                WebkitMask: 'radial-gradient(circle, transparent 70%, black 85%)',
-                zIndex: 2
               }}
             />
           </div>

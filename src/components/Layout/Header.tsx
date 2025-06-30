@@ -37,15 +37,27 @@ const Header: React.FC = () => {
           <Link to="/">
             <motion.div
               whileHover={{ scale: 1.05 }}
-              className="flex items-center cursor-pointer"
+              className="flex items-center cursor-pointer space-x-3 rtl:space-x-reverse"
             >
               <div className="w-10 h-10 rounded-full overflow-hidden">
                 <img 
-                  src="/logo.png" 
+                  src="/logo2 copy copy.png" 
                   alt="StockSence Logo" 
                   className="w-full h-full object-cover"
                 />
               </div>
+              <motion.h2 
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                className={`font-bold text-xl bg-gradient-to-r ${
+                  theme === 'dark' 
+                    ? 'from-blue-400 via-purple-400 to-pink-400' 
+                    : 'from-blue-600 via-purple-600 to-pink-600'
+                } bg-clip-text text-transparent`}
+              >
+                StockSence
+              </motion.h2>
             </motion.div>
           </Link>
 

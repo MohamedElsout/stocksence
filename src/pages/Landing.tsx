@@ -151,7 +151,7 @@ const Landing: React.FC = () => {
             }}
           >
             <img 
-              src="/logo.png" 
+              src="/logo2 copy copy.png" 
               alt="StockSence Logo" 
               className="w-full h-full object-cover rounded-full"
               style={{
@@ -260,20 +260,33 @@ const Landing: React.FC = () => {
                     className="w-32 h-32 mb-6 rounded-full overflow-hidden shadow-2xl"
                   >
                     <img 
-                      src="/logo.png" 
+                      src="/logo2 copy copy.png" 
                       alt="StockSence Logo" 
                       className="w-full h-full object-cover"
                     />
                   </motion.div>
                   
+                  {/* StockSence Title */}
                   <motion.h1
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.4 }}
                     className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 bg-gradient-to-r from-blue-500 via-purple-500 to-green-500 bg-clip-text text-transparent"
                   >
-                    Professional inventory management system for modern businesses
+                    StockSence
                   </motion.h1>
+                  
+                  {/* Subtitle */}
+                  <motion.p
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6 }}
+                    className={`text-xl md:text-2xl mb-12 max-w-3xl mx-auto ${
+                      theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                    }`}
+                  >
+                    Professional inventory management system for modern businesses
+                  </motion.p>
                 </div>
               </motion.div>
               
@@ -322,7 +335,7 @@ const Landing: React.FC = () => {
             >
               <div className="w-16 h-16 rounded-full overflow-hidden">
                 <img 
-                  src="/logo.png" 
+                  src="/logo2 copy copy.png" 
                   alt="StockSence Logo" 
                   className="w-full h-full object-cover"
                 />
@@ -546,7 +559,7 @@ const Landing: React.FC = () => {
                 >
                   <div className="w-24 h-24 rounded-full overflow-hidden">
                     <img 
-                      src="/logo.png" 
+                      src="/logo2 copy copy.png" 
                       alt="StockSence Logo" 
                       className="w-full h-full object-cover"
                     />

@@ -14,7 +14,6 @@ import {
 import { useStore } from '../store/useStore';
 import Sidebar from '../components/Layout/Sidebar';
 import AnimatedCounter from '../components/UI/AnimatedCounter';
-import Logo from '../components/UI/Logo';
 
 const Landing: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -247,32 +246,36 @@ const Landing: React.FC = () => {
                 transition={{ delay: 0.2, duration: 0.6 }}
                 className="mb-8"
               >
-                <Logo size="xl" />
+                {/* Logo Image */}
+                <div className="flex flex-col items-center justify-center">
+                  <motion.div
+                    animate={{ 
+                      y: [0, -10, 0],
+                      rotate: [0, 5, -5, 0]
+                    }}
+                    transition={{ 
+                      y: { duration: 3, repeat: Infinity, ease: "easeInOut" },
+                      rotate: { duration: 6, repeat: Infinity, ease: "easeInOut" }
+                    }}
+                    className="w-32 h-32 mb-6 rounded-full overflow-hidden shadow-2xl"
+                  >
+                    <img 
+                      src="/logo.png" 
+                      alt="StockSence Logo" 
+                      className="w-full h-full object-cover"
+                    />
+                  </motion.div>
+                  
+                  <motion.h1
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                    className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 bg-gradient-to-r from-blue-500 via-purple-500 to-green-500 bg-clip-text text-transparent"
+                  >
+                    Professional inventory management system for modern businesses
+                  </motion.h1>
+                </div>
               </motion.div>
-
-              <h1 className={`text-4xl md:text-6xl lg:text-7xl font-bold mb-6 ${
-                theme === 'dark' ? 'text-white' : 'text-gray-900'
-              }`}>
-                <motion.span
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 }}
-                  className="bg-gradient-to-r from-blue-500 via-purple-500 to-green-500 bg-clip-text text-transparent"
-                >
-                  {t('heroTitle')}
-                </motion.span>
-              </h1>
-              
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 }}
-                className={`text-xl md:text-2xl lg:text-3xl mb-12 max-w-4xl mx-auto ${
-                  theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
-                }`}
-              >
-                {t('heroSubtitle')}
-              </motion.p>
               
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -317,7 +320,13 @@ const Landing: React.FC = () => {
               transition={{ duration: 6, repeat: Infinity }}
               className="absolute top-20 left-10 opacity-20"
             >
-              <Logo size="lg" showText={false} />
+              <div className="w-16 h-16 rounded-full overflow-hidden">
+                <img 
+                  src="/logo.png" 
+                  alt="StockSence Logo" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
             </motion.div>
             <motion.div
               animate={{ y: [0, 20, 0], rotate: [0, -5, 5, 0] }}
@@ -535,7 +544,13 @@ const Landing: React.FC = () => {
                   transition={{ duration: 4, repeat: Infinity }}
                   className="absolute -top-4 -right-4 w-24 h-24 rounded-full flex items-center justify-center shadow-lg"
                 >
-                  <Logo size="lg" showText={false} />
+                  <div className="w-24 h-24 rounded-full overflow-hidden">
+                    <img 
+                      src="/logo.png" 
+                      alt="StockSence Logo" 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                 </motion.div>
               </motion.div>
             </div>

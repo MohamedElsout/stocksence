@@ -559,8 +559,8 @@ const Landing: React.FC = () => {
                 >
                   <div className="w-24 h-24 rounded-full overflow-hidden">
                     <img 
-                      src="/logo2 copy copy.png" 
-                      alt="StockSence Logo" 
+                      src="/footer.png" 
+                      alt="Footer Logo" 
                       className="w-full h-full object-cover"
                     />
                   </div>

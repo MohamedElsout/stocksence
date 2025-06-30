@@ -9,7 +9,11 @@ import {
   ChevronLeft,
   ChevronRight,
   Star,
-  Zap
+  Zap,
+  Shield,
+  Globe,
+  BarChart3,
+  Package
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import Sidebar from '../components/Layout/Sidebar';
@@ -105,6 +109,14 @@ const Landing: React.FC = () => {
       color: 'text-purple-500',
       bgColor: 'bg-purple-50 dark:bg-purple-900/20'
     }
+  ];
+
+  // كلمات متحركة للنص الفرعي
+  const animatedWords = [
+    { text: 'Professional', icon: Shield, color: 'text-blue-500' },
+    { text: 'inventory management', icon: Package, color: 'text-green-500' },
+    { text: 'system for', icon: BarChart3, color: 'text-purple-500' },
+    { text: 'modern businesses', icon: Globe, color: 'text-orange-500' }
   ];
 
   return (
@@ -271,29 +283,149 @@ const Landing: React.FC = () => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.4 }}
-                    className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 bg-gradient-to-r from-blue-500 via-purple-500 to-green-500 bg-clip-text text-transparent"
+                    className="text-4xl md:text-6xl lg:text-7xl font-bold mb-8 bg-gradient-to-r from-blue-500 via-purple-500 to-green-500 bg-clip-text text-transparent"
                   >
                     StockSence
                   </motion.h1>
                   
-                  {/* Subtitle */}
-                  <motion.p
-                    initial={{ opacity: 0, y: 20 }}
+                  {/* Enhanced Subtitle with Animation */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.6 }}
-                    className={`text-xl md:text-2xl mb-12 max-w-3xl mx-auto ${
-                      theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
-                    }`}
+                    className="mb-12 max-w-4xl mx-auto"
                   >
-                    Professional inventory management system for modern businesses
-                  </motion.p>
+                    {/* Main Subtitle Container */}
+                    <div className={`relative p-8 rounded-2xl backdrop-blur-sm border ${
+                      theme === 'dark' 
+                        ? 'bg-gray-800/30 border-gray-700/50' 
+                        : 'bg-white/30 border-gray-200/50'
+                    } shadow-2xl`}>
+                      
+                      {/* Animated Background Gradient */}
+                      <motion.div
+                        animate={{
+                          background: [
+                            'linear-gradient(45deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1))',
+                            'linear-gradient(45deg, rgba(139, 92, 246, 0.1), rgba(236, 72, 153, 0.1))',
+                            'linear-gradient(45deg, rgba(236, 72, 153, 0.1), rgba(59, 130, 246, 0.1))'
+                          ]
+                        }}
+                        transition={{ duration: 4, repeat: Infinity }}
+                        className="absolute inset-0 rounded-2xl"
+                      />
+                      
+                      {/* Content */}
+                      <div className="relative z-10">
+                        {/* Animated Words */}
+                        <div className="flex flex-wrap justify-center items-center gap-3 md:gap-4 text-lg md:text-2xl lg:text-3xl font-semibold">
+                          {animatedWords.map((word, index) => {
+                            const Icon = word.icon;
+                            return (
+                              <motion.div
+                                key={index}
+                                initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                transition={{ 
+                                  delay: 0.8 + (index * 0.2),
+                                  duration: 0.6,
+                                  type: "spring",
+                                  stiffness: 100
+                                }}
+                                whileHover={{ 
+                                  scale: 1.1,
+                                  y: -5,
+                                  transition: { duration: 0.2 }
+                                }}
+                                className={`flex items-center space-x-2 rtl:space-x-reverse px-4 py-2 rounded-xl ${
+                                  theme === 'dark' 
+                                    ? 'bg-gray-700/50 hover:bg-gray-600/50' 
+                                    : 'bg-white/50 hover:bg-white/70'
+                                } backdrop-blur-sm border ${
+                                  theme === 'dark' ? 'border-gray-600/30' : 'border-gray-300/30'
+                                } shadow-lg hover:shadow-xl transition-all duration-300 cursor-default`}
+                              >
+                                <motion.div
+                                  animate={{ rotate: 360 }}
+                                  transition={{ 
+                                    duration: 3, 
+                                    repeat: Infinity, 
+                                    ease: "linear",
+                                    delay: index * 0.5
+                                  }}
+                                  className={`p-1 rounded-lg ${word.color} bg-opacity-20`}
+                                >
+                                  <Icon className={`w-5 h-5 md:w-6 md:h-6 ${word.color}`} />
+                                </motion.div>
+                                <span className={`font-bold bg-gradient-to-r ${
+                                  theme === 'dark' 
+                                    ? 'from-white to-gray-300' 
+                                    : 'from-gray-800 to-gray-600'
+                                } bg-clip-text text-transparent`}>
+                                  {word.text}
+                                </span>
+                              </motion.div>
+                            );
+                          })}
+                        </div>
+                        
+                        {/* Decorative Elements */}
+                        <div className="flex justify-center items-center mt-6 space-x-4 rtl:space-x-reverse">
+                          {[Shield, Zap, Globe].map((Icon, index) => (
+                            <motion.div
+                              key={index}
+                              animate={{ 
+                                y: [0, -10, 0],
+                                rotate: [0, 180, 360]
+                              }}
+                              transition={{ 
+                                duration: 3,
+                                repeat: Infinity,
+                                delay: index * 0.5,
+                                ease: "easeInOut"
+                              }}
+                              className={`p-2 rounded-full ${
+                                theme === 'dark' ? 'bg-gray-700/30' : 'bg-white/30'
+                              } backdrop-blur-sm`}
+                            >
+                              <Icon className={`w-4 h-4 ${
+                                index === 0 ? 'text-blue-500' :
+                                index === 1 ? 'text-green-500' : 'text-purple-500'
+                              }`} />
+                            </motion.div>
+                          ))}
+                        </div>
+                        
+                        {/* Subtitle Badge */}
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.8 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: 1.5, duration: 0.5 }}
+                          className={`inline-flex items-center px-6 py-2 mt-6 rounded-full text-sm font-medium ${
+                            theme === 'dark' 
+                              ? 'bg-blue-900/30 text-blue-300 border border-blue-500/30' 
+                              : 'bg-blue-100/50 text-blue-700 border border-blue-300/50'
+                          } backdrop-blur-sm shadow-lg`}
+                        >
+                          <motion.div
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                            className="mr-2"
+                          >
+                            <Star className="w-4 h-4" />
+                          </motion.div>
+                          {isRTL ? 'نظام إدارة المخزون الاحترافي' : 'Enterprise-Grade Solution'}
+                        </motion.div>
+                      </div>
+                    </div>
+                  </motion.div>
                 </div>
               </motion.div>
               
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8 }}
+                transition={{ delay: 1.8 }}
                 className="flex flex-col sm:flex-row gap-4 justify-center items-center"
               >
                 <Link to="/dashboard">

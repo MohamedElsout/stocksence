@@ -6,22 +6,13 @@ import {
   Package, 
   User, 
   Lock, 
-  Hash,
   Eye,
   EyeOff,
   UserPlus,
   LogIn,
-  Shield,
-  Users,
-  Plus,
-  Trash2,
-  CheckCircle,
-  XCircle,
-  Info,
   Mail,
-  Globe,
   Building,
-  AlertTriangle
+  Info
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 
@@ -178,9 +169,6 @@ const Auth: React.FC = () => {
     currentUser, 
     isAuthenticated, 
     users, 
-    serialNumbers, 
-    addSerialNumber, 
-    removeSerialNumber,
     login, 
     register, 
     logout, 
@@ -190,8 +178,6 @@ const Auth: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [showAdminPanel, setShowAdminPanel] = useState(false);
-  const [newSerialNumber, setNewSerialNumber] = useState('');
   
   const [formData, setFormData] = useState({
     username: '',
@@ -222,13 +208,6 @@ const Auth: React.FC = () => {
       console.error('Authentication error:', error);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleAddSerialNumber = () => {
-    if (newSerialNumber.trim() && /^\d{6}$/.test(newSerialNumber.trim())) {
-      addSerialNumber(newSerialNumber.trim());
-      setNewSerialNumber('');
     }
   };
 
@@ -542,23 +521,6 @@ const Auth: React.FC = () => {
               </motion.button>
             </div>
           </form>
-
-          {/* Admin Panel Toggle */}
-          {users.length > 0 && users.some(u => u.role === 'admin') && (
-            <div className="text-center pt-6 border-t border-gray-200 dark:border-gray-700">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setShowAdminPanel(!showAdminPanel)}
-                className={`text-sm ${
-                  theme === 'dark' ? 'text-purple-400 hover:text-purple-300' : 'text-purple-600 hover:text-purple-500'
-                } transition-colors flex items-center space-x-2 rtl:space-x-reverse mx-auto`}
-              >
-                <Shield className="w-4 h-4" />
-                <span>{t('adminPanel')}</span>
-              </motion.button>
-            </div>
-          )}
         </motion.div>
       </div>
 
@@ -580,7 +542,7 @@ const Auth: React.FC = () => {
             <div className={`inline-flex p-8 rounded-full ${
               theme === 'dark' ? 'bg-blue-600' : 'bg-blue-500'
             } shadow-2xl`}>
-              <Users className="w-16 h-16 text-white" />
+              <Package className="w-16 h-16 text-white" />
             </div>
           </motion.div>
           
@@ -603,7 +565,7 @@ const Auth: React.FC = () => {
             <div className={`p-4 rounded-lg ${
               theme === 'dark' ? 'bg-gray-700' : 'bg-white'
             } shadow-lg`}>
-              <Shield className={`w-8 h-8 mx-auto mb-2 ${
+              <Package className={`w-8 h-8 mx-auto mb-2 ${
                 theme === 'dark' ? 'text-blue-400' : 'text-blue-500'
               }`} />
               <h4 className={`font-semibold ${
@@ -656,177 +618,6 @@ const Auth: React.FC = () => {
           </div>
         </div>
       </motion.div>
-
-      {/* Admin Panel Modal */}
-      {showAdminPanel && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-          onClick={() => setShowAdminPanel(false)}
-        >
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            onClick={(e) => e.stopPropagation()}
-            className={`w-full max-w-4xl max-h-[80vh] overflow-y-auto rounded-xl shadow-2xl ${
-              theme === 'dark' ? 'bg-gray-800' : 'bg-white'
-            }`}
-          >
-            <div className={`p-6 border-b ${
-              theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
-            }`}>
-              <h3 className={`text-xl font-semibold ${
-                theme === 'dark' ? 'text-white' : 'text-gray-900'
-              }`}>
-                {t('manageSerialNumbers')}
-              </h3>
-            </div>
-
-            <div className="p-6 space-y-6">
-              {/* Add Serial Number */}
-              <div className={`p-4 rounded-lg ${
-                theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'
-              }`}>
-                <h4 className={`text-lg font-medium mb-4 ${
-                  theme === 'dark' ? 'text-white' : 'text-gray-900'
-                }`}>
-                  {t('addSerialNumber')}
-                </h4>
-                <div className="flex space-x-3 rtl:space-x-reverse">
-                  <input
-                    type="text"
-                    value={newSerialNumber}
-                    onChange={(e) => {
-                      const value = e.target.value.replace(/\D/g, '').slice(0, 6);
-                      setNewSerialNumber(value);
-                    }}
-                    placeholder={isRTL ? 'مثال: 123456' : 'Example: 123456'}
-                    className={`flex-1 px-3 py-2 border rounded-lg font-mono ${
-                      theme === 'dark'
-                        ? 'bg-gray-600 border-gray-500 text-white placeholder-gray-400'
-                        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                    } focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                      newSerialNumber && !/^\d{6}$/.test(newSerialNumber) 
-                        ? 'border-red-500 focus:ring-red-500' 
-                        : ''
-                    }`}
-                    maxLength={6}
-                  />
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={handleAddSerialNumber}
-                    disabled={!newSerialNumber.trim() || !/^\d{6}$/.test(newSerialNumber)}
-                    className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:from-green-600 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
-                  >
-                    <Plus className="w-5 h-5" />
-                  </motion.button>
-                </div>
-                {newSerialNumber && !/^\d{6}$/.test(newSerialNumber) && (
-                  <p className="text-red-500 text-sm mt-1 flex items-center space-x-1 rtl:space-x-reverse">
-                    <XCircle className="w-4 h-4" />
-                    <span>{isRTL ? 'يجب أن يكون 6 أرقام فقط' : 'Must be exactly 6 digits'}</span>
-                  </p>
-                )}
-              </div>
-
-              {/* Serial Numbers List */}
-              <div>
-                <h4 className={`text-lg font-medium mb-4 ${
-                  theme === 'dark' ? 'text-white' : 'text-gray-900'
-                }`}>
-                  {t('serialNumbersList')}
-                </h4>
-                
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead className={`${
-                      theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'
-                    }`}>
-                      <tr>
-                        <th className={`px-4 py-3 text-${isRTL ? 'right' : 'left'} text-xs font-medium uppercase tracking-wider ${
-                          theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
-                        }`}>
-                          {t('serialNumber')}
-                        </th>
-                        <th className={`px-4 py-3 text-${isRTL ? 'right' : 'left'} text-xs font-medium uppercase tracking-wider ${
-                          theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
-                        }`}>
-                          {t('status')}
-                        </th>
-                        <th className={`px-4 py-3 text-${isRTL ? 'right' : 'left'} text-xs font-medium uppercase tracking-wider ${
-                          theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
-                        }`}>
-                          {t('createdAt')}
-                        </th>
-                        <th className={`px-4 py-3 text-${isRTL ? 'right' : 'left'} text-xs font-medium uppercase tracking-wider ${
-                          theme === 'dark' ? 'text-gray-300' : 'text-gray-500'
-                        }`}>
-                          {t('actions')}
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className={`divide-y ${
-                      theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'
-                    }`}>
-                      {serialNumbers.map((serial) => (
-                        <tr key={serial.id} className={`hover:${
-                          theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'
-                        } transition-colors`}>
-                          <td className={`px-4 py-4 whitespace-nowrap font-mono text-lg font-bold ${
-                            theme === 'dark' ? 'text-white' : 'text-gray-900'
-                          }`}>
-                            {serial.serialNumber}
-                          </td>
-                          <td className="px-4 py-4 whitespace-nowrap">
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                              serial.isUsed
-                                ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
-                                : 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
-                            }`}>
-                              {serial.isUsed ? (
-                                <>
-                                  <XCircle className="w-3 h-3 mr-1" />
-                                  {t('used')}
-                                </>
-                              ) : (
-                                <>
-                                  <CheckCircle className="w-3 h-3 mr-1" />
-                                  {t('unused')}
-                                </>
-                              )}
-                            </span>
-                          </td>
-                          <td className={`px-4 py-4 whitespace-nowrap text-sm ${
-                            theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
-                          }`}>
-                            {new Date(serial.createdAt).toLocaleDateString()}
-                          </td>
-                          <td className="px-4 py-4 whitespace-nowrap">
-                            {!serial.isUsed && (
-                              <motion.button
-                                whileHover={{ scale: 1.1 }}
-                                whileTap={{ scale: 0.9 }}
-                                onClick={() => removeSerialNumber(serial.id)}
-                                className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </motion.button>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        </motion.div>
-      )}
     </div>
   );
 };
